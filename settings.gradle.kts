@@ -21,4 +21,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "WealthGrid"
 include(":app")
- 
+include(":data")
+include(":presentation")
+include(":domain")

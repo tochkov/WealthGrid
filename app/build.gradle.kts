@@ -6,14 +6,14 @@ plugins {
 
 android {
     namespace = "com.topdownedge.wealthgrid"
-    compileSdk = 35
+    compileSdk = rootProject.ext["compileSdk"] as Int
 
     defaultConfig {
         applicationId = "com.topdownedge.wealthgrid"
-        minSdk = 24
-        targetSdk = 34
+        minSdk = rootProject.ext["minSdk"] as Int
+        targetSdk = rootProject.ext["targetSdk"] as Int
         versionCode = 1
-        versionName = "1.0"
+        versionName = "0.0.1-Beta"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -49,6 +49,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

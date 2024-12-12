@@ -7,7 +7,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.jvm) apply false
 }
 
-// TODO - take a look at buildSrc and/or convention plugins
+// TODO - take a look at build-logic, buildSrc and/or convention plugins
 ext {
     set("compileSdk", 35)
     set("minSdk", 24)

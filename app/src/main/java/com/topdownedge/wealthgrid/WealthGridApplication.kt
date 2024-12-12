@@ -2,5 +2,5 @@ package com.topdownedge.wealthgrid
 
 import android.app.Application
 
-class WealthGridApp: Application() {
+class WealthGridApplication: Application() {
 }

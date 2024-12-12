@@ -6,22 +6,20 @@ import androidx.navigation.NavHostController
 
 fun <T : ScreenDestination> NavHostController.navigateClearingBackStack(destinationRoute: T) {
     this.navigate(destinationRoute) {
-        launchSingleTop = true
         popUpTo(this@navigateClearingBackStack.graph.id) {
             inclusive = true
         }
+        launchSingleTop = true
     }
 }
 
 fun <T : ScreenDestination> NavHostController.navigateSingleTopTo(destinationRoute: T) {
     this.navigate(destinationRoute) {
-        launchSingleTop = true
-        restoreState = true
-
         popUpTo(this@navigateSingleTopTo.graph.findStartDestination().id) {
             saveState = true
         }
-
+        launchSingleTop = true
+        restoreState = true
     }
 }
 

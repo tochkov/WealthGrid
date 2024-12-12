@@ -20,9 +20,11 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
+import androidx.compose.runtime.getValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.topdownedge.presentation.market.CompaniesListScreen
@@ -31,7 +33,7 @@ import com.topdownedge.presentation.news.NewsListScreen
 import com.topdownedge.presentation.portfolio.PortfolioScreen
 
 @Composable
-fun WealthGridHomeScreen() {
+internal fun WealthGridHomeScreen() {
 
     val navController = rememberNavController()
 
@@ -63,35 +65,22 @@ private enum class NavBarElement(
     val icon: ImageVector,
     val iconSelected: ImageVector
 ) {
-    Markets(
-        ScreenDestination.Markets,
-        "Markets",
-        Icons.Outlined.Home,
-        Icons.Filled.Home
-    ),
-    Portfolio(
-        ScreenDestination.Portfolio,
-        "Portfolio",
-        Icons.Outlined.AccountCircle,
-        Icons.Filled.AccountCircle
-    ),
-    News(
-        ScreenDestination.News,
-        "News",
-        Icons.Outlined.DateRange,
-        Icons.Filled.DateRange
-    )
+    Markets(ScreenDestination.MarketsGraph, "Markets", Icons.Outlined.Home, Icons.Filled.Home),
+    Portfolio(ScreenDestination.PortfolioGraph, "Portfolio", Icons.Outlined.AccountCircle, Icons.Filled.AccountCircle),
+    News(ScreenDestination.NewsGraph, "News", Icons.Outlined.DateRange, Icons.Filled.DateRange)
 }
 
 
 @SuppressLint("RestrictedApi") // - https://issuetracker.google.com/issues/372175033
 @Composable
-fun HomeBottomNavigationBar(
+private fun HomeBottomNavigationBar(
     navController: NavHostController
 ) {
-    val currentBackStackEntry = navController.currentBackStackEntryAsState().value
-    val currentDestination = currentBackStackEntry?.destination
+    val entry by navController.currentBackStackEntryAsState()
+    val currentDestination = entry?.destination
 
+//    https://developer.android.com/develop/ui/compose/navigation#bottom-nav
+//    TODO - check official and see why on back pressed loses state on tabs
 
     NavigationBar {
         NavBarElement.entries.forEachIndexed { index, item ->
@@ -116,34 +105,43 @@ fun HomeBottomNavigationBar(
 }
 
 @Composable
-internal fun HomeScreenNavHost(
+private fun HomeScreenNavHost(
     navController: NavHostController,
     modifier: Modifier,
 ) {
     NavHost(
         navController = navController,
-        startDestination = ScreenDestination.Markets,
+        startDestination = ScreenDestination.MarketsGraph,
         modifier = modifier
     ) {
-        composable<ScreenDestination.Markets> {
-            CompaniesListScreen()
+        navigation<ScreenDestination.MarketsGraph>(startDestination = ScreenDestination.Markets) {
+            composable<ScreenDestination.Markets> {
+                CompaniesListScreen()
+            }
         }
-        composable<ScreenDestination.Portfolio> {
-            PortfolioScreen()
+
+        navigation<ScreenDestination.PortfolioGraph>(startDestination = ScreenDestination.Portfolio) {
+            composable<ScreenDestination.Portfolio> {
+                PortfolioScreen()
+            }
         }
-        composable<ScreenDestination.News> {
+
+        navigation<ScreenDestination.NewsGraph>(startDestination = ScreenDestination.News) {
+            composable<ScreenDestination.News> {
+                // TODO - back press + nav bar issue potential fix starts with something like this probably:
 //            BackHandler {
 //                navController.navigateSingleTopTo(ScreenDestination.Markets)
 //            }
-            NewsListScreen(
-                onListItemClick = { newsId ->
-                    navController.navigateDeeperTo(ScreenDestination.SingleNews(newsId))
-                }
-            )
-        }
-        composable<ScreenDestination.SingleNews> { backstackEntry ->
-            val singleNews: ScreenDestination.SingleNews = backstackEntry.toRoute()
-            NewsDetailsScreen(singleNews.newsId)
+                NewsListScreen(
+                    onListItemClick = { newsId ->
+                        navController.navigateDeeperTo(ScreenDestination.SingleNews(newsId))
+                    }
+                )
+            }
+            composable<ScreenDestination.SingleNews> { backstackEntry ->
+                val singleNews: ScreenDestination.SingleNews = backstackEntry.toRoute()
+                NewsDetailsScreen(singleNews.newsId)
+            }
         }
     }
 

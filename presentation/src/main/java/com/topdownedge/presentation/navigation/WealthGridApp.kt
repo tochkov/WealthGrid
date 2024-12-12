@@ -11,7 +11,7 @@ import com.topdownedge.presentation.welcome.WelcomeScreen2
 fun WealthGridApp() {
 
     val navController = rememberNavController()
-    val isLoggedIn = true
+    val isLoggedIn = false
 
     NavHost(
         navController = navController,

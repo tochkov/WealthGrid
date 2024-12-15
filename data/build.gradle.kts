@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.hilt)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.ktorfit)
 }
 
 android {
@@ -52,6 +54,9 @@ dependencies {
     // DI
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
+
+    // Networking
+    implementation(libs.ktorfit.lib)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

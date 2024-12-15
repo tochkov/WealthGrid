@@ -89,7 +89,7 @@ internal fun WelcomeScreen(
                 if (inputValue.isBlank()) {
                     toastNoToken.show()
                 } else {
-                    viewModel.saveApiToken(inputValue)
+                    viewModel.saveApiToken(inputValue.trim())
                     onSuccessfulClickNext()
                 }
             },

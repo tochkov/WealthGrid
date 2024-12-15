@@ -7,6 +7,8 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.jvm) apply false
     alias(libs.plugins.kotlin.kapt) apply false
     alias(libs.plugins.hilt) apply false
+    alias(libs.plugins.ksp) apply false
+    alias(libs.plugins.ktorfit) apply false
 }
 
 // TODO - take a look at build-logic, buildSrc and/or convention plugins

@@ -1,0 +1,8 @@
+<resources>
+<!--    <string name="app_name">WealthGrid</string>-->
+    <string name="welcome_title">Enter API token</string>
+    <string name="welcome_subtitle">You can obtain one from\t</string>
+    <string name="welcome_subtitle_hyperlink">eodhd.com</string>
+    <string name="toast_no_token">Please provide API token</string>
+    <string name="button_next">Next</string>
+</resources>

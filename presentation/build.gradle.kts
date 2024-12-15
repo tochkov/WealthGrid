@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.hilt)
 }
 
 android {
@@ -37,6 +39,17 @@ android {
     }
 }
 
+
+kapt {
+    // produce more accurate error messages
+    correctErrorTypes = true
+    arguments {
+        // skip some validation steps during initialization
+        arg("dagger.fastInit", "true")
+    }
+}
+
+
 dependencies {
 
     implementation(project(":domain"))
@@ -53,6 +66,11 @@ dependencies {
 
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
+
+    // DI
+    implementation(libs.hilt.android)
+    implementation(libs.hilt.navigation.compose)
+    kapt(libs.hilt.compiler)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

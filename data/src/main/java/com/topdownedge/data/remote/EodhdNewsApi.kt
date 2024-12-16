@@ -1,6 +1,7 @@
 package com.topdownedge.data.remote
 
 import com.topdownedge.data.remote.dto.NewsArticleDto
+import de.jensklingenberg.ktorfit.Response
 import de.jensklingenberg.ktorfit.http.GET
 import de.jensklingenberg.ktorfit.http.Query
 
@@ -28,14 +29,14 @@ interface EodhdNewsApi {
      * @param toDate Optional end date for news articles (format: YYYY-MM-DD)
      * @return List of news articles related to the specified ticker
      */
-    @GET("api/news")
+    @GET("news")
     suspend fun getNewsForSymbol(
         @Query("s") symbol: String,
         @Query("limit") limit: Int? = null,
         @Query("offset") offset: Int? = null,
         @Query("from") fromDate: String? = null,
         @Query("to") toDate: String? = null
-    ): List<NewsArticleDto>
+    ): Response<List<NewsArticleDto>>
 
     /**
      * Fetches news articles for a specific topic.
@@ -47,14 +48,14 @@ interface EodhdNewsApi {
      * @param toDate Optional end date for news articles (format: YYYY-MM-DD)
      * @return List of news articles related to the specified topic
      */
-    @GET("api/news")
+    @GET("news")
     suspend fun getNewsForTopic(
         @Query("t") topic: String,
         @Query("limit") limit: Int? = null,
         @Query("offset") offset: Int? = null,
         @Query("from") fromDate: String? = null,
         @Query("to") toDate: String? = null
-    ): List<NewsArticleDto>
+    ): Response<List<NewsArticleDto>>
 
     companion object {
         /**

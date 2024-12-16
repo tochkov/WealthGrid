@@ -12,14 +12,14 @@ class TokenRepositoryImpl @Inject constructor(
     private val KEY_PREFERENCES = "wg_prefs"
     private val KEY_TOKEN = "key_api_token"
 
-    private var token: String? = null
+    private var token: String = ""
 
     override fun hasApiToken(): Boolean {
-        return !getApiToken().isNullOrEmpty()
+        return getApiToken().isNotEmpty()
     }
 
-    override fun getApiToken(): String? {
-        if (token.isNullOrEmpty()) {
+    override fun getApiToken(): String {
+        if (token.isEmpty()) {
             token = loadToken()
         }
         return token
@@ -36,9 +36,9 @@ class TokenRepositoryImpl @Inject constructor(
         setApiToken("")
     }
 
-    private fun loadToken(): String? {
+    private fun loadToken(): String {
         return context.getSharedPreferences(KEY_PREFERENCES, Context.MODE_PRIVATE)
-            .getString(KEY_TOKEN, null)
+            .getString(KEY_TOKEN, "")!!
     }
 
 

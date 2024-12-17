@@ -1,6 +1,8 @@
 package com.topdownedge.data.remote.dto
 
+import com.topdownedge.domain.entities.NewsArticle
 import kotlinx.serialization.Serializable
+import java.net.URL
 
 /**
  * Data transfer object representing a news article from the EODHD API
@@ -25,4 +27,14 @@ data class SentimentDto(
     val neg: Double,
     val neu: Double,
     val pos: Double
+)
+
+fun NewsArticleDto.toNewsArticle() = NewsArticle(
+    date = date,
+    title = title,
+    content = content,
+    url = link,
+    source = runCatching { URL(link).host }.getOrDefault(""),
+    symbols = symbols,
+    tags = tags
 )

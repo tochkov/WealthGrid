@@ -1,65 +1,35 @@
 package com.topdownedge.data.repositories
 
 import com.topdownedge.data.remote.EodhdNewsApi
+import com.topdownedge.data.remote.dto.NewsArticleDto
+import com.topdownedge.data.remote.dto.toNewsArticle
+import com.topdownedge.data.remote.ktorRequestToResult
+import com.topdownedge.domain.Resource
+import com.topdownedge.domain.entities.NewsArticle
 import com.topdownedge.domain.repositories.NewsRepository
-import de.jensklingenberg.ktorfit.Response
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class NewsRepositoryImpl
 @Inject constructor(private val newsApi: EodhdNewsApi) : NewsRepository {
 
 
-    init {
+    override fun getNews(): Flow<Resource<List<NewsArticle>?>> {
 
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val newsResponse = newsApi.getNewsForSymbol(symbol = "AAPL.US")
-//                val newsResponse = newsApi.getNewsForTopic(topic = "class action")
-                val ss = newsResponse.toApiResult()
-                println("XXXX ${newsResponse.body()?.size ?: -1}")
-                when (newsResponse.code) {
-                    in 200..299 -> {
-                        newsResponse.body()?.forEach {
-//                            println("XXXX ${it.title}")
-                        }
-                    }
+        return flow {
 
-                    404 -> {
-                        println("XXXX 404}")
-                    }
+            emit(Resource.loading(true))
 
-                    in 400..499 -> {
-                        println("XXXX 499")
-                    }
-
-                    in 500..599 -> {
-
-                    }
-
-                    else -> {
-                        println("XXXX else")
-                    }
-                }
-            } catch (e: Exception) {
-                println("XXXX ${e}")
-                e.printStackTrace()
-            }
+            val newsResultDtos: Resource<List<NewsArticleDto>?> =
+//                ktorRequestToResult { newsApi.getNewsForSymbol("AAPL.US") }
+                ktorRequestToResult { newsApi.getNewsForTopic("european regulatory news") }
+            val newsResult: Resource<List<NewsArticle>?> =
+                newsResultDtos.mapTo { it?.map { it.toNewsArticle() } }
+            emit(newsResult)
+            emit(Resource.loading(false))
         }
-
     }
 
-
 }
 
-sealed class ApiResult<V>(val data: V) {
-    class Success<V>(data: V) : ApiResult<V>(data)
-    class Loading()
-    class Error()
-}
-
-fun <T> Response<T>.toApiResult(): ApiResult<T> {
-    return ApiResult.Success(this.body()!!)
-}

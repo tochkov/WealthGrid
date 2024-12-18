@@ -1,10 +1,8 @@
 package com.topdownedge.data.repositories
 
 import com.topdownedge.data.remote.EodhdNewsApi
-import com.topdownedge.data.remote.dto.NewsArticleDto
 import com.topdownedge.data.remote.dto.toNewsArticle
-import com.topdownedge.data.remote.ktorRequestToResult
-import com.topdownedge.domain.Resource
+import com.topdownedge.data.remote.safeApiCall
 import com.topdownedge.domain.entities.NewsArticle
 import com.topdownedge.domain.repositories.NewsRepository
 import kotlinx.coroutines.flow.Flow
@@ -15,19 +13,18 @@ class NewsRepositoryImpl
 @Inject constructor(private val newsApi: EodhdNewsApi) : NewsRepository {
 
 
-    override fun getNews(): Flow<Resource<List<NewsArticle>?>> {
+    override fun getNews(): Flow<Result<List<NewsArticle>?>> {
 
         return flow {
 
-            emit(Resource.loading(true))
-
-            val newsResultDtos: Resource<List<NewsArticleDto>?> =
-//                ktorRequestToResult { newsApi.getNewsForSymbol("AAPL.US") }
-                ktorRequestToResult { newsApi.getNewsForTopic("european regulatory news") }
-            val newsResult: Resource<List<NewsArticle>?> =
-                newsResultDtos.mapTo { it?.map { it.toNewsArticle() } }
+            val newsResult =
+                safeApiCall {
+                    newsApi.getNewsForSymbol("SPY.US")
+//                    newsApi.getNewsForTopic("european regulatory news")
+                }.map {
+                    it?.map { it.toNewsArticle() }
+                }
             emit(newsResult)
-            emit(Resource.loading(false))
         }
     }
 

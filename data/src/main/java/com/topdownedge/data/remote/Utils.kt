@@ -1,33 +1,33 @@
 package com.topdownedge.data.remote
 
-import com.topdownedge.domain.Resource
 import de.jensklingenberg.ktorfit.Response
 import io.ktor.client.plugins.HttpRequestTimeoutException
+import kotlinx.io.IOException
 import java.net.SocketTimeoutException
 
 /**
  * Safely executes a Ktor request and handles common exceptions by wrapping the response
- * in a Resource object. Handles network timeouts and HTTP error codes.
+ * in a [Result] object. Handles network timeouts and HTTP error codes.
  *
  * @param T Type of expected response body
  * @param request Lambda that executes the Ktor request
- * @return [Resource] containing either successful response data or error details
+ * @return [Result] containing either successful response data or error details
  */
-suspend inline fun <T> ktorRequestToResult(request: suspend () -> Response<T>): Resource<T?> {
+suspend inline fun <T> safeApiCall(request: suspend () -> Response<T>): Result<T?> {
 
     return try {
         val response = request.invoke()
-        response.toResource()
+        response.toResult()
 
     } catch (e: SocketTimeoutException) {
         e.printStackTrace()
-        Resource.failure(message = "Socket Timeout")
+        Result.failure(IOException("Socket Timeout", e))
     } catch (e: HttpRequestTimeoutException) {
         e.printStackTrace()
-        Resource.failure(message = "Http Timeout")
+        Result.failure(IOException("Http Request Timeout", e))
     } catch (e: Exception) {
         e.printStackTrace()
-        Resource.failure(e)
+        Result.failure(IOException("Unknown Error", e))
     }
 }
 
@@ -36,22 +36,24 @@ suspend inline fun <T> ktorRequestToResult(request: suspend () -> Response<T>): 
  * Success for 2xx, appropriate failure messages for client (4xx) and server (5xx) errors.
  *
  * @param T Type of response body
- * @return [Resource] mapped from HTTP response status and body
+ * @return [Result] mapped from HTTP response status and body
  */
-fun <T> Response<T>.toResource(): Resource<T?> {
+fun <T> Response<T>.toResult(): Result<T?> {
+
+
     return when (this.code) {
 
-        in 200..299 -> Resource.success(this.body())
+        in 200..299 -> Result.success(this.body())
 
-        401 -> Resource.failure(message = "401 - Unauthorized")
-        403 -> Resource.failure(message = "403 - Forbidden")
-        404 -> Resource.failure(message = "404 - Not Found")
+        401 -> Result.failure(IOException("401 - Unauthorized"))
+        403 -> Result.failure(IOException("403 - Forbidden"))
+        404 -> Result.failure(IOException("404 - Not Found"))
 
-        in 400..499 -> Resource.failure(message = "$code - Client Error")
+        in 400..499 -> Result.failure(IOException("$code - Client Error"))
 
-        in 500..599 -> Resource.failure(message = "$code - Server Error")
+        in 500..599 -> Result.failure(IOException("$code - Server Error"))
 
-        else -> Resource.failure("$code - Unknown Network Error")
+        else -> Result.failure(IOException("$code - Unknown Network Error"))
     }
 }
 

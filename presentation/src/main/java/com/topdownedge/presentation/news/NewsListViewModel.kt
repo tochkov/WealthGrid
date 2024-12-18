@@ -1,15 +1,13 @@
 package com.topdownedge.presentation.news
 
-import android.R.attr.value
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.topdownedge.domain.Resource
 import com.topdownedge.domain.entities.NewsArticle
 import com.topdownedge.domain.repositories.NewsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -22,29 +20,46 @@ class NewsListViewModel
     // - https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://cnbc.com&size=64
     // - https://webutility.io/favicon-extractor
 
-    private val _newsState = MutableStateFlow<Resource<List<NewsArticle>?>>(Resource.Loading(true))
+        // maybe do this in a generic style UIState<T>
+    data class UIState(
+        var isLoading: Boolean = false,
+        var news: List<NewsArticle> = emptyList(),
+        var isError: Boolean = false,
+        var errorMassage: String = "error",
+    )
+
+    private val _newsState = MutableStateFlow(UIState(isLoading = true))
     val newsState = _newsState.asStateFlow()
+
+    init {
+        getNewzzz()
+    }
 
     fun getNewzzz() {
         viewModelScope.launch {
             newsRepository.getNews().collect { value ->
-                when (value) {
-                    is Resource.Success -> {
-                        _newsState.value = value
-                        Log.d("XXX", "VM Success: ${value.data?.size ?: -1}")
-                    }
-                    is Resource.Error -> {
-                        _newsState.value = value
-                        Log.d("XXX", "VM Err: ${value.message}")
-                    }
-                    is Resource.Loading -> {
-                        _newsState.value = value
 
-                        Log.d("XXX", "VM load: ${value.isLoading}")
+                if (value.isSuccess) {
+                    _newsState.update {
+                        it.copy(
+                            isLoading = false,
+                            news = value.getOrNull() ?: emptyList()
+                        )
+                    }
+                } else {
+                    _newsState.update {
+                        it.copy(
+                            isLoading = false,
+                            isError = true,
+                            errorMassage = value.exceptionOrNull()?.message ?: "error"
+                        )
                     }
                 }
+
             }
         }
+
+
     }
 
 }

@@ -5,7 +5,11 @@ import kotlinx.coroutines.flow.Flow
 
 interface NewsRepository {
 
-    fun getNews(): Flow<Result<List<NewsArticle>?>>
+    fun getGeneralNews(page: Int): Flow<Result<List<NewsArticle>?>>
+
+    fun getNewsForTicker(ticker: String, page: Int): Flow<Result<List<NewsArticle>?>>
+
+    fun getNewsForTopic(topic: String, page: Int): Flow<Result<List<NewsArticle>?>>
 
 
 }

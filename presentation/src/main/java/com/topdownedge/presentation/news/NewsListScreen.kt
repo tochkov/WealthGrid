@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -36,27 +37,39 @@ internal fun NewsListScreen(
     LazyColumn(
         modifier = Modifier.fillMaxSize()
     ) {
-
-        if (state.isLoading) {
-            item {
+        items(state.news.size) { position ->
+            //TODO think of how to refactor this. Side effect
+            // TODO - add preloading threshold
+            if (position >= state.news.size - 1 && state.hasMoreToLoad && !state.isLoading) {
+                viewModel.loadNextPage()
+            }
+            NewsItemCard2(newsArticle = state.news[position])
+        }
+        item {
+            if (state.isError) {
+                Column(
+                    modifier = Modifier.fillMaxSize().padding(8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text( text = state.errorMassage)
+                    Button(
+                        onClick = {
+                            viewModel.loadNextPage()
+                        }
+                    ) {
+                        Text(text = "Retry")
+                    }
+                }
+            }
+        }
+        item {
+            if (state.isLoading) {
                 Box(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.fillMaxSize().padding(8.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator()
                 }
-            }
-        } else if (state.isError) {
-            item {
-                Text(
-                    modifier = Modifier.fillMaxSize(),
-                    text = state.errorMassage,
-                    fontSize = 32.sp
-                )
-            }
-        } else {
-            items(state.news.size) { position ->
-                NewsItemCard2(newsArticle = state.news[position])
             }
         }
     }

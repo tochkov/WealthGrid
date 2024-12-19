@@ -20,46 +20,60 @@ class NewsListViewModel
     // - https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://cnbc.com&size=64
     // - https://webutility.io/favicon-extractor
 
-        // maybe do this in a generic style UIState<T>
+    // maybe do this in a generic style UIState<T>
     data class UIState(
-        var isLoading: Boolean = false,
         var news: List<NewsArticle> = emptyList(),
+        var isLoading: Boolean = false,
+        var hasMoreToLoad: Boolean = true,
         var isError: Boolean = false,
         var errorMassage: String = "error",
     )
 
+    var ticker = "AAPL.US"
+
+    // TODO why do I need stateFLow not just state after the pagination implementation?
     private val _newsState = MutableStateFlow(UIState(isLoading = true))
     val newsState = _newsState.asStateFlow()
 
-    init {
-        getNewzzz()
-    }
+    private val paginator: FlowPaginator<NewsArticle> = FlowPaginator<NewsArticle>(
+        requestPage = { page ->
+            newsRepository.getGeneralNews(page)
+//            newsRepository.getNewsForTicker(ticker, page)
+        },
+        onLoadingUpdated = { isLoading ->
+            _newsState.update {
+                it.copy(isLoading = isLoading)
+            }
+        },
+        onSuccess = { items ->
+            _newsState.update {
+                it.copy(
+//                    news = (it.news + items).distinctBy { article -> article.url }
+                    news = it.news + items,
+                    hasMoreToLoad = items.isNotEmpty(),
+                    isError = false
 
-    fun getNewzzz() {
-        viewModelScope.launch {
-            newsRepository.getNews().collect { value ->
-
-                if (value.isSuccess) {
-                    _newsState.update {
-                        it.copy(
-                            isLoading = false,
-                            news = value.getOrNull() ?: emptyList()
-                        )
-                    }
-                } else {
-                    _newsState.update {
-                        it.copy(
-                            isLoading = false,
-                            isError = true,
-                            errorMassage = value.exceptionOrNull()?.message ?: "error"
-                        )
-                    }
-                }
-
+                )
+            }
+        },
+        onFailure = { e ->
+            _newsState.update {
+                it.copy(
+                    isError = true,
+                    errorMassage = e?.message ?: "error"
+                )
             }
         }
+    )
 
+    init {
+        loadNextPage()
+    }
 
+    fun loadNextPage() {
+        viewModelScope.launch {
+            paginator.loadNextPage()
+        }
     }
 
 }

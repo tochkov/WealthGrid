@@ -57,7 +57,27 @@ interface EodhdNewsApi {
         @Query("to") toDate: String? = null
     ): Response<List<NewsArticleDto>>
 
+    /**
+     * Fetches general news articles.
+     *
+     * @param limit Optional number of results to return (1-1000, default: 50)
+     * @param offset Optional offset for pagination (min: 0, default: 0)
+     * @param fromDate Optional start date for news articles (format: YYYY-MM-DD)
+     * @param toDate Optional end date for news articles (format: YYYY-MM-DD)
+     * @return List of news articles
+     */
+    @GET("news")
+    suspend fun getGeneralNews(
+        @Query("limit") limit: Int? = null,
+        @Query("offset") offset: Int? = null,
+        @Query("from") fromDate: String? = null,
+        @Query("to") toDate: String? = null
+    ): Response<List<NewsArticleDto>>
+
     companion object {
+
+        const val ITEMS_PER_PAGE = 20
+
         /**
          * List of supported topics for the getNewsForTopic endpoint.
          * These topics can be used to filter news articles by specific financial themes.

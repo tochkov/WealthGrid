@@ -12,15 +12,53 @@ import javax.inject.Inject
 class NewsRepositoryImpl
 @Inject constructor(private val newsApi: EodhdNewsApi) : NewsRepository {
 
-
-    override fun getNews(): Flow<Result<List<NewsArticle>?>> {
+    override fun getGeneralNews(page: Int): Flow<Result<List<NewsArticle>?>> {
 
         return flow {
-
             val newsResult =
                 safeApiCall {
-                    newsApi.getNewsForSymbol("SPY.US")
-//                    newsApi.getNewsForTopic("european regulatory news")
+                    newsApi.getGeneralNews(
+                        EodhdNewsApi.ITEMS_PER_PAGE,
+                        page * EodhdNewsApi.ITEMS_PER_PAGE
+                    )
+                }.map {
+                    it?.map { it.toNewsArticle() }
+                }
+            emit(newsResult)
+        }
+    }
+
+
+    override fun getNewsForTicker(ticker: String, page: Int): Flow<Result<List<NewsArticle>?>> {
+
+        return flow {
+            val newsResult =
+                safeApiCall {
+                    newsApi.getNewsForSymbol(
+                        ticker,
+                        EodhdNewsApi.ITEMS_PER_PAGE,
+                        page * EodhdNewsApi.ITEMS_PER_PAGE
+                    )
+                }.map {
+                    it?.map { it.toNewsArticle() }
+                }
+            emit(newsResult)
+        }
+    }
+
+    override fun getNewsForTopic(
+        topic: String,
+        page: Int
+    ): Flow<Result<List<NewsArticle>?>> {
+
+        return flow {
+            val newsResult =
+                safeApiCall {
+                    newsApi.getNewsForTopic(
+                        topic,
+                        EodhdNewsApi.ITEMS_PER_PAGE,
+                        page * EodhdNewsApi.ITEMS_PER_PAGE
+                    )
                 }.map {
                     it?.map { it.toNewsArticle() }
                 }

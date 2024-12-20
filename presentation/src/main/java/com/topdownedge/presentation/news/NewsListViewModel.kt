@@ -5,11 +5,20 @@ import androidx.lifecycle.viewModelScope
 import com.topdownedge.domain.entities.NewsArticle
 import com.topdownedge.domain.repositories.NewsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+data class UIState(
+    var news: List<NewsArticle> = emptyList(),
+    var isLoading: Boolean = false,
+    var hasMoreToLoad: Boolean = true,
+    var isError: Boolean = false,
+    var errorMassage: String = "error",
+)
 
 @HiltViewModel
 class NewsListViewModel
@@ -20,33 +29,23 @@ class NewsListViewModel
     // - https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://cnbc.com&size=64
     // - https://webutility.io/favicon-extractor
 
-    // maybe do this in a generic style UIState<T>
-    data class UIState(
-        var news: List<NewsArticle> = emptyList(),
-        var isLoading: Boolean = false,
-        var hasMoreToLoad: Boolean = true,
-        var isError: Boolean = false,
-        var errorMassage: String = "error",
-    )
-
     var ticker = "AAPL.US"
 
-    // TODO why do I need stateFLow not just state after the pagination implementation?
-    private val _newsState = MutableStateFlow(UIState(isLoading = true))
-    val newsState = _newsState.asStateFlow()
+    val newsState: StateFlow<UIState>
+        field = MutableStateFlow(UIState())
 
-    private val paginator: FlowPaginator<NewsArticle> = FlowPaginator<NewsArticle>(
+    private val paginator: JustPaginator<NewsArticle> = JustPaginator<NewsArticle>(
         requestPage = { page ->
             newsRepository.getGeneralNews(page)
 //            newsRepository.getNewsForTicker(ticker, page)
         },
         onLoadingUpdated = { isLoading ->
-            _newsState.update {
+            newsState.update {
                 it.copy(isLoading = isLoading)
             }
         },
         onSuccess = { items ->
-            _newsState.update {
+            newsState.update {
                 it.copy(
 //                    news = (it.news + items).distinctBy { article -> article.url }
                     news = it.news + items,
@@ -57,7 +56,7 @@ class NewsListViewModel
             }
         },
         onFailure = { e ->
-            _newsState.update {
+            newsState.update {
                 it.copy(
                     isError = true,
                     errorMassage = e?.message ?: "error"
@@ -70,10 +69,17 @@ class NewsListViewModel
         loadNextPage()
     }
 
+    //    private var fetchJob: Job? = null
+    //        fetchJob?.cancel()
+//    fetchJob = viewModelScope.launch
     fun loadNextPage() {
         viewModelScope.launch {
             paginator.loadNextPage()
         }
+    }
+
+    fun onCategoryClick() {
+
     }
 
 }

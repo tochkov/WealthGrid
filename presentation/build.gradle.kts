@@ -39,6 +39,11 @@ android {
     }
 }
 
+kotlin {
+    sourceSets.all {
+        languageSettings.enableLanguageFeature("ExplicitBackingFields")
+    }
+}
 
 kapt {
     // produce more accurate error messages

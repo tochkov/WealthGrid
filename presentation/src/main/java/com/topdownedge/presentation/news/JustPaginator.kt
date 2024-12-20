@@ -1,9 +1,7 @@
 package com.topdownedge.presentation.news
 
-import kotlinx.coroutines.flow.Flow
-
 /**
- * Handles paginated data loading using Kotlin Flow.
+ * Handles paginated data loading.
  *
  * @param Item The type of items being paginated
  * @property requestPage Function that loads a page of items
@@ -12,15 +10,16 @@ import kotlinx.coroutines.flow.Flow
  * @property onFailure Callback for loading failures
  * @property initialPage Starting page number
  */
-class FlowPaginator<Item>(
-    private val requestPage: (pageToLoad: Int) -> Flow<Result<List<Item>?>>,
+class JustPaginator<Item>(
+    private val requestPage: suspend (pageToLoad: Int) -> Result<List<Item>?>,
     private val onLoadingUpdated: (isLoading: Boolean) -> Unit,
     private val onSuccess: (items: List<Item>) -> Unit,
     private val onFailure: (e: Throwable?) -> Unit,
     private val initialPage: Int = 0
 ) {
 
-    private var currentPage = initialPage
+    var currentPage = initialPage
+        private set
     private var isLoading = false
 
     /**
@@ -36,17 +35,15 @@ class FlowPaginator<Item>(
 
         val result = requestPage(currentPage)
 
-        result.collect {
-            it.onSuccess { items ->
-                onSuccess(items ?: emptyList())
-                isLoading = false
-                onLoadingUpdated(false)
-                currentPage++
-            }.onFailure {
-                onFailure(it)
-                isLoading = false
-                onLoadingUpdated(false)
-            }
+        if (result.isSuccess) {
+            onSuccess(result.getOrNull() ?: emptyList())
+            isLoading = false
+            onLoadingUpdated(false)
+            currentPage++
+        } else {
+            onFailure(result.exceptionOrNull())
+            isLoading = false
+            onLoadingUpdated(false)
         }
     }
 

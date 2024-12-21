@@ -4,6 +4,7 @@ import de.jensklingenberg.ktorfit.Response
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import kotlinx.io.IOException
 import java.net.SocketTimeoutException
+import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * Safely executes a Ktor request and handles common exceptions by wrapping the response
@@ -25,6 +26,9 @@ suspend inline fun <T> safeApiCall(request: suspend () -> Response<T>): Result<T
     } catch (e: HttpRequestTimeoutException) {
         e.printStackTrace()
         Result.failure(IOException("Http Request Timeout", e))
+    } catch (e: CancellationException) {
+        e.printStackTrace()
+        Result.failure(e)
     } catch (e: Exception) {
         e.printStackTrace()
         Result.failure(IOException("Unknown Error", e))

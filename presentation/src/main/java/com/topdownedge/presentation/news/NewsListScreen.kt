@@ -1,6 +1,5 @@
 package com.topdownedge.presentation.news
 
-import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -9,19 +8,24 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -29,74 +33,100 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.topdownedge.domain.entities.NewsArticle
+import com.topdownedge.domain.entities.NewsCategory
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun NewsListScreen(
     onListItemClick: (String) -> Unit = {}
 ) {
     val viewModel: NewsListViewModel = hiltViewModel()
-    val state = viewModel.newsState.collectAsStateWithLifecycle().value
+    val uiState = viewModel.newsState.collectAsStateWithLifecycle().value
+    val scrollState = rememberLazyListState()
+    val PRELOAD_TRESHOLD = 5
 
-    LazyColumn(
-        modifier = Modifier.fillMaxSize()
+    PullToRefreshBox(
+        isRefreshing = uiState.isRefreshing,
+        onRefresh = { viewModel.refreshCategory() }
     ) {
-        item{
-            LazyRow(
-                modifier = Modifier.padding(top = 8.dp),
-                contentPadding = PaddingValues(horizontal = 8.dp)
-            ) {
-                val categories = mutableListOf("General", "Portfolio", "AAPL", "TSLA", "NVDA", "MSFT", "AMD", "AVGO", "ASTS", "BABA", "FXI")
-                items(categories.size){ i ->
-                    Button(
-                        onClick = {
-                            viewModel.onCategoryClick()
-                        },
-                        modifier = Modifier.padding(4.dp)
-                    ) {
-                        Text(modifier = Modifier.padding(4.dp),
-                            text = categories[i])
-                    }
-                }
-            }
-        }
-
-        items(state.news.size) { position ->
-            //TODO think of how to refactor this. Side effect;
-            // TODO - add preloading threshold
-            // LaunchedEffect() { }
-            if (position >= state.news.size - 1 && state.hasMoreToLoad && !state.isLoading) {
-                viewModel.loadNextPage()
-            }
-            NewsItemCard2(newsArticle = state.news[position])
-        }
-
-        item {
-            if (state.isError) {
-                Column(
-                    modifier = Modifier.fillMaxSize().padding(8.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+        LazyColumn(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            item {
+                LazyRow(
+                    modifier = Modifier.padding(top = 8.dp),
+                    contentPadding = PaddingValues(horizontal = 8.dp)
                 ) {
-                    Text( text = state.errorMassage)
-                    Button(
-                        onClick = {
-                            viewModel.loadNextPage()
+                    val categories = mutableListOf(
+                        NewsCategory.General,
+                        NewsCategory.Ticker("AAPL"),
+                        NewsCategory.Topic("zacks rank")
+                    )
+                    items(categories.size) { i ->
+                        val isSelected = categories[i] == uiState.selectedCategory
+                        Button(
+                            onClick = {
+                                viewModel.onCategoryChange(categories[i])
+                            },
+                            modifier = Modifier.padding(4.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if (isSelected) Color.DarkGray else Color.LightGray
+                            )
+                        ) {
+                            Text(
+                                modifier = Modifier.padding(4.dp),
+                                text = categories[i].title
+                            )
                         }
+                    }
+                }
+            }
+
+            items(uiState.news.size) { position ->
+                LaunchedEffect(scrollState) {
+                    if (position >= uiState.news.size - 1 - PRELOAD_TRESHOLD
+                        && uiState.hasMoreToLoad
+                        && !uiState.isLoading
                     ) {
-                        Text(text = "Retry")
+                        viewModel.loadNextPage()
+                    }
+                }
+                NewsItemCard2(newsArticle = uiState.news[position])
+            }
+
+            item {
+                if (uiState.paginationError) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(8.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(text = uiState.errorMassage)
+                        Button(
+                            onClick = {
+                                viewModel.loadNextPage()
+                            }
+                        ) {
+                            Text(text = "Retry")
+                        }
+                    }
+                }
+            }
+            item {
+                if (uiState.isLoading) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(8.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
                     }
                 }
             }
         }
-        item {
-            if (state.isLoading) {
-                Box(
-                    modifier = Modifier.fillMaxSize().padding(8.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
-            }
-        }
+
     }
 }
 

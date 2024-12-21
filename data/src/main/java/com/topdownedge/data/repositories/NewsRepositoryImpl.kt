@@ -4,13 +4,23 @@ import com.topdownedge.data.remote.EodhdNewsApi
 import com.topdownedge.data.remote.dto.toNewsArticle
 import com.topdownedge.data.remote.safeApiCall
 import com.topdownedge.domain.entities.NewsArticle
+import com.topdownedge.domain.entities.NewsCategory
 import com.topdownedge.domain.repositories.NewsRepository
 import javax.inject.Inject
 
 class NewsRepositoryImpl
 @Inject constructor(private val newsApi: EodhdNewsApi) : NewsRepository {
 
-    // TODO Consider how to cancel calls if user taps on different tab (General, AAPL, etc) while news is loading
+    override suspend fun getNews(
+        category: NewsCategory,
+        page: Int
+    ): Result<List<NewsArticle>?> {
+        return when(category){
+            is NewsCategory.General -> getGeneralNews(page)
+            is NewsCategory.Ticker -> getNewsForTicker(category.ticker, page)
+            is NewsCategory.Topic -> getNewsForTopic(category.topic, page)
+        }
+    }
 
     override suspend fun getGeneralNews(page: Int): Result<List<NewsArticle>?> {
         return safeApiCall {

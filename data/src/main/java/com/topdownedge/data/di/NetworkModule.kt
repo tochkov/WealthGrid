@@ -1,6 +1,7 @@
 package com.topdownedge.data.di
 
 
+import com.topdownedge.data.BuildConfig
 import com.topdownedge.data.remote.EodhdNewsApi
 import com.topdownedge.data.remote.createEodhdNewsApi
 import com.topdownedge.domain.repositories.TokenRepository
@@ -29,17 +30,11 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
-    @Provides
-    @Singleton
-    @Named("base_eodhd_url")
-    fun provideBaseUrl(): String {
-        //TODO move this in build config
-        return "https://eodhd.com/api/"
-    }
 
     @Provides
     @Singleton
-    fun provideKtorfit(@Named("base_eodhd_url") baseUrl: String, tokenManager: TokenRepository): Ktorfit {
+    @Named("ktorfit_eodhd")
+    fun provideKtorfit(tokenManager: TokenRepository): Ktorfit {
         return Ktorfit.Builder()
             //.baseUrl(baseUrl) // Cant add default parameter, when baseUrl set here
             .converterFactories(ResponseConverterFactory())
@@ -60,7 +55,7 @@ object NetworkModule {
                     }
                     defaultRequest {
                         url {
-                            takeFrom(baseUrl)
+                            takeFrom(BuildConfig.BASE_URL_EODHD)
                             parameters.append("api_token", tokenManager.getApiToken())
                         }
                     }
@@ -72,7 +67,7 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideEodhdNewsApi(ktorfit: Ktorfit): EodhdNewsApi {
+    fun provideEodhdNewsApi(@Named("ktorfit_eodhd") ktorfit: Ktorfit): EodhdNewsApi {
         return ktorfit.createEodhdNewsApi()
     }
 }

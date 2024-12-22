@@ -19,8 +19,17 @@ android {
         consumerProguardFiles("consumer-rules.pro")
     }
 
+    buildFeatures {
+        buildConfig = true
+    }
+    
     buildTypes {
+        debug {
+            buildConfigField("String", "BASE_URL_EODHD", "\"https://eodhd.com/api/\"")
+            isMinifyEnabled = false
+        }
         release {
+            buildConfigField("String", "BASE_URL_EODHD", "\"https://eodhd.com/api/\"")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),

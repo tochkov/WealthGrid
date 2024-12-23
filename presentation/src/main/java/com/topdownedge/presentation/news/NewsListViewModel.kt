@@ -20,7 +20,7 @@ data class NewsListUiState(
     var isRefreshing: Boolean = false,
     var hasMoreToLoad: Boolean = true,
     var paginationError: Boolean = false,
-    var errorMassage: String = "error",
+    var errorMassage: String = "",
     var selectedCategory: NewsCategory = NewsCategory.General,
 )
 
@@ -29,6 +29,8 @@ class NewsListViewModel
 @Inject constructor(private val newsRepository: NewsRepository) :
     ViewModel() {
 
+    val DEFAULT_ERROR_MESSAGE = "Error"
+
     // https://stackoverflow.com/questions/10282939/how-to-get-favicons-url-from-a-generic-webpage-in-javascript?answertab=scoredesc#tab-top
     // - https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://cnbc.com&size=64
     // - https://webutility.io/favicon-extractor
@@ -36,8 +38,9 @@ class NewsListViewModel
     val newsState: StateFlow<NewsListUiState>
         field = MutableStateFlow(NewsListUiState())
 
+    lateinit var currentPaginator: JustPaginator<NewsArticle>
+
     private var currentCategory: NewsCategory? = null
-    private lateinit var currentPaginator: JustPaginator<NewsArticle>
     private lateinit var currentNewsList: ArrayList<NewsArticle>
     private val categoriesMap =
         mutableMapOf<NewsCategory, Pair<JustPaginator<NewsArticle>, ArrayList<NewsArticle>>>()
@@ -113,7 +116,13 @@ class NewsListViewModel
             },
             onSuccessNextPage = { newItems ->
 
-                articleList.addAll(newItems)
+                // if new articles are produced between page loads -> filter to avoid duplicated items
+                articleList.addAll(newItems.filter { newItem ->
+                    articleList.none { existingItem ->
+                        existingItem.url == newItem.url &&
+                                existingItem.title == newItem.title
+                    }
+                })
 
                 newsState.update {
                     it.copy(
@@ -128,7 +137,7 @@ class NewsListViewModel
                     newsState.update {
                         it.copy(
                             paginationError = true,
-                            errorMassage = e?.message ?: it.errorMassage
+                            errorMassage = e?.message ?: DEFAULT_ERROR_MESSAGE
                         )
                     }
                 }
@@ -154,7 +163,7 @@ class NewsListViewModel
                     newsState.update {
                         it.copy(
                             paginationError = true,
-                            errorMassage = e?.message ?: it.errorMassage
+                            errorMassage = e?.message ?: DEFAULT_ERROR_MESSAGE
                         )
                     }
                 }

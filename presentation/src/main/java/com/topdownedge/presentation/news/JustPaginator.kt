@@ -25,7 +25,7 @@ class JustPaginator<Item>(
 ) {
 
 
-    var currentPage = initialPage
+    var pageToLoad = initialPage
         private set
     private var isLoading = false
     private var isRefreshing = false
@@ -41,13 +41,13 @@ class JustPaginator<Item>(
         isLoading = true
         onLoadingUpdated(true)
 
-        val result = requestPage(currentPage)
+        val result = requestPage(pageToLoad)
 
         if (result.isSuccess) {
             onSuccessNextPage(result.getOrNull() ?: emptyList())
             isLoading = false
             onLoadingUpdated(false)
-            currentPage++
+            pageToLoad++
         } else {
             onFailureNextPage(result.exceptionOrNull())
             isLoading = false
@@ -66,15 +66,15 @@ class JustPaginator<Item>(
         isRefreshing = true
         onRefreshingUpdated(true)
 
-        currentPage = initialPage
+        pageToLoad = initialPage
 
-        val result = requestPage(currentPage)
+        val result = requestPage(pageToLoad)
 
         if (result.isSuccess) {
             onSuccessRefresh(result.getOrNull() ?: emptyList())
             isRefreshing = false
             onRefreshingUpdated(false)
-            currentPage++
+            pageToLoad++
         } else {
             onFailureRefresh(result.exceptionOrNull())
             isRefreshing = false

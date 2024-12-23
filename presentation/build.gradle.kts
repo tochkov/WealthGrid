@@ -81,4 +81,13 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 //    debugImplementation(libs.ui.tooling)
+
+    testImplementation (libs.kotlinx.coroutines.test)
+    testImplementation(libs.hilt.android.testing)
+    kaptTest(libs.hilt.android.compiler)
+    testImplementation (libs.truth)
+
+    testImplementation(libs.mockk)
+//    testImplementation(libs.mockk.android)
+//    testImplementation(libs.mockk.agent)
 }

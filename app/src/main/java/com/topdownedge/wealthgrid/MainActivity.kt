@@ -6,7 +6,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.topdownedge.domain.repositories.TokenRepository
 import com.topdownedge.presentation.WealthGridApp
-import com.topdownedge.wealthgrid.ui.theme.WealthGridTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -20,9 +19,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            WealthGridTheme {
-                WealthGridApp(tokenManager.hasApiToken())
-            }
+            WealthGridApp(tokenManager.hasApiToken())
         }
     }
 }

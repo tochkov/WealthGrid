@@ -19,13 +19,13 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -70,12 +70,15 @@ internal fun NewsListScreen(
                             },
                             modifier = Modifier.padding(4.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = if (isSelected) Color.DarkGray else Color.LightGray
+                                containerColor = if (isSelected) MaterialTheme.colorScheme.inversePrimary
+                                else MaterialTheme.colorScheme.primaryContainer
                             )
                         ) {
                             Text(
                                 modifier = Modifier.padding(4.dp),
-                                text = categories[i].title
+                                text = categories[i].title,
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
                             )
                         }
                     }
@@ -150,10 +153,11 @@ fun NewsItemCard2(
 //                text = "NewsHeading Ashweaganda, Ashkolsun mashala Starwars The Gateman of the Galaxy",
                 text = newsArticle.title,
                 fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
+//                fontWeight = FontWeight.ExtraBold,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.padding(bottom = 8.dp)
+                modifier = Modifier.padding(bottom = 8.dp),
+                style = MaterialTheme.typography.titleLarge,
 
             )
             Text(

@@ -1,5 +1,6 @@
 package com.topdownedge.data.remote.dto
 
+import android.system.Os.link
 import com.topdownedge.domain.entities.NewsArticle
 import kotlinx.serialization.Serializable
 import java.net.URL
@@ -30,11 +31,24 @@ data class SentimentDto(
 )
 
 fun NewsArticleDto.toNewsArticle() = NewsArticle(
-    date = date,
+    date = getFormattedDate(date),
     title = title,
     content = content,
     url = link,
-    source = runCatching { URL(link).host }.getOrDefault(""),
+    source = getStrippedSource(url = link),
     symbols = symbols,
     tags = tags
 )
+
+fun getStrippedSource(url: String): String {
+    var source = runCatching { URL(url).host }.getOrDefault("")
+    if (source.startsWith("www.")) {
+        source = source.substring(4)
+    }
+    return source
+}
+
+//TODO - make this proper formatting
+fun getFormattedDate(date: String): String {
+    return date.split("T")[0]
+}

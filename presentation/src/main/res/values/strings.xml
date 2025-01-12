@@ -5,4 +5,8 @@
     <string name="welcome_subtitle_hyperlink">eodhd.com</string>
     <string name="toast_no_token">Please provide API token</string>
     <string name="button_next">Next</string>
+
+    <string name="home_tab_markets">Markets</string>
+    <string name="home_tab_portfolio">Portfolio</string>
+    <string name="home_tab_news">News</string>
 </resources>

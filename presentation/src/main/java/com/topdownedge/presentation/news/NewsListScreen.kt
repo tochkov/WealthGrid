@@ -38,7 +38,7 @@ import com.topdownedge.domain.entities.NewsCategory
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun NewsListScreen(
-    onListItemClick: (String) -> Unit = {}
+    onListItemClick: (NewsArticle) -> Unit = {}
 ) {
     val viewModel: NewsListViewModel = hiltViewModel()
     val uiState = viewModel.newsState.collectAsStateWithLifecycle().value
@@ -94,7 +94,9 @@ internal fun NewsListScreen(
                         viewModel.loadNextPage()
                     }
                 }
-                NewsItemCard2(newsArticle = uiState.news[position])
+                NewsItemCard2(
+                    newsArticle = uiState.news[position],
+                    onCardClick = { onListItemClick(uiState.news[position]) })
             }
 
             item {
@@ -137,11 +139,13 @@ internal fun NewsListScreen(
 @Composable
 fun NewsItemCard2(
     newsArticle: NewsArticle,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onCardClick: () -> Unit = {}
 ) {
     Card(
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        modifier = modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+        modifier = modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+        onClick = onCardClick
     ) {
         Column(
             modifier = modifier.padding(

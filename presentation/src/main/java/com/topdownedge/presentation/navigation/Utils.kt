@@ -1,5 +1,15 @@
 package com.topdownedge.presentation.navigation
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 
@@ -28,3 +38,25 @@ fun <T : ScreenDestination> NavHostController.navigateDeeperTo(destinationRoute:
         launchSingleTop = true
     }
 }
+
+val EnterFromBottomTransition: (@JvmSuppressWildcards AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition) =
+    {
+        slideInVertically(
+            initialOffsetY = { it }, // Bottom to top
+            animationSpec = tween(
+                durationMillis = 400,
+                easing = FastOutSlowInEasing
+            )
+        ) + fadeIn(animationSpec = tween(200))
+    }
+
+val ExitToBottomTransition: (@JvmSuppressWildcards AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition) =
+    {
+        slideOutVertically(
+            targetOffsetY = { it },
+            animationSpec = tween(
+                durationMillis = 400,
+                easing = FastOutSlowInEasing
+            )
+        )
+    }

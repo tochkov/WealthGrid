@@ -5,6 +5,7 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.AccountCircle
@@ -12,6 +13,7 @@ import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -30,24 +32,26 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.toRoute
 import com.topdownedge.presentation.market.CompaniesListScreen
-import com.topdownedge.presentation.news.NewsDetailsScreen
 import com.topdownedge.presentation.news.NewsListScreen
 import com.topdownedge.presentation.portfolio.PortfolioScreen
 
 import com.topdownedge.presentation.R
 
 @Composable
-internal fun WealthGridHomeScreen() {
+internal fun WealthGridHomeScreen(
+    onNavigateToScreen: (ScreenDestination) -> Unit = {}
+) {
 
     val navController = rememberNavController()
 
     Scaffold(
         topBar = {
-            HomeAppBar(navController = navController)
+            HomeAppBar(
+                navController = navController,
+                onNavigateToScreen = onNavigateToScreen
+            )
         },
         bottomBar = {
 //            https://claude.ai/chat/a7eca2c9-b2a6-49e2-b05c-7e4578ddf855
@@ -58,6 +62,7 @@ internal fun WealthGridHomeScreen() {
         HomeScreenNavHost(
             navController = navController,
             modifier = Modifier.padding(innerPadding),
+            onNavigateToScreen = onNavigateToScreen
         )
 
     }
@@ -70,9 +75,9 @@ private enum class NavBarElement(
     val icon: ImageVector,
     val iconSelected: ImageVector
 ) {
-    Markets(ScreenDestination.MarketsGraph, R.string.home_tab_markets, Icons.Outlined.Home, Icons.Filled.Home),
-    Portfolio(ScreenDestination.PortfolioGraph, R.string.home_tab_portfolio, Icons.Outlined.AccountCircle, Icons.Filled.AccountCircle),
-    News(ScreenDestination.NewsGraph, R.string.home_tab_news, Icons.Outlined.DateRange, Icons.Filled.DateRange)
+    Markets(ScreenDestination.Markets, R.string.home_tab_markets, Icons.Outlined.Home, Icons.Filled.Home),
+    Portfolio(ScreenDestination.Portfolio, R.string.home_tab_portfolio, Icons.Outlined.AccountCircle, Icons.Filled.AccountCircle),
+    News(ScreenDestination.News, R.string.home_tab_news, Icons.Outlined.DateRange, Icons.Filled.DateRange)
 }
 
 @SuppressLint("RestrictedApi") // - https://issuetracker.google.com/issues/372175033
@@ -80,9 +85,9 @@ private enum class NavBarElement(
 @Composable
 private fun HomeAppBar(
     navController: NavHostController,
+    onNavigateToScreen: (ScreenDestination) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-
     val entry by navController.currentBackStackEntryAsState()
     val currentDestination = entry?.destination
 
@@ -102,6 +107,25 @@ private fun HomeAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainer,  // Same as BottomNavigation
         ),
+        actions = {
+            val currentElement = NavBarElement.entries.firstOrNull { item ->
+                currentDestination?.hierarchy?.any {
+                    it.hasRoute(item.route::class)
+                } == true
+            }
+            if (currentElement == NavBarElement.Portfolio) {
+                IconButton(
+                    onClick = {
+                        onNavigateToScreen(ScreenDestination.TradeInitiation)
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Add,
+                        contentDescription = stringResource(currentElement.textResource)
+                    )
+                }
+            }
+        },
         modifier = modifier
     )
 }
@@ -143,42 +167,37 @@ private fun HomeBottomNavigationBar(
 @Composable
 private fun HomeScreenNavHost(
     navController: NavHostController,
+    onNavigateToScreen: (ScreenDestination) -> Unit = {},
     modifier: Modifier,
 ) {
     NavHost(
         navController = navController,
-        startDestination = ScreenDestination.MarketsGraph,
+        startDestination = ScreenDestination.Portfolio,
         modifier = modifier
     ) {
-        navigation<ScreenDestination.MarketsGraph>(startDestination = ScreenDestination.Markets) {
-            composable<ScreenDestination.Markets> {
-                CompaniesListScreen()
-            }
+        composable<ScreenDestination.Markets> {
+            CompaniesListScreen()
         }
-
-        navigation<ScreenDestination.PortfolioGraph>(startDestination = ScreenDestination.Portfolio) {
-            composable<ScreenDestination.Portfolio> {
-                PortfolioScreen()
-            }
+        composable<ScreenDestination.Portfolio> {
+            PortfolioScreen()
         }
-
-        navigation<ScreenDestination.NewsGraph>(startDestination = ScreenDestination.News) {
-            composable<ScreenDestination.News> {
-                // TODO - back press + nav bar issue potential fix starts with something like this probably:
+        composable<ScreenDestination.News> {
+            // TODO - back press + nav bar issue potential fix starts with something like this probably:
 //            BackHandler {
 //                navController.navigateSingleTopTo(ScreenDestination.Markets)
 //            }
-                NewsListScreen(
-                    onListItemClick = { newsId ->
-                        navController.navigateDeeperTo(ScreenDestination.SingleNews(newsId))
-                    }
-                )
-            }
-            composable<ScreenDestination.SingleNews> { backstackEntry ->
-                val singleNews: ScreenDestination.SingleNews = backstackEntry.toRoute()
-                NewsDetailsScreen(singleNews.newsId)
-            }
+            NewsListScreen(
+                onListItemClick = { newsArticle ->
+                    onNavigateToScreen(
+                        ScreenDestination.SingleNews(
+                            newsArticle.title,
+                            newsArticle.content
+                        )
+                    )
+                }
+            )
         }
+
     }
 
 }

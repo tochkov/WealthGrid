@@ -1,12 +1,24 @@
 package com.topdownedge.presentation
 
+import android.util.Log
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
+import com.topdownedge.presentation.navigation.EnterFromBottomTransition
+import com.topdownedge.presentation.navigation.ExitToBottomTransition
 import com.topdownedge.presentation.navigation.ScreenDestination
 import com.topdownedge.presentation.navigation.WealthGridHomeScreen
 import com.topdownedge.presentation.navigation.navigateClearingBackStack
+import com.topdownedge.presentation.navigation.navigateDeeperTo
+import com.topdownedge.presentation.navigation.navigateSingleTopTo
+import com.topdownedge.presentation.news.NewsDetailsScreen
+import com.topdownedge.presentation.news.NewsListScreen
+import com.topdownedge.presentation.portfolio.trade.InstrumentPickerScreen
+import com.topdownedge.presentation.portfolio.trade.TradeInitiationScreen
 import com.topdownedge.presentation.ui.theme.WealthGridTheme
 import com.topdownedge.presentation.welcome.WelcomeScreen
 
@@ -16,19 +28,69 @@ fun WealthGridApp(
 ) {
     val navController = rememberNavController()
     WealthGridTheme {
-        NavHost(
-            navController = navController,
-            startDestination = if (!hasApiToken) ScreenDestination.Welcome else ScreenDestination.WealthGridHome
-        ) {
-            composable<ScreenDestination.Welcome> {
-                WelcomeScreen(
-                    onSuccessfulClickNext = {
-                        navController.navigateClearingBackStack(ScreenDestination.WealthGridHome)
+        Surface {
+            NavHost(
+                navController = navController,
+                startDestination = if (!hasApiToken) ScreenDestination.Welcome else ScreenDestination.HomeScreen
+            ) {
+                composable<ScreenDestination.Welcome> {
+                    WelcomeScreen(
+                        onSuccessfulClickNext = {
+                            navController.navigateClearingBackStack(ScreenDestination.HomeScreen)
+                        }
+                    )
+                }
+
+                composable<ScreenDestination.HomeScreen> {
+                    WealthGridHomeScreen(
+                        onNavigateToScreen = { screen ->
+                            when (screen) {
+                                is ScreenDestination.SingleNews -> {
+                                    navController.navigateSingleTopTo(screen)
+                                }
+
+                                is ScreenDestination.TradeInitiation -> {
+                                    navController.navigateSingleTopTo(screen)
+                                }
+
+                                else -> {}
+                            }
+                        }
+                    )
+                }
+
+                composable<ScreenDestination.SingleNews>(
+                    enterTransition = EnterFromBottomTransition,
+                    exitTransition = ExitToBottomTransition
+                ) { backstackEntry ->
+                    val singleNews: ScreenDestination.SingleNews = backstackEntry.toRoute()
+                    NewsDetailsScreen(singleNews.newsTitle, singleNews.newsContent)
+                }
+
+                //TODO maybe extract this to new NavHost for the trade package
+                navigation<ScreenDestination.TradeGraph>(
+                    startDestination = ScreenDestination.TradeInitiation
+                ) {
+                    composable<ScreenDestination.TradeInitiation> {
+
+                        TradeInitiationScreen(
+                            navigateToInstrumentPicker = {
+                                navController.navigateDeeperTo(ScreenDestination.InstrumentPicker)
+                            }
+                        )
                     }
-                )
-            }
-            composable<ScreenDestination.WealthGridHome> {
-                WealthGridHomeScreen()
+                    composable<ScreenDestination.InstrumentPicker> { backstackEntry ->
+                        InstrumentPickerScreen()
+                    }
+                }
+
+
+//                composable<ScreenDestination.TradeInitiation>(
+//                    enterTransition = EnterFromBottomTransition,
+//                    exitTransition = ExitToBottomTransition
+//                ) {
+//                    TradeInitiationScreen()
+//                }
             }
         }
     }

@@ -13,12 +13,9 @@ import com.topdownedge.presentation.navigation.ExitToBottomTransition
 import com.topdownedge.presentation.navigation.ScreenDestination
 import com.topdownedge.presentation.navigation.WealthGridHomeScreen
 import com.topdownedge.presentation.navigation.navigateClearingBackStack
-import com.topdownedge.presentation.navigation.navigateDeeperTo
 import com.topdownedge.presentation.navigation.navigateSingleTopTo
 import com.topdownedge.presentation.news.NewsDetailsScreen
-import com.topdownedge.presentation.news.NewsListScreen
 import com.topdownedge.presentation.portfolio.trade.InstrumentPickerScreen
-import com.topdownedge.presentation.portfolio.trade.TradeInitiationScreen
 import com.topdownedge.presentation.ui.theme.WealthGridTheme
 import com.topdownedge.presentation.welcome.WelcomeScreen
 
@@ -49,7 +46,7 @@ fun WealthGridApp(
                                     navController.navigateSingleTopTo(screen)
                                 }
 
-                                is ScreenDestination.TradeInitiation -> {
+                                is ScreenDestination.InstrumentPicker -> {
                                     navController.navigateSingleTopTo(screen)
                                 }
 
@@ -67,30 +64,30 @@ fun WealthGridApp(
                     NewsDetailsScreen(singleNews.newsTitle, singleNews.newsContent)
                 }
 
-                //TODO maybe extract this to new NavHost for the trade package
-                navigation<ScreenDestination.TradeGraph>(
-                    startDestination = ScreenDestination.TradeInitiation
-                ) {
-                    composable<ScreenDestination.TradeInitiation> {
-
-                        TradeInitiationScreen(
-                            navigateToInstrumentPicker = {
-                                navController.navigateDeeperTo(ScreenDestination.InstrumentPicker)
-                            }
-                        )
-                    }
-                    composable<ScreenDestination.InstrumentPicker> { backstackEntry ->
-                        InstrumentPickerScreen()
-                    }
-                }
-
-
-//                composable<ScreenDestination.TradeInitiation>(
-//                    enterTransition = EnterFromBottomTransition,
-//                    exitTransition = ExitToBottomTransition
+//                //TODO maybe extract this to new NavHost for the trade package; Or just rethink the flow
+//                navigation<ScreenDestination.TradeGraph>(
+//                    startDestination = ScreenDestination.TradeInitiation
 //                ) {
-//                    TradeInitiationScreen()
+//                    composable<ScreenDestination.TradeInitiation> {
+//
+//                        TradeInitiationScreen(
+//                            navigateToInstrumentPicker = {
+//                                navController.navigateDeeperTo(ScreenDestination.InstrumentPicker)
+//                            }
+//                        )
+//                    }
+//                    composable<ScreenDestination.InstrumentPicker> { backstackEntry ->
+//                        InstrumentPickerScreen()
+//                    }
 //                }
+
+
+                composable<ScreenDestination.InstrumentPicker>(
+                    enterTransition = EnterFromBottomTransition,
+                    exitTransition = ExitToBottomTransition
+                ) {
+                    InstrumentPickerScreen()
+                }
             }
         }
     }

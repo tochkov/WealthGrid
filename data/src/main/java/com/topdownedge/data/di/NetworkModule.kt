@@ -2,7 +2,9 @@ package com.topdownedge.data.di
 
 
 import com.topdownedge.data.BuildConfig
+import com.topdownedge.data.remote.EodhdFundamentalsApi
 import com.topdownedge.data.remote.EodhdNewsApi
+import com.topdownedge.data.remote.createEodhdFundamentalsApi
 import com.topdownedge.data.remote.createEodhdNewsApi
 import com.topdownedge.domain.repositories.TokenRepository
 import dagger.Module
@@ -69,5 +71,11 @@ object NetworkModule {
     @Singleton
     fun provideEodhdNewsApi(@Named("ktorfit_eodhd") ktorfit: Ktorfit): EodhdNewsApi {
         return ktorfit.createEodhdNewsApi()
+    }
+
+    @Provides
+    @Singleton
+    fun provideEodhdFundamentalsApi(@Named("ktorfit_eodhd") ktorfit: Ktorfit): EodhdFundamentalsApi {
+        return ktorfit.createEodhdFundamentalsApi()
     }
 }

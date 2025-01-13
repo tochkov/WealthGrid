@@ -116,7 +116,7 @@ private fun HomeAppBar(
             if (currentElement == NavBarElement.Portfolio) {
                 IconButton(
                     onClick = {
-                        onNavigateToScreen(ScreenDestination.TradeInitiation)
+                        onNavigateToScreen(ScreenDestination.InstrumentPicker)
                     }
                 ) {
                     Icon(

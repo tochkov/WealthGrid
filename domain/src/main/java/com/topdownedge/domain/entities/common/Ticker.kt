@@ -10,4 +10,5 @@ data class Ticker(
     val isin: String = "",
     val sector: String = "",
     val industry: String = "",
+    val weight: String = "",
 ): Asset

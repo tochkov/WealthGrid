@@ -30,7 +30,7 @@ data class IndexConstituentDto(
     val Industry: String,
     val Name: String,
     val Sector: String,
-    val Weight: Double
+    val Weight: Double? = null
 )
 
 @Serializable
@@ -58,4 +58,5 @@ fun IndexConstituentDto.toTicker() = Ticker(
     exchange = Exchange,
     sector = Sector,
     industry = Industry,
+    weight = Weight.toString(),
 )

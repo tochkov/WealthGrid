@@ -3,6 +3,7 @@ package com.topdownedge.presentation.portfolio.trade
 import android.content.res.Configuration
 import android.util.Log
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -35,14 +36,17 @@ import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.topdownedge.domain.entities.NewsArticle
 import com.topdownedge.presentation.ui.theme.WealthGridTheme
 
 @Composable
-internal fun InstrumentPickerScreen(
+internal fun AssetSearchScreen(
     onListItemClick: (NewsArticle) -> Unit = {}
 ) {
-    val viewModel: InstrumentPickerViewModel = hiltViewModel()
+    val viewModel: AssetSearchViewModel = hiltViewModel()
+    val uiState = viewModel.assetSearchState.collectAsStateWithLifecycle().value
+
     var searchQuery by remember { mutableStateOf("") }
 
     Scaffold(
@@ -57,17 +61,24 @@ internal fun InstrumentPickerScreen(
             )
         }
     ) { innerPadding ->
-
+        innerPadding
         LazyColumn {
-            items(10) {
-                innerPadding
-                Text(
-                    text = "Item $it",
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(16.dp)
-                )
+
+            items(uiState.assets.size) { position ->
+                Row {
+                    Text(
+                        text = uiState.assets[position].name,
+                        modifier = Modifier.padding(16.dp)
+                    )
+
+                    Text(
+                        text = uiState.assets[position].weight,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
 
             }
+
         }
 
     }
@@ -154,7 +165,7 @@ fun SearchBoxAppBar(
 @Composable
 private fun SearchTopBarPreview() {
     WealthGridTheme {
-        InstrumentPickerScreen(
+        AssetSearchScreen(
 
         )
     }

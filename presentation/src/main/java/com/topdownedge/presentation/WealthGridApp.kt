@@ -1,11 +1,9 @@
 package com.topdownedge.presentation
 
-import android.util.Log
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.topdownedge.presentation.navigation.EnterFromBottomTransition
@@ -15,7 +13,7 @@ import com.topdownedge.presentation.navigation.WealthGridHomeScreen
 import com.topdownedge.presentation.navigation.navigateClearingBackStack
 import com.topdownedge.presentation.navigation.navigateSingleTopTo
 import com.topdownedge.presentation.news.NewsDetailsScreen
-import com.topdownedge.presentation.portfolio.trade.InstrumentPickerScreen
+import com.topdownedge.presentation.portfolio.trade.AssetSearchScreen
 import com.topdownedge.presentation.ui.theme.WealthGridTheme
 import com.topdownedge.presentation.welcome.WelcomeScreen
 
@@ -86,7 +84,7 @@ fun WealthGridApp(
                     enterTransition = EnterFromBottomTransition,
                     exitTransition = ExitToBottomTransition
                 ) {
-                    InstrumentPickerScreen()
+                    AssetSearchScreen()
                 }
             }
         }

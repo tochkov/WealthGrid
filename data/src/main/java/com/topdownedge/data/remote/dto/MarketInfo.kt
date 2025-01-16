@@ -1,5 +1,6 @@
 package com.topdownedge.data.remote.dto
 
+import com.topdownedge.data.local.dao.TickerEntity
 import com.topdownedge.domain.entities.common.Ticker
 import kotlinx.serialization.Serializable
 
@@ -58,5 +59,12 @@ fun IndexConstituentDto.toTicker() = Ticker(
     exchange = Exchange,
     sector = Sector,
     industry = Industry,
-    weight = Weight.toString(),
+    indexWeight = Weight,
+)
+
+fun IndexConstituentDto.toTickerEntity() = TickerEntity(
+    code = Code,
+    name = Name,
+    exchange = Exchange,
+    index_weight = Weight
 )

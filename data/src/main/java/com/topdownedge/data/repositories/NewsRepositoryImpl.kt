@@ -15,7 +15,7 @@ class NewsRepositoryImpl
         category: NewsCategory,
         page: Int
     ): Result<List<NewsArticle>?> {
-        return when(category){
+        return when (category) {
             is NewsCategory.General -> getGeneralNews(page)
             is NewsCategory.Ticker -> getNewsForTicker(category.ticker, page)
             is NewsCategory.Topic -> getNewsForTopic(category.topic, page)
@@ -28,8 +28,8 @@ class NewsRepositoryImpl
                 EodhdNewsApi.ITEMS_PER_PAGE,
                 page * EodhdNewsApi.ITEMS_PER_PAGE
             )
-        }.map {
-            it?.map { it.toNewsArticle() }
+        }.map { articles ->
+            articles?.map { it.toNewsArticle() }
         }
     }
 
@@ -40,8 +40,8 @@ class NewsRepositoryImpl
                 EodhdNewsApi.ITEMS_PER_PAGE,
                 page * EodhdNewsApi.ITEMS_PER_PAGE
             )
-        }.map {
-            it?.map { it.toNewsArticle() }
+        }.map { articles ->
+            articles?.map { it.toNewsArticle() }
         }
     }
 
@@ -52,8 +52,8 @@ class NewsRepositoryImpl
                 EodhdNewsApi.ITEMS_PER_PAGE,
                 page * EodhdNewsApi.ITEMS_PER_PAGE
             )
-        }.map {
-            it?.map { it.toNewsArticle() }
+        }.map { articles ->
+            articles?.map { it.toNewsArticle() }
         }
     }
 

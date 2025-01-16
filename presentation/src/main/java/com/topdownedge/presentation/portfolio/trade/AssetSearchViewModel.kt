@@ -2,6 +2,7 @@ package com.topdownedge.presentation.portfolio.trade
 
 
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.topdownedge.domain.entities.common.Ticker
@@ -29,20 +30,18 @@ class AssetSearchViewModel @Inject constructor(
         field = MutableStateFlow(AssetSearchUiState())
 
     init {
+        viewModelScope.launch {
 
-        viewModelScope.launch() {
-
-            val result = marketInfoRepository.getIndexTickersList("")
-            if (result.isFailure) {
-                Log.e("XXX", "(tickers.isFailure: ${result.exceptionOrNull()}")
-            } else {
-
-                assetSearchState.update {
-                    it.copy(
-                        assets = result.getOrNull()!!
-                    )
+            marketInfoRepository.getInitialSearchTickerList().collect { result ->
+                if (result.isSuccess) {
+                    assetSearchState.update {
+                        it.copy(
+                            assets = result.getOrNull()!!
+                        )
+                    }
+                } else {
+                    Log.e("XXX", "tickers.isFailure: ${result.exceptionOrNull()}")
                 }
-
             }
 
 //            marketInfoRepository.getAllTickerList("")

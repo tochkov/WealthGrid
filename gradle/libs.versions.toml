@@ -10,6 +10,7 @@ composeBom = "2024.12.01"
 navigationCompose = "2.8.5"
 kotlinxSerialization = "1.7.3"
 
+room = "2.6.1"
 uiTextGoogleFonts = "1.7.6"
 
 hilt = "2.52"
@@ -28,6 +29,9 @@ truth = "1.4.4"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
 hilt-android-testing = { module = "com.google.dagger:hilt-android-testing", version.ref = "hilt" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }

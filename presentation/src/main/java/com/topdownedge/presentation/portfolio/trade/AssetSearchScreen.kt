@@ -72,7 +72,7 @@ internal fun AssetSearchScreen(
                     )
 
                     Text(
-                        text = uiState.assets[position].weight,
+                        text = uiState.assets[position].indexWeight.toString(),
                         modifier = Modifier.padding(16.dp)
                     )
                 }

@@ -80,14 +80,11 @@ class NewsListViewModelTest {
             delay(100)
             Result.success(ARTICLES_GENERAL.take(PAGE_SIZE))
         }
-        println("XXX - initial test")
         viewModel.loadNextPage()
         testDispatcher.scheduler.advanceTimeBy(50)
-        println("XXX - assert1")
         assertThat(viewModel.newsState.value.isLoading).isTrue()
 
         testDispatcher.scheduler.advanceTimeBy(100)
-        println("XXX - assert2")
         assertThat(viewModel.newsState.value.isLoading).isFalse()
     }
 

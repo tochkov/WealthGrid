@@ -9,4 +9,6 @@
     <string name="home_tab_markets">Markets</string>
     <string name="home_tab_portfolio">Portfolio</string>
     <string name="home_tab_news">News</string>
+
+    <string name="no_results_found">No results found</string>
 </resources>

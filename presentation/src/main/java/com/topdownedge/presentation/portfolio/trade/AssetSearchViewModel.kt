@@ -2,7 +2,6 @@ package com.topdownedge.presentation.portfolio.trade
 
 
 import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.topdownedge.domain.entities.common.Ticker
@@ -16,9 +15,7 @@ import javax.inject.Inject
 
 data class AssetSearchUiState(
     var assets: List<Ticker> = emptyList(),
-    var isLoading: Boolean = false,
-    var messageError: String = "",
-    var messageNoResults: String = "",
+    var noResultsState: Boolean = false
 )
 
 @HiltViewModel
@@ -31,20 +28,43 @@ class AssetSearchViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
+            getInitialTickerList(false)
+        }
+    }
 
-            marketInfoRepository.getInitialSearchTickerList().collect { result ->
-                if (result.isSuccess) {
-                    assetSearchState.update {
-                        it.copy(
-                            assets = result.getOrNull()!!
-                        )
+    suspend fun getInitialTickerList(fromCacheOnly: Boolean) {
+        marketInfoRepository.getInitialSearchTickerList(fromCacheOnly).collect { result ->
+            if (result.isSuccess) {
+                assetSearchState.update {
+                    it.copy(
+                        assets = result.getOrNull()!!
+                    )
+                }
+            } else {
+                Log.e("XXX", "tickers.isFailure: ${result.exceptionOrNull()}")
+            }
+        }
+    }
+
+    fun onSearchQueryChange(query: String) {
+        viewModelScope.launch {
+            if (query.isEmpty()) {
+                getInitialTickerList(true)
+                assetSearchState.update { it.copy(noResultsState = false) }
+            } else {
+                marketInfoRepository.getTickersForSearch(query).collect { result ->
+                    if (result.isSuccess) {
+                        assetSearchState.update {
+                            it.copy(
+                                noResultsState = result.getOrNull()!!.isEmpty(),
+                                assets = result.getOrNull()!!
+                            )
+                        }
+                    } else {
+                        Log.e("XXX", "ERRRORRRRR---")
                     }
-                } else {
-                    Log.e("XXX", "tickers.isFailure: ${result.exceptionOrNull()}")
                 }
             }
-
-//            marketInfoRepository.getAllTickerList("")
         }
 
     }

@@ -84,7 +84,14 @@ fun WealthGridApp(
                     enterTransition = EnterFromBottomTransition,
                     exitTransition = ExitToBottomTransition
                 ) {
-                    AssetSearchScreen()
+                    AssetSearchScreen(
+                        onBackPress = {
+                            navController.popBackStack()
+                        },
+                        onListItemClick = {
+
+                        }
+                    )
                 }
             }
         }

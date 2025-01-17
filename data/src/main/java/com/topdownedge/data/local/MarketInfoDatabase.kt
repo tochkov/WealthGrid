@@ -7,7 +7,7 @@ import com.topdownedge.data.local.dao.TickerEntity
 
 @Database(
     entities = [TickerEntity::class],
-    version = 1
+    version = 2
 )
 abstract class MarketInfoDatabase: RoomDatabase() {
 

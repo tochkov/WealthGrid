@@ -13,6 +13,12 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 class LocalModule {
 
+//    val MIGRATION_1_2 = object : Migration(1, 2) {
+//        override fun migrate(database: SupportSQLiteDatabase) {
+//            database.execSQL("CREATE INDEX IF NOT EXISTS `index_TickerEntity_name` ON `TickerEntity` (`name`)")
+//        }
+//    }
+
     @Provides
     @Singleton
     fun provideMarketInfoDatabase(appContext: Application): MarketInfoDatabase {
@@ -20,7 +26,9 @@ class LocalModule {
             appContext,
             MarketInfoDatabase::class.java,
             "market_info"
-        ).build()
+        )
+//            .addMigrations(MIGRATION_1_2)
+            .build()
     }
 
     @Provides

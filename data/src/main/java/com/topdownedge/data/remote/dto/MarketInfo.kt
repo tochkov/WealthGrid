@@ -1,7 +1,5 @@
 package com.topdownedge.data.remote.dto
 
-import com.topdownedge.data.local.dao.TickerEntity
-import com.topdownedge.domain.entities.common.Ticker
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -42,29 +40,4 @@ data class SymbolItemDto(
     val Exchange: String,
     val Currency: String,
     val Type: String,
-)
-
-fun SymbolItemDto.toTicker() = Ticker(
-    code = Code,
-    name = Name,
-    country = Country,
-    exchange = Exchange,
-    currency = Currency,
-    type = Type,
-)
-
-fun IndexConstituentDto.toTicker() = Ticker(
-    code = Code,
-    name = Name,
-    exchange = Exchange,
-    sector = Sector,
-    industry = Industry,
-    indexWeight = Weight,
-)
-
-fun IndexConstituentDto.toTickerEntity() = TickerEntity(
-    code = Code,
-    name = Name,
-    exchange = Exchange,
-    index_weight = Weight
 )

@@ -23,10 +23,10 @@ fun <T : ScreenDestination> NavHostController.navigateClearingBackStack(destinat
     }
 }
 
-fun <T : ScreenDestination> NavHostController.navigateSingleTopTo(destinationRoute: T) {
+fun <T : ScreenDestination> NavHostController.navigateSingleTopTo(destinationRoute: T, saveState: Boolean = true) {
     this.navigate(destinationRoute) {
         popUpTo(this@navigateSingleTopTo.graph.findStartDestination().id) {
-            saveState = true
+            this.saveState = saveState
         }
         launchSingleTop = true
         restoreState = true

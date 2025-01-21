@@ -11,4 +11,8 @@
     <string name="home_tab_news">News</string>
 
     <string name="no_results_found">No results found</string>
+    <string name="discard_trade_dialog_title">Are you sure you want to discard this trade?</string>
+    <string name="discard_trade_dialog_confirm">Discard Trade</string>
+    <string name="discard_trade_dialog_dismiss">Return to Trade</string>
+
 </resources>

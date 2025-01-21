@@ -14,6 +14,7 @@ import com.topdownedge.presentation.navigation.navigateClearingBackStack
 import com.topdownedge.presentation.navigation.navigateSingleTopTo
 import com.topdownedge.presentation.news.NewsDetailsScreen
 import com.topdownedge.presentation.portfolio.trade.AssetSearchScreen
+import com.topdownedge.presentation.portfolio.trade.NewTradeScreen
 import com.topdownedge.presentation.ui.theme.WealthGridTheme
 import com.topdownedge.presentation.welcome.WelcomeScreen
 
@@ -82,17 +83,36 @@ fun WealthGridApp(
 
                 composable<ScreenDestination.InstrumentPicker>(
                     enterTransition = EnterFromBottomTransition,
-                    exitTransition = ExitToBottomTransition
+                    popExitTransition = ExitToBottomTransition,
                 ) {
                     AssetSearchScreen(
                         onBackPress = {
                             navController.popBackStack()
                         },
-                        onListItemClick = {
-
+                        onListItemClick = { ticker ->
+                            navController.navigateSingleTopTo(
+                                ScreenDestination.NewTrade(
+                                    ticker.code,
+                                    ticker.exchange
+                                ),
+                                saveState = false
+                            )
                         }
                     )
                 }
+
+                composable<ScreenDestination.NewTrade> { backstackEntry ->
+                    val ticker: ScreenDestination.NewTrade = backstackEntry.toRoute()
+                    NewTradeScreen(
+                        ticker.tickerCode,
+                        ticker.tickerExchange,
+                        onBackPress = {
+                            navController.popBackStack()
+                        }
+                    )
+                }
+
+
             }
         }
     }

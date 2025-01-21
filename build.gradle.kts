@@ -15,6 +15,6 @@ plugins {
 // TODO - take a look at build-logic, buildSrc and/or convention plugins
 ext {
     set("compileSdk", 35)
-    set("minSdk", 24)
+    set("minSdk", 26)
     set("targetSdk", 34)
 }

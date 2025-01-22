@@ -48,7 +48,7 @@ fun NewTradeScreen(
     onBackPress: () -> Unit = {}
 ) {
     val viewModel: NewTradeViewModel = hiltViewModel()
-    val state = viewModel.assetSearchState.collectAsState().value
+    val state = viewModel.uiState.collectAsState().value
 
     var showExitDialog by remember { mutableStateOf(false) }
     var showDatePicker by remember { mutableStateOf(false) }

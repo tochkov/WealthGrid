@@ -7,10 +7,9 @@ import java.time.LocalDate
 
 interface PriceDataRepository {
 
-    fun getHistoricalPrices(
+    fun getHistoricalDailyPrices(
         symbol: String,
         fromDate: LocalDate? = null,
         toDate: LocalDate? = null,
-        interval: BarInterval = BarInterval.DAY
-    ): Flow<Result<List<PriceBar>>>
+    ): Flow<Result<List<PriceBar>?>>
 }

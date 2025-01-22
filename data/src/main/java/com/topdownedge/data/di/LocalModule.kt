@@ -2,7 +2,7 @@ package com.topdownedge.data.di
 
 import android.app.Application
 import androidx.room.Room
-import com.topdownedge.data.local.MarketInfoDatabase
+import com.topdownedge.data.local.MarketDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -21,19 +21,24 @@ class LocalModule {
 
     @Provides
     @Singleton
-    fun provideMarketInfoDatabase(appContext: Application): MarketInfoDatabase {
+    fun provideMarketDatabase(appContext: Application): MarketDatabase {
         return Room.databaseBuilder(
             appContext,
-            MarketInfoDatabase::class.java,
+            MarketDatabase::class.java,
             "market_info"
         )
 //            .addMigrations(MIGRATION_1_2)
+//            .fallbackToDestructiveMigration()
             .build()
     }
 
     @Provides
     @Singleton
-    fun provideTickerDao(db: MarketInfoDatabase) = db.tickerDao()
+    fun provideTickerDao(db: MarketDatabase) = db.tickerDao()
+
+    @Provides
+    @Singleton
+    fun providePriceBarDao(db: MarketDatabase) = db.priceBarDao()
 
 
 }

@@ -1,13 +1,15 @@
 package com.topdownedge.domain.entities.common
 
+import java.time.LocalDate
+
 data class PriceBar(
-    val date: String,
-    val open: String,
-    val high: String,
-    val low: String,
-    val close: String,
-    val adjClose: String,
-    val volume: String,
+    val date: LocalDate,
+    val open: Double,
+    val high: Double,
+    val low: Double,
+    val close: Double,
+    val adjustedClose: Double,
+    val volume: Long,
 )
 
 enum class BarInterval(val value: String) {

@@ -1,52 +1,71 @@
 package com.topdownedge.data.repositories
 
-import android.util.Log
-import com.topdownedge.data.local.dao.TickerDao
-import com.topdownedge.data.remote.EodhdFundamentalsApi
+import com.topdownedge.data.local.dao.PriceBarDao
+import com.topdownedge.data.mappers.toEntities
+import com.topdownedge.data.mappers.toPriceBars
 import com.topdownedge.data.remote.EodhdPriceDataApi
+import com.topdownedge.data.remote.fmt
 import com.topdownedge.data.remote.safeApiCall
-import com.topdownedge.domain.entities.common.BarInterval
 import com.topdownedge.domain.entities.common.PriceBar
 import com.topdownedge.domain.repositories.PriceDataRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 class PriceDataRepositoryImpl
 @Inject constructor(
     private val eodhdApi: EodhdPriceDataApi,
-    private val tickerDao: TickerDao
+    private val priceBarDao: PriceBarDao,
 ) : PriceDataRepository {
-    override fun getHistoricalPrices(
+
+    override fun getHistoricalDailyPrices(
         symbol: String,
         fromDate: LocalDate?,
         toDate: LocalDate?,
-        interval: BarInterval
-    ): Flow<Result<List<PriceBar>>> = flow {
+    ): Flow<Result<List<PriceBar>?>> = flow {
 
-        val fromDateStr = fromDate?.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-        val toDateStr = toDate?.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-        Log.e("XXX", "interval: ${interval.value}" )
-        val apiResult = safeApiCall {
-            eodhdApi.getHistoricalPrices(
-                symbol,
-                fromDateStr,
-                toDateStr,
-                interval.value
-            )
+        // First, try to get cached data from local database
+        val initialData = priceBarDao.observePriceBarsForSymbol(symbol).firstOrNull()
+        var lastDateWithPrice: LocalDate? = null
+
+        // If we have cached data, emit it immediately and note the last date
+        if (initialData != null && initialData.isNotEmpty()) {
+            lastDateWithPrice = LocalDate.ofEpochDay(initialData.last().dateTimestamp)
+            emit(Result.success(initialData.toPriceBars()))
         }
 
-        if(apiResult.isSuccess) {
-            Log.e("XXX", "apiResult.isSuccess")
-            Log.e("XXX", apiResult.getOrNull().toString())
-//            emit(Result.success(apiResult.getOrNull()!!.map { it.toPriceBar() }))
-        } else {
-            Log.e("XXX", "apiResult.FAILURE")
-//            emit(Result.failure(apiResult.exceptionOrNull()!!))
+        // Check if we need to fetch new data (no cache or cache is outdated)
+        if (lastDateWithPrice == null || lastDateWithPrice < LocalDate.now()) {
+            // Fetch new data from API, starting from the day after our last cached date
+            val apiResult = safeApiCall {
+                eodhdApi.getHistoricalPrices(
+                    symbol = symbol,
+                    fromDate = lastDateWithPrice?.plusDays(1)?.fmt()
+                )
+            }
 
-
+            // Handle API errors
+            if (apiResult.isFailure) {
+                emit(Result.failure(apiResult.exceptionOrNull()!!))
+            } else {
+                // Store new price data in local database
+                val priceBars = apiResult.getOrNull()!!
+                priceBarDao.upsertPriceBars(priceBars.toEntities(symbol))
+            }
         }
-    }
+
+        // Observe and emit all future updates from the local database
+        priceBarDao.observePriceBarsForSymbol(symbol).collect { entities ->
+            emit(Result.success(entities.toPriceBars()))
+        }
+
+    }.flowOn(Dispatchers.IO)
+
+
+
+
 }

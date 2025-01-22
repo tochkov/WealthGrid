@@ -1,6 +1,6 @@
 package com.topdownedge.data.mappers
 
-import com.topdownedge.data.local.dao.TickerEntity
+import com.topdownedge.data.local.TickerEntity
 import com.topdownedge.data.remote.dto.IndexConstituentDto
 import com.topdownedge.data.remote.dto.SymbolItemDto
 import com.topdownedge.domain.entities.common.Ticker
@@ -35,7 +35,7 @@ fun IndexConstituentDto.toTickerEntity() = TickerEntity(
     code = Code,
     name = Name,
     exchange = Exchange,
-    index_weight = Weight
+    indexWeight = Weight
 )
 
 fun TickerEntity.toTicker(): Ticker {
@@ -44,7 +44,7 @@ fun TickerEntity.toTicker(): Ticker {
         name = name,
         exchange = exchange,
         type = type ?: "",
-        indexWeight = index_weight
+        indexWeight = indexWeight
     )
 }
 
@@ -54,7 +54,7 @@ fun Ticker.toTickerEntity(): TickerEntity {
         name = name,
         exchange = exchange,
         type = type,
-        index_weight = indexWeight
+        indexWeight = indexWeight
     )
 
 }

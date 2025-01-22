@@ -84,3 +84,5 @@ hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 ktorfit = { id = "de.jensklingenberg.ktorfit", version.ref = "ktorfit" }
+
+room = { id = "androidx.room", version.ref = "room" }

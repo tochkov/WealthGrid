@@ -24,7 +24,7 @@ class MarketInfoRepositoryImpl
     override fun getInitialSearchTickerList(fromCacheOnly: Boolean): Flow<Result<List<Ticker>?>> =
         flow {
             val initialData = tickerDao.getAllIndexTickers().firstOrNull()
-            if (initialData != null) {
+            if (initialData != null && initialData.isNotEmpty()) {
                 emit(Result.success(initialData.map { it.toTicker() }))
                 if (fromCacheOnly) {
                     return@flow
@@ -32,12 +32,10 @@ class MarketInfoRepositoryImpl
             }
 
             val apiResult = safeApiCall { eodhdApi.getIndexConstituents() }
-//            val apiResult = safeApiCall { eodhdApi.getExchangeSymbolsList() }
             if (apiResult.isFailure || apiResult.getOrNull() == null) {
                 emit(Result.failure(apiResult.exceptionOrNull()!!))
             } else {
                 val tickers = apiResult.getOrNull()!!.Components.values
-//                val tickers = apiResult.getOrNull()!!
                 tickerDao.upsertAllTickers(tickers.map { it.toTickerEntity() })
             }
 

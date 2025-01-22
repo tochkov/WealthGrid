@@ -9,6 +9,7 @@ import com.topdownedge.domain.repositories.MarketInfoRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -33,17 +34,20 @@ class AssetSearchViewModel @Inject constructor(
     }
 
     suspend fun getInitialTickerList(fromCacheOnly: Boolean) {
-        marketInfoRepository.getInitialSearchTickerList(fromCacheOnly).collect { result ->
-            if (result.isSuccess) {
-                assetSearchState.update {
-                    it.copy(
-                        assets = result.getOrNull()!!
-                    )
+        marketInfoRepository.getInitialSearchTickerList(fromCacheOnly)
+            .distinctUntilChanged()
+            .collect { result ->
+                if (result.isSuccess) {
+                    assetSearchState.update {
+                        it.copy(
+                            assets = result.getOrNull()!!
+                        )
+                    }
+                } else {
+                    Log.e("XXX", "tickers.isFailure: ${result.exceptionOrNull()}")
+
                 }
-            } else {
-                Log.e("XXX", "tickers.isFailure: ${result.exceptionOrNull()}")
             }
-        }
     }
 
     fun onSearchQueryChange(query: String) {
@@ -52,18 +56,20 @@ class AssetSearchViewModel @Inject constructor(
                 getInitialTickerList(true)
                 assetSearchState.update { it.copy(noResultsState = false) }
             } else {
-                marketInfoRepository.getTickersForSearch(query).collect { result ->
-                    if (result.isSuccess) {
-                        assetSearchState.update {
-                            it.copy(
-                                noResultsState = result.getOrNull()!!.isEmpty(),
-                                assets = result.getOrNull()!!
-                            )
+                marketInfoRepository.getTickersForSearch(query)
+                    .distinctUntilChanged()
+                    .collect { result ->
+                        if (result.isSuccess) {
+                            assetSearchState.update {
+                                it.copy(
+                                    noResultsState = result.getOrNull()!!.isEmpty(),
+                                    assets = result.getOrNull()!!
+                                )
+                            }
+                        } else {
+                            Log.e("XXX", "ERRRORRRRR---")
                         }
-                    } else {
-                        Log.e("XXX", "ERRRORRRRR---")
                     }
-                }
             }
         }
 

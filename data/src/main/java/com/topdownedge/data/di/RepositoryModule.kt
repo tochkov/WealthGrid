@@ -2,9 +2,11 @@ package com.topdownedge.data.di
 
 import com.topdownedge.data.repositories.MarketInfoRepositoryImpl
 import com.topdownedge.data.repositories.NewsRepositoryImpl
+import com.topdownedge.data.repositories.PriceDataRepositoryImpl
 import com.topdownedge.data.repositories.TokenRepositoryImpl
 import com.topdownedge.domain.repositories.MarketInfoRepository
 import com.topdownedge.domain.repositories.NewsRepository
+import com.topdownedge.domain.repositories.PriceDataRepository
 import com.topdownedge.domain.repositories.TokenRepository
 import dagger.Binds
 import dagger.Module
@@ -23,5 +25,8 @@ internal interface  RepositoryModule {
 
     @Binds
     fun bindsMarketInfoRepository(impl: MarketInfoRepositoryImpl): MarketInfoRepository
+
+    @Binds
+    fun bindsPriceDataRepository(impl: PriceDataRepositoryImpl): PriceDataRepository
 
 }

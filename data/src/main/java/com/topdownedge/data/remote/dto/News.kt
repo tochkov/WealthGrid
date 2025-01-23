@@ -1,9 +1,10 @@
 package com.topdownedge.data.remote.dto
 
-import android.system.Os.link
 import com.topdownedge.domain.entities.NewsArticle
 import kotlinx.serialization.Serializable
 import java.net.URL
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 /**
  * Data transfer object representing a news article from the EODHD API
@@ -48,7 +49,6 @@ fun getStrippedSource(url: String): String {
     return source
 }
 
-//TODO - make this proper formatting
 fun getFormattedDate(date: String): String {
-    return date.split("T")[0]
+    return LocalDate.parse(date.split("T")[0]).format(DateTimeFormatter.ofPattern("MMM dd"))
 }

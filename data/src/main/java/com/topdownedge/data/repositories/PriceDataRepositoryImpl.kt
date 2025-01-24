@@ -4,9 +4,9 @@ import com.topdownedge.data.local.dao.PriceBarDao
 import com.topdownedge.data.mappers.toEntities
 import com.topdownedge.data.mappers.toPriceBars
 import com.topdownedge.data.remote.EodhdPriceDataApi
-import com.topdownedge.data.remote.fmt
 import com.topdownedge.data.remote.safeApiCall
 import com.topdownedge.domain.entities.common.PriceBar
+import com.topdownedge.domain.fmt
 import com.topdownedge.domain.repositories.PriceDataRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

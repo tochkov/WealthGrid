@@ -73,6 +73,8 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
 
+    implementation(libs.vico.compose.m3)
+    implementation (libs.ehsannarmani.compose.charts)
     // DI
     implementation(libs.hilt.android)
     implementation(libs.hilt.navigation.compose)

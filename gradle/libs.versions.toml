@@ -13,6 +13,9 @@ kotlinxSerialization = "1.7.3"
 room = "2.6.1"
 uiTextGoogleFonts = "1.7.6"
 
+vico="2.0.0"
+ehsannarmaniCharts = "0.1.0"
+
 hilt = "2.52"
 hilt-navigation-compose = "1.2.0"
 
@@ -25,6 +28,7 @@ espressoCore = "3.6.1"
 junit = "4.13.2"
 mockk = "1.13.9"
 truth = "1.4.4"
+
 
 
 [libraries]
@@ -52,6 +56,9 @@ androidx-navigation-compose = { group = "androidx.navigation", name = "navigatio
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
+
+vico-compose-m3 = { group = "com.patrykandpatrick.vico", name = "compose-m3", version.ref = "vico" }
+ehsannarmani-compose-charts = { module = "io.github.ehsannarmani:compose-charts", version.ref = "ehsannarmaniCharts" }
 
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }

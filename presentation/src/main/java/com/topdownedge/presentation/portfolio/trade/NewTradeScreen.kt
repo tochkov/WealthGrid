@@ -4,6 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -35,10 +36,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.topdownedge.presentation.R
 import com.topdownedge.presentation.common.ConfirmDialog
 import com.topdownedge.presentation.common.SimpleAppBar
+import com.topdownedge.presentation.portfolio.trade.chart.CustomFormatterWithListener
+import com.topdownedge.presentation.portfolio.trade.chart.SimpleAssetLineChart
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -71,6 +75,18 @@ fun NewTradeScreen(
 
     ) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
+
+            SimpleAssetLineChart(
+                modelProducer = state.modelProducer,
+                modifier = Modifier.height(230.dp),
+                customFormatter = CustomFormatterWithListener(
+                    state.priceBars,
+                    selectedPriceBarListener = { index, priceBar ->
+                        price = priceBar.close.toString()
+                    }
+                )
+            )
+
             Row {
                 Text(
                     text = tickerCode,

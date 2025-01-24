@@ -4,8 +4,6 @@ import de.jensklingenberg.ktorfit.Response
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import kotlinx.io.IOException
 import java.net.SocketTimeoutException
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import kotlin.coroutines.cancellation.CancellationException
 
 /**
@@ -63,6 +61,5 @@ fun <T> Response<T>.toResult(): Result<T?> {
     }
 }
 
-fun LocalDate.fmt(pattern: String = "yyyy-MM-dd") =format(DateTimeFormatter.ofPattern(pattern))
 
 

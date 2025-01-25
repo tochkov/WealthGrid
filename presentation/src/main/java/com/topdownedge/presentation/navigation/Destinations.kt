@@ -1,6 +1,5 @@
 package com.topdownedge.presentation.navigation
 
-import com.topdownedge.domain.entities.common.Ticker
 import kotlinx.serialization.Serializable
 
 sealed interface ScreenDestination {
@@ -22,6 +21,6 @@ sealed interface ScreenDestination {
 
     @Serializable object InstrumentPicker : ScreenDestination
 
-    @Serializable data class NewTrade(val tickerCode: String, val tickerExchange: String) : ScreenDestination
+    @Serializable data class NewTrade(val tickerCode: String, val tickerExchange: String, val tickerName: String) : ScreenDestination
 }
 

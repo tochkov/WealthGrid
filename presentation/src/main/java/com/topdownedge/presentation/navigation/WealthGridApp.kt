@@ -1,4 +1,4 @@
-package com.topdownedge.presentation
+package com.topdownedge.presentation.navigation
 
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -6,12 +6,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.topdownedge.presentation.navigation.EnterFromBottomTransition
-import com.topdownedge.presentation.navigation.ExitToBottomTransition
-import com.topdownedge.presentation.navigation.ScreenDestination
-import com.topdownedge.presentation.navigation.WealthGridHomeScreen
-import com.topdownedge.presentation.navigation.navigateClearingBackStack
-import com.topdownedge.presentation.navigation.navigateSingleTopTo
 import com.topdownedge.presentation.news.NewsDetailsScreen
 import com.topdownedge.presentation.portfolio.trade.AssetSearchScreen
 import com.topdownedge.presentation.portfolio.trade.NewTradeScreen
@@ -93,7 +87,8 @@ fun WealthGridApp(
                             navController.navigateSingleTopTo(
                                 ScreenDestination.NewTrade(
                                     ticker.code,
-                                    ticker.exchange
+                                    ticker.exchange,
+                                    ticker.name
                                 ),
                                 saveState = false
                             )
@@ -106,6 +101,7 @@ fun WealthGridApp(
                     NewTradeScreen(
                         ticker.tickerCode,
                         ticker.tickerExchange,
+                        ticker.tickerName,
                         onBackPress = {
                             navController.popBackStack()
                         }

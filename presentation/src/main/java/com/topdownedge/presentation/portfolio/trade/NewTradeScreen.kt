@@ -2,6 +2,7 @@ package com.topdownedge.presentation.portfolio.trade
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
@@ -49,15 +50,16 @@ import java.time.format.DateTimeFormatter
 fun NewTradeScreen(
     tickerCode: String,
     tickerExchange: String,
+    tickerName: String,
     onBackPress: () -> Unit = {}
 ) {
     val viewModel: NewTradeViewModel = hiltViewModel()
-    val state = viewModel.uiState.collectAsState().value
+    val uiState = viewModel.uiState.collectAsState().value
 
     var showExitDialog by remember { mutableStateOf(false) }
     var showDatePicker by remember { mutableStateOf(false) }
 
-//    var selectedDate by remember { mutableStateOf(LocalDate.now()) }
+    var selectedDate by remember { mutableStateOf(LocalDate.now()) }
     var price by remember { mutableStateOf("") }
     var shares by remember { mutableStateOf("") }
 
@@ -65,38 +67,38 @@ fun NewTradeScreen(
         showExitDialog = true
     }
 
-    Scaffold(
-        topBar = {
-            SimpleAppBar(
-                title = "New Trade",
-                onBackPress = { showExitDialog = true }
-            )
-        }
+    Scaffold(topBar = {
+        SimpleAppBar(title = "New Trade", onBackPress = { showExitDialog = true })
+    }
 
     ) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
 
-            SimpleAssetLineChart(
-                modelProducer = state.modelProducer,
-                modifier = Modifier.height(230.dp),
-                customFormatter = CustomFormatterWithListener(
-                    state.priceBars,
-                    selectedPriceBarListener = { index, priceBar ->
-                        price = priceBar.close.toString()
-                    }
-                )
-            )
+            Box {
+                Column {
 
-            Row {
-                Text(
-                    text = tickerCode,
-                    modifier = Modifier.padding(12.dp),
-                    style = MaterialTheme.typography.headlineLarge
-                )
-                Text(
-                    text = tickerExchange,
-                    modifier = Modifier.padding(12.dp),
-                    style = MaterialTheme.typography.bodyLarge
+                    Text(
+                        text = tickerCode,
+                        modifier = Modifier.padding(start = 12.dp),
+                        style = MaterialTheme.typography.headlineLarge
+                    )
+                    Text(
+                        text = tickerName,
+                        modifier = Modifier.padding(start = 12.dp),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+
+                }
+                SimpleAssetLineChart(
+                    modelProducer = uiState.modelProducer,
+                    modifier = Modifier.height(230.dp),
+                    customFormatter = CustomFormatterWithListener(
+                        uiState.priceBars,
+                        selectedPriceBarListener = { index, priceBar ->
+                            price = priceBar.close.toString()
+                            selectedDate = priceBar.date
+                        }
+                    )
                 )
             }
 
@@ -109,7 +111,7 @@ fun NewTradeScreen(
                         .weight(4f)
                 )
                 TextField(
-                    value = state.date.format(DateTimeFormatter.ofPattern("dd/MM/yy")),
+                    value = selectedDate.format(DateTimeFormatter.ofPattern("dd/MM/yy")),
                     onValueChange = { },
                     textStyle = MaterialTheme.typography.bodyLarge,
                     enabled = false,
@@ -180,7 +182,7 @@ fun NewTradeScreen(
 
     if (showDatePicker) {
         val datePickerState = rememberDatePickerState(
-            initialSelectedDateMillis = state.date.atStartOfDay(ZoneId.systemDefault())
+            initialSelectedDateMillis = selectedDate.atStartOfDay(ZoneId.systemDefault())
                 .toInstant()
                 .toEpochMilli(),
             selectableDates = object : SelectableDates {
@@ -198,7 +200,7 @@ fun NewTradeScreen(
             confirmButton = {
                 TextButton(onClick = {
                     showDatePicker = false
-                    state.date = Instant.ofEpochMilli(datePickerState.selectedDateMillis!!)
+                    selectedDate = Instant.ofEpochMilli(datePickerState.selectedDateMillis!!)
                         .atZone(ZoneId.systemDefault())
                         .toLocalDate()
                 }) {
@@ -238,7 +240,6 @@ fun NewTradeScreen(
 @Composable
 fun NewTradeScreenPreview() {
     NewTradeScreen(
-        tickerCode = "AAPL",
-        tickerExchange = "NASDAQ"
+        tickerCode = "AAPL", tickerExchange = "NASDAQ", tickerName = "Apple Inc."
     )
 }

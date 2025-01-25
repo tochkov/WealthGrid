@@ -25,11 +25,11 @@ data class GeneralInfo(
 @Serializable
 data class IndexConstituentDto(
     val Code: String,
-    val Exchange: String,
-    val Industry: String,
     val Name: String,
-    val Sector: String,
-    val Weight: Double? = null
+    val Exchange: String,
+    val Industry: String?,
+    val Sector: String?,
+    val Weight: Double?
 )
 
 @Serializable

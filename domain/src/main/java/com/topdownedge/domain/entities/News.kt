@@ -9,3 +9,9 @@ data class NewsArticle(
     val symbols: List<String>,
     val tags: List<String>
 )
+
+sealed class NewsCategory(val title: String) {
+    object General: NewsCategory("General")
+    data class Ticker(val ticker: String): NewsCategory(ticker)
+    data class Topic(val topic: String): NewsCategory(topic)
+}

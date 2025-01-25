@@ -3,7 +3,6 @@ package com.topdownedge.data.local
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import java.time.LocalDate
 
 
 @Entity(
@@ -21,7 +20,7 @@ data class TickerEntity(
     val name: String,
     val exchange: String,
     var type: String? = null,
-    var indexWeight: Double? = null,
+    var indexWeight: Double?,
 )
 
 @Entity(

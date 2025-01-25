@@ -24,7 +24,7 @@ class AssetSearchViewModel @Inject constructor(
     private val marketInfoRepository: MarketInfoRepository
 ) : ViewModel() {
 
-    val assetSearchState: StateFlow<AssetSearchUiState>
+    val uiState: StateFlow<AssetSearchUiState>
         field = MutableStateFlow(AssetSearchUiState())
 
     init {
@@ -38,7 +38,7 @@ class AssetSearchViewModel @Inject constructor(
             .distinctUntilChanged()
             .collect { result ->
                 if (result.isSuccess) {
-                    assetSearchState.update {
+                    uiState.update {
                         it.copy(
                             assets = result.getOrNull()!!
                         )
@@ -54,13 +54,13 @@ class AssetSearchViewModel @Inject constructor(
         viewModelScope.launch {
             if (query.isEmpty()) {
                 getInitialTickerList(true)
-                assetSearchState.update { it.copy(noResultsState = false) }
+                uiState.update { it.copy(noResultsState = false) }
             } else {
                 marketInfoRepository.getTickersForSearch(query)
                     .distinctUntilChanged()
                     .collect { result ->
                         if (result.isSuccess) {
-                            assetSearchState.update {
+                            uiState.update {
                                 it.copy(
                                     noResultsState = result.getOrNull()!!.isEmpty(),
                                     assets = result.getOrNull()!!

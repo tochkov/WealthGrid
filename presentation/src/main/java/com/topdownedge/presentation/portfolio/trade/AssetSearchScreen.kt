@@ -36,7 +36,7 @@ internal fun AssetSearchScreen(
     onBackPress: () -> Unit = {}
 ) {
     val viewModel: AssetSearchViewModel = hiltViewModel()
-    val uiState = viewModel.assetSearchState.collectAsState().value
+    val uiState = viewModel.uiState.collectAsState().value
 
     var searchQuery by remember { mutableStateOf("") }
 

@@ -1,12 +1,8 @@
 package com.topdownedge.data.local
 
-import androidx.room.AutoMigration
 import androidx.room.Database
-import androidx.room.DeleteColumn
-import androidx.room.RenameColumn
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import androidx.room.migration.AutoMigrationSpec
 import com.topdownedge.data.local.dao.PriceBarDao
 import com.topdownedge.data.local.dao.TickerDao
 

@@ -5,7 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.topdownedge.domain.repositories.TokenRepository
-import com.topdownedge.presentation.WealthGridApp
+import com.topdownedge.presentation.navigation.WealthGridApp
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

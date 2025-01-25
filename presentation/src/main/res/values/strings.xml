@@ -15,4 +15,10 @@
     <string name="discard_trade_dialog_confirm">Discard Trade</string>
     <string name="discard_trade_dialog_dismiss">Return to Trade</string>
 
+    <string name="new_trade">New Trade</string>
+    <string name="problem_with_chart">There was a problem loading the chart</string>
+    <string name="select_date">Select Date</string>
+    <string name="enter_price">Enter Price</string>
+    <string name="num_of_shares">Number of Shares</string>
+
 </resources>

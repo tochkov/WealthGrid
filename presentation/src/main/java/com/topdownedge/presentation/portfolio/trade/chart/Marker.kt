@@ -124,7 +124,7 @@ internal fun rememberMarker(
                 },
                 indicatorSizeDp = 36f,
                 guideline = guideline,
-                labelPosition = LabelPosition.Top
+                labelPosition = LabelPosition.Bottom
             ) {
             override fun updateLayerMargins(
                 context: CartesianMeasuringContext,

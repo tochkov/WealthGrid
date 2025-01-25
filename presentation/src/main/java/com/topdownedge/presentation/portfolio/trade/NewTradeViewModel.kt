@@ -7,10 +7,12 @@ import androidx.lifecycle.viewModelScope
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
 import com.topdownedge.domain.entities.common.PriceBar
+import com.topdownedge.domain.fmtPrice
 import com.topdownedge.domain.repositories.PriceDataRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -20,11 +22,17 @@ import javax.inject.Inject
 
 data class NewTradeUiState(
     var ticker: String = "",
-    var date: LocalDate = LocalDate.now(),
-    var price: Long = 0L,
-    var shares: Int = 0,
-    val modelProducer : CartesianChartModelProducer =  CartesianChartModelProducer(),
-    var priceBars : List<PriceBar> = emptyList(),
+    var name: String = "",
+    var displayPriceStr: String = "",
+    var displayChangePct: Double? = null,
+    var chartError: Boolean = false,
+
+    var manualInputDetected: Boolean = false,
+    var isBuyState: Boolean = true,
+    var selectedDate: LocalDate = LocalDate.now(),
+    var selectedPrice: String = "",
+    var selectedShares: String = "",
+    var totalPosition: String = "0.00",
 )
 
 @HiltViewModel
@@ -39,46 +47,154 @@ class NewTradeViewModel @Inject constructor(
     val uiState: StateFlow<NewTradeUiState>
         field = MutableStateFlow(NewTradeUiState())
 
+    var priceBars: List<PriceBar> = emptyList()
+    val chartModelProducer = CartesianChartModelProducer()
 
     init {
-        val timeStart = System.currentTimeMillis()
-
-        Log.d("XXX", "Ticker: $tickerCode, Exchange: $tickerExchange")
         val symbol = "$tickerCode.$tickerExchange"
         viewModelScope.launch {
             priceDataRepository.getHistoricalDailyPrices(symbol)
                 .distinctUntilChanged()
-                .collect { result ->
-                    Log.e(
-                        "XXX",
-                        "${symbol} | ${result.isSuccess} || timer : ${System.currentTimeMillis() - timeStart}"
-                    )
-
-                    val priceBars = result.getOrNull()!!
-                    val date = priceBars.map { it.date.toEpochDay() }
-                    val o = priceBars.map { it.open }
-                    val h = priceBars.map { it.high }
-                    val l = priceBars.map { it.low }
-                    val c = priceBars.map { it.close }
-
-                        Log.d("XXX", c.toString())
-
-                    uiState.value.modelProducer.runTransaction {
-                        lineSeries { series(c) }
+                .collectLatest { result ->
+                    if (result.isFailure ) {
+                        uiState.update {
+                            it.copy(
+                                chartError = true
+                            )
+                        }
+                    } else {
+                        priceBars = result.getOrNull() ?: emptyList()
+                        uiState.update {
+                            it.copy(
+                                chartError = false,
+                                displayPriceStr = getLastAvailablePrice().fmtPrice(),
+                                displayChangePct = getLastPriceChangePct(),
+                                selectedDate = getLastAvailableDate() ?: LocalDate.now(),
+                                selectedPrice = getLastAvailablePrice().fmtPrice()
+                            )
+                        }
+                        chartModelProducer.runTransaction {
+                            lineSeries { series(priceBars.map { it.close }) }
+                        }
                     }
-
-
-                    uiState.update{
-                        it.copy(
-                            priceBars = priceBars
-                        )
-                    }
-
-
-
-
                 }
         }
     }
+
+    fun userSetBuyState(isBuyState: Boolean) {
+        uiState.update {
+            it.copy(
+                manualInputDetected = true,
+                isBuyState = isBuyState
+            )
+        }
+    }
+
+    fun userSetDate(date: LocalDate) {
+        uiState.update {
+            it.copy(
+                manualInputDetected = true,
+                selectedDate = date
+            )
+        }
+    }
+
+    fun userSetPrice(price: String) {
+        uiState.update {
+            it.copy(
+                manualInputDetected = true,
+                selectedPrice = price,
+                totalPosition = calculateTotalPosition(price, it.selectedShares)
+            )
+        }
+    }
+
+    fun userSetShares(shares: String) {
+        uiState.update {
+            it.copy(
+                manualInputDetected = true,
+                selectedShares = shares,
+                totalPosition = calculateTotalPosition(it.selectedPrice, shares)
+            )
+        }
+    }
+
+    private fun calculateTotalPosition(price: String, shares: String): String {
+        val priceDouble = price.toDoubleOrNull() ?: return "0.00"
+        val sharesDouble = shares.toDoubleOrNull() ?: return "0.00"
+        return (priceDouble * sharesDouble).fmtPrice()
+    }
+
+
+    fun onSubmitClicked() {
+        Log.e("XXX", "onSubmitClicked: ")
+        Log.e("XXX", "tickerCode: $tickerCode, tickerExchange: $tickerExchange")
+        Log.e("XXX", "selectedDate: ${uiState.value.selectedDate}")
+        Log.e("XXX", "selectedPrice: ${uiState.value.selectedPrice}")
+        Log.e("XXX", "selectedShares: ${uiState.value.selectedShares}")
+        Log.e("XXX", "totalPosition: ${uiState.value.totalPosition}")
+
+        // no empty fields
+        // no non numeric/date fields
+        // date cannot be in future
+    }
+
+    fun onUserClickOrDragChart(position: Int) {
+        uiState.update {
+            val lastPrice = getLastAvailablePrice(position).fmtPrice()
+            it.copy(
+                manualInputDetected = true,
+                displayPriceStr = lastPrice,
+                displayChangePct = getLastPriceChangePct(position),
+                selectedDate = getLastAvailableDate(position) ?: LocalDate.now(),
+                selectedPrice = lastPrice,
+                totalPosition = calculateTotalPosition(lastPrice, it.selectedShares)
+            )
+        }
+
+    }
+
+    fun onUserChartInteractionOver() {
+        uiState.update {
+            it.copy(
+                displayPriceStr = getLastAvailablePrice().fmtPrice(),
+                displayChangePct = getLastPriceChangePct(),
+            )
+        }
+    }
+    val DEFAULT_POSITION = -1
+    private fun getLastAvailableDate(index: Int = DEFAULT_POSITION): LocalDate? {
+        return if (index <= DEFAULT_POSITION) {
+            priceBars.lastOrNull()?.date
+        } else {
+            priceBars.getOrNull(index)?.date
+        }
+    }
+
+    private fun getLastAvailablePrice(index: Int = DEFAULT_POSITION): Double? {
+        return if (index <= DEFAULT_POSITION) {
+            priceBars.lastOrNull()?.close
+        } else {
+            priceBars.getOrNull(index)?.close
+        }
+    }
+
+    private fun getLastPriceChangePct(index: Int = DEFAULT_POSITION): Double? {
+
+        // if index not specified and there are at least 2 price bars, use last index
+        val targetIndex = if (index <= DEFAULT_POSITION && priceBars.size >= 2) {
+            priceBars.size - 1 // last index
+            // if index and previous index are in bounds -> use index
+        } else if (index >= 1 && index <= priceBars.size - 1) {
+            index
+        } else {
+            return null
+        }
+
+        val lastClose = priceBars[targetIndex].close
+        val prevClose = priceBars[targetIndex - 1].close
+        return 100 * ((lastClose - prevClose) / prevClose)
+    }
+
 
 }

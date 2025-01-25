@@ -60,7 +60,9 @@ class PriceDataRepositoryImpl
 
         // Observe and emit all future updates from the local database
         priceBarDao.observePriceBarsForSymbol(symbol).collect { entities ->
-            emit(Result.success(entities.toPriceBars()))
+            if(entities.isNotEmpty()) {
+                emit(Result.success(entities.toPriceBars()))
+            }
         }
 
     }.flowOn(Dispatchers.IO)

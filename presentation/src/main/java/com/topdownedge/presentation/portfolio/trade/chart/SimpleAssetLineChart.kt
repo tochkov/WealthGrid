@@ -19,12 +19,13 @@ import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianLayerRangeProvider
 import com.patrykandpatrick.vico.core.cartesian.layer.LineCartesianLayer
 import com.patrykandpatrick.vico.core.cartesian.marker.CartesianMarker
+import com.patrykandpatrick.vico.core.cartesian.marker.CartesianMarkerVisibilityListener
 import com.patrykandpatrick.vico.core.cartesian.marker.DefaultCartesianMarker
 import com.patrykandpatrick.vico.core.cartesian.marker.LineCartesianLayerMarkerTarget
 import com.patrykandpatrick.vico.core.common.data.ExtraStore
 import com.patrykandpatrick.vico.core.common.shader.ShaderProvider
-import com.topdownedge.domain.entities.common.PriceBar
 import com.topdownedge.domain.fmt
+import java.time.LocalDate
 
 
 private val RangeProvider =
@@ -33,29 +34,13 @@ private val RangeProvider =
             minY - (maxY - minY) * 0.1 // add 10% on bottom
 
         override fun getMaxY(minY: Double, maxY: Double, extraStore: ExtraStore) =
-            maxY + (maxY - minY) * 0.1 // add 10% on top
-//            maxY
+//            maxY + (maxY - minY) * 0.1 // add 10% on top
+            maxY
     }
 
-/**
- * A custom formatter that doubles as a selection listener for price bar data.
- * This is a workaround solution due to library limitations in Vico charts.
- * While this violates separation of concerns, it provides a way to detect
- * selection changes through the formatter's update cycle.
- *
- * After writing this i found out there is markerVisibilityListener...
- *
- * @param priceList List of price bars to display
- * @param color Default color for the marker text
- * @param selectedPriceBarListener Callback triggered when a new price bar is selected
- */
-class CustomFormatterWithListener(
-    val priceList: List<PriceBar> = emptyList(),
-    val color: Long = -1,
-    val selectedPriceBarListener: ((index: Int, priceBar: PriceBar) -> Unit)? = null
+class CustomDateFormatter(
+    val dateList: List<LocalDate> = emptyList(),
 ) : DefaultCartesianMarker.ValueFormatter {
-
-    var lastBar: PriceBar? = null
 
     override fun format(
         context: CartesianDrawingContext,
@@ -63,27 +48,14 @@ class CustomFormatterWithListener(
     ): CharSequence {
 
         val target = targets.first() as LineCartesianLayerMarkerTarget
-        val priceBar = priceList.getOrNull(target.x.toInt())
-
-        if (lastBar != priceBar && priceBar != null) {
-            val position = target.x.toInt()
-            lastBar = priceList.get(position)
-            selectedPriceBarListener?.invoke(position, priceBar)
-        }
+        val date = dateList.getOrNull(target.x.toInt())
 
         return SpannableStringBuilder()
             .append(
-                lastBar?.date?.fmt("MM/dd - ") ?: "",
-                ForegroundColorSpan(Color.Yellow.hashCode()),
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
-            )
-            .append(" ")
-            .append(
-                lastBar?.close?.toString() ?: "",
+                date?.fmt("dd MMM YYYY") ?: "",
                 ForegroundColorSpan(target.points.first().color),
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
             )
-
     }
 
 }
@@ -92,8 +64,9 @@ class CustomFormatterWithListener(
 @Composable
 fun SimpleAssetLineChart(
     modelProducer: CartesianChartModelProducer,
-    modifier: Modifier,
-    customFormatter: CustomFormatterWithListener
+    modifier: Modifier = Modifier,
+    customFormatter: CustomDateFormatter,
+    markerVisibilityListener: CartesianMarkerVisibilityListener
 ) {
     val lineColor = MaterialTheme.colorScheme.primary
 
@@ -116,7 +89,8 @@ fun SimpleAssetLineChart(
                 ),
                 rangeProvider = RangeProvider,
             ),
-            marker = rememberMarker(customFormatter)
+            marker = rememberMarker(customFormatter),
+            markerVisibilityListener = markerVisibilityListener
 
         ),
         modelProducer,

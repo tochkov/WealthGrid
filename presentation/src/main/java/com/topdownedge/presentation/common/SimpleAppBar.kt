@@ -8,12 +8,16 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.vector.ImageVector
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SimpleAppBar(
     title: String,
-    onBackPress: () -> Unit
+    onBackPress: () -> Unit,
+    actionImage: ImageVector? = null,
+    actionDescription: String? = null,
+    onActionClick: () -> Unit = {}
 ) {
     TopAppBar(
         title = {
@@ -25,6 +29,16 @@ fun SimpleAppBar(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Navigate back"
                 )
+            }
+        },
+        actions = {
+            if (actionImage != null) {
+                IconButton(onClick = onActionClick) {
+                    Icon(
+                        imageVector = actionImage,
+                        contentDescription = actionDescription
+                    )
+                }
             }
         }
     )

@@ -9,31 +9,28 @@ import java.time.LocalDate
 
 @Dao
 interface PriceBarDao {
+
     @Upsert
     suspend fun upsertPriceBars(priceBars: List<PriceBarEntity>)
 
     @Query("""
         SELECT * FROM price_bars_daily 
         WHERE symbol = :symbol 
+        AND dateTimestamp >= :startDate 
+        AND (:endDate IS NULL OR dateTimestamp <= :endDate)
         ORDER BY dateTimestamp ASC
     """)
-    fun observePriceBarsForSymbol(symbol: String): Flow<List<PriceBarEntity>>
+    fun observePriceBarsForSymbol(
+        symbol: String,
+        startDate: Long,
+        endDate: Long? = null
+    ): Flow<List<PriceBarEntity>>
 
     @Query("""
         SELECT MAX(dateTimestamp) 
         FROM price_bars_daily 
         WHERE symbol = :symbol
-        LIMIT 100
     """)
     suspend fun getLastDateForSymbol(symbol: String): LocalDate?
 
-//    @Query("""
-//        SELECT MIN(date)
-//        FROM price_bars
-//        WHERE symbol = :symbol
-//    """)
-//    suspend fun getFirstDateForSymbol(symbol: String): LocalDate?
-//
-//    @Query("DELETE FROM price_bars WHERE symbol = :symbol")
-//    suspend fun clearPriceDataForSymbol(symbol: String)
 }

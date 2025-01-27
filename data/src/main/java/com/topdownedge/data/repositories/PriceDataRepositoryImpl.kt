@@ -29,11 +29,14 @@ class PriceDataRepositoryImpl
     ): Flow<Result<List<PriceBar>?>> = flow {
 
         // First, try to get cached data from local database
-        val initialData = priceBarDao.observePriceBarsForSymbol(symbol).firstOrNull()
+        val initialData = priceBarDao.observePriceBarsForSymbol(
+            symbol,
+            fromDate?.toEpochDay() ?: 0,
+        ).firstOrNull()
         var lastDateWithPrice: LocalDate? = null
 
         // If we have cached data, emit it immediately and note the last date
-        if (initialData != null && initialData.isNotEmpty()) {
+        if (initialData?.isEmpty() == false) {
             lastDateWithPrice = LocalDate.ofEpochDay(initialData.last().dateTimestamp)
             emit(Result.success(initialData.toPriceBars()))
         }
@@ -59,15 +62,16 @@ class PriceDataRepositoryImpl
         }
 
         // Observe and emit all future updates from the local database
-        priceBarDao.observePriceBarsForSymbol(symbol).collect { entities ->
-            if(entities.isNotEmpty()) {
+        priceBarDao.observePriceBarsForSymbol(
+            symbol,
+            fromDate?.toEpochDay() ?: 0,
+        ).collect { entities ->
+            if (entities.isNotEmpty()) {
                 emit(Result.success(entities.toPriceBars()))
             }
         }
 
     }.flowOn(Dispatchers.IO)
-
-
 
 
 }

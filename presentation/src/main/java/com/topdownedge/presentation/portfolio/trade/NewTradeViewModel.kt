@@ -50,10 +50,14 @@ class NewTradeViewModel @Inject constructor(
     var priceBars: List<PriceBar> = emptyList()
     val chartModelProducer = CartesianChartModelProducer()
 
+
+
     init {
         val symbol = "$tickerCode.$tickerExchange"
+        val startDate = LocalDate.now().minusMonths(6)
+
         viewModelScope.launch {
-            priceDataRepository.getHistoricalDailyPrices(symbol)
+            priceDataRepository.getHistoricalDailyPrices(symbol, fromDate = startDate)
                 .distinctUntilChanged()
                 .collectLatest { result ->
                     if (result.isFailure ) {

@@ -32,6 +32,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -77,9 +78,27 @@ fun NewTradeScreen(
 ) {
     val viewModel: NewTradeViewModel = hiltViewModel()
     val uiState = viewModel.uiState.collectAsState().value
+    val uiEvents = viewModel.uiEvents
 
     var showExitDialog by remember { mutableStateOf(false) }
     var showDatePicker by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
+    LaunchedEffect(Unit) {
+        uiEvents.collect { event ->
+           when(event){
+               is UiEvent.ShowToast -> {
+                   val errorMessageRes = when(event.inputError){
+                       InputError.DATE -> R.string.enter_valid_date
+                       InputError.PRICE -> R.string.enter_valid_price
+                       InputError.SHARES -> R.string.enter_valid_shares
+                   }
+                   Toast.makeText(context, errorMessageRes, Toast.LENGTH_SHORT).show()
+               }
+               else -> {}
+           }
+        }
+    }
 
     BackHandler(enabled = uiState.manualInputDetected) {
         showExitDialog = true

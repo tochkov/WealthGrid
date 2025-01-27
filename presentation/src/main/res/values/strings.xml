@@ -21,4 +21,9 @@
     <string name="enter_price">Enter Price</string>
     <string name="num_of_shares">Number of Shares</string>
 
+    <string name="enter_valid_date">Please enter a valid date</string>
+    <string name="enter_valid_price">Please enter a valid price</string>
+    <string name="enter_valid_shares">Please enter a valid number of shares</string>
+
+
 </resources>

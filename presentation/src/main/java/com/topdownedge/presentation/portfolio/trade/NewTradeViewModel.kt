@@ -10,15 +10,27 @@ import com.topdownedge.domain.entities.common.PriceBar
 import com.topdownedge.domain.fmtPrice
 import com.topdownedge.domain.repositories.PriceDataRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import javax.inject.Inject
 
+enum class InputError{
+    DATE,
+    PRICE,
+    SHARES,
+}
+
+sealed interface UiEvent {
+    data class ShowToast(val inputError: InputError) : UiEvent
+    data class Navigate(val route: String) : UiEvent
+}
 
 data class NewTradeUiState(
     var ticker: String = "",
@@ -26,6 +38,7 @@ data class NewTradeUiState(
     var displayPriceStr: String = "",
     var displayChangePct: Double? = null,
     var chartError: Boolean = false,
+    var inputError: InputError? = null,
 
     var manualInputDetected: Boolean = false,
     var isBuyState: Boolean = true,
@@ -47,10 +60,11 @@ class NewTradeViewModel @Inject constructor(
     val uiState: StateFlow<NewTradeUiState>
         field = MutableStateFlow(NewTradeUiState())
 
+    private val _uiEvents = Channel<UiEvent>()
+    val uiEvents = _uiEvents.receiveAsFlow()
+
     var priceBars: List<PriceBar> = emptyList()
     val chartModelProducer = CartesianChartModelProducer()
-
-
 
     init {
         val symbol = "$tickerCode.$tickerExchange"
@@ -138,9 +152,37 @@ class NewTradeViewModel @Inject constructor(
         Log.e("XXX", "selectedShares: ${uiState.value.selectedShares}")
         Log.e("XXX", "totalPosition: ${uiState.value.totalPosition}")
 
-        // no empty fields
-        // no non numeric/date fields
-        // date cannot be in future
+        Log.e("XXX", "isBuyState: ${uiState.value.isBuyState}")
+
+
+        val isInputValid = validateInput()
+
+        if(isInputValid){
+            // repo.saveTrade()
+        }
+    }
+
+    private fun validateInput(): Boolean {
+        val uiState = uiState.value
+        if (uiState.selectedDate.isAfter(LocalDate.now())) {
+            showErrorToast(InputError.DATE)
+            return false
+        }
+        if (uiState.selectedPrice.toDoubleOrNull() == null) {
+            showErrorToast(InputError.PRICE)
+            return false
+        }
+        if (uiState.selectedShares.toDoubleOrNull() == null) {
+            showErrorToast(InputError.SHARES)
+            return false
+        }
+        return true
+    }
+
+    private fun showErrorToast(inputError: InputError){
+        viewModelScope.launch{
+            _uiEvents.send(UiEvent.ShowToast(inputError))
+        }
     }
 
     fun onUserClickOrDragChart(position: Int) {

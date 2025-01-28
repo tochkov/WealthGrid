@@ -25,5 +25,7 @@
     <string name="enter_valid_price">Please enter a valid price</string>
     <string name="enter_valid_shares">Please enter a valid number of shares</string>
 
+    <string name="new_trade_success">Successfully added new trade for %1$s</string>
+
 
 </resources>

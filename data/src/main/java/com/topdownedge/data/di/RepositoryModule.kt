@@ -4,10 +4,12 @@ import com.topdownedge.data.repositories.MarketInfoRepositoryImpl
 import com.topdownedge.data.repositories.NewsRepositoryImpl
 import com.topdownedge.data.repositories.PriceDataRepositoryImpl
 import com.topdownedge.data.repositories.TokenRepositoryImpl
+import com.topdownedge.data.repositories.UserPortfolioRepositoryImpl
 import com.topdownedge.domain.repositories.MarketInfoRepository
 import com.topdownedge.domain.repositories.NewsRepository
 import com.topdownedge.domain.repositories.PriceDataRepository
 import com.topdownedge.domain.repositories.TokenRepository
+import com.topdownedge.domain.repositories.UserPortfolioRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -28,5 +30,9 @@ internal interface  RepositoryModule {
 
     @Binds
     fun bindsPriceDataRepository(impl: PriceDataRepositoryImpl): PriceDataRepository
+
+    @Binds
+    fun bindsUserPortfolioRepository(impl: UserPortfolioRepositoryImpl): UserPortfolioRepository
+
 
 }

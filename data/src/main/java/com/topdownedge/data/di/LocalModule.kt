@@ -3,6 +3,7 @@ package com.topdownedge.data.di
 import android.app.Application
 import androidx.room.Room
 import com.topdownedge.data.local.MarketDatabase
+import com.topdownedge.data.local.PortfolioDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -39,6 +40,26 @@ class LocalModule {
     @Provides
     @Singleton
     fun providePriceBarDao(db: MarketDatabase) = db.priceBarDao()
+
+
+
+
+    @Provides
+    @Singleton
+    fun providePortfolioDatabase(appContext: Application): PortfolioDatabase {
+        return Room.databaseBuilder(
+            appContext,
+            PortfolioDatabase::class.java,
+            "user_portfolio"
+        )
+//            .fallbackToDestructiveMigration()
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideUserTradeDao(db: PortfolioDatabase) = db.userTradeDao()
+
 
 
 }

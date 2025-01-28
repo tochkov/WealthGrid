@@ -1,0 +1,96 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 2,
+    "identityHash": "1275b0dc058a51bc82fc5cb19bd0153e",
+    "entities": [
+      {
+        "tableName": "user_trades",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `tickerCode` TEXT NOT NULL, `tickerExchange` TEXT NOT NULL, `dateSubmitted` TEXT NOT NULL, `dateTraded` TEXT NOT NULL, `price` REAL NOT NULL, `shares` REAL NOT NULL, `isBuy` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tickerCode",
+            "columnName": "tickerCode",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tickerExchange",
+            "columnName": "tickerExchange",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dateSubmitted",
+            "columnName": "dateSubmitted",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dateTraded",
+            "columnName": "dateTraded",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "price",
+            "columnName": "price",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "shares",
+            "columnName": "shares",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isBuy",
+            "columnName": "isBuy",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_user_trades_tickerCode_tickerExchange",
+            "unique": false,
+            "columnNames": [
+              "tickerCode",
+              "tickerExchange"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_user_trades_tickerCode_tickerExchange` ON `${TABLE_NAME}` (`tickerCode`, `tickerExchange`)"
+          },
+          {
+            "name": "index_user_trades_dateTraded",
+            "unique": false,
+            "columnNames": [
+              "dateTraded"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_user_trades_dateTraded` ON `${TABLE_NAME}` (`dateTraded`)"
+          }
+        ],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1275b0dc058a51bc82fc5cb19bd0153e')"
+    ]
+  }
+}

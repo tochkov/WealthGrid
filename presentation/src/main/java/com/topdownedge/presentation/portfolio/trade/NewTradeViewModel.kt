@@ -1,14 +1,15 @@
 package com.topdownedge.presentation.portfolio.trade
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
+import com.topdownedge.domain.entities.UserTrade
 import com.topdownedge.domain.entities.common.PriceBar
 import com.topdownedge.domain.fmtPrice
 import com.topdownedge.domain.repositories.PriceDataRepository
+import com.topdownedge.domain.repositories.UserPortfolioRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +22,7 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import javax.inject.Inject
 
-enum class InputError{
+enum class InputError {
     DATE,
     PRICE,
     SHARES,
@@ -51,7 +52,8 @@ data class NewTradeUiState(
 @HiltViewModel
 class NewTradeViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    priceDataRepository: PriceDataRepository
+    priceDataRepository: PriceDataRepository,
+    val userPortfolioRepository: UserPortfolioRepository
 ) : ViewModel() {
 
     val tickerCode = savedStateHandle.get<String>("tickerCode") ?: ""
@@ -74,7 +76,7 @@ class NewTradeViewModel @Inject constructor(
             priceDataRepository.getHistoricalDailyPrices(symbol, fromDate = startDate)
                 .distinctUntilChanged()
                 .collectLatest { result ->
-                    if (result.isFailure ) {
+                    if (result.isFailure) {
                         uiState.update {
                             it.copy(
                                 chartError = true
@@ -143,22 +145,23 @@ class NewTradeViewModel @Inject constructor(
         return (priceDouble * sharesDouble).fmtPrice()
     }
 
-
     fun onSubmitClicked() {
-        Log.e("XXX", "onSubmitClicked: ")
-        Log.e("XXX", "tickerCode: $tickerCode, tickerExchange: $tickerExchange")
-        Log.e("XXX", "selectedDate: ${uiState.value.selectedDate}")
-        Log.e("XXX", "selectedPrice: ${uiState.value.selectedPrice}")
-        Log.e("XXX", "selectedShares: ${uiState.value.selectedShares}")
-        Log.e("XXX", "totalPosition: ${uiState.value.totalPosition}")
-
-        Log.e("XXX", "isBuyState: ${uiState.value.isBuyState}")
-
-
         val isInputValid = validateInput()
-
-        if(isInputValid){
-            // repo.saveTrade()
+        if (isInputValid) {
+            viewModelScope.launch {
+                userPortfolioRepository.addUserTrade(
+                    UserTrade(
+                        tickerCode = tickerCode,
+                        tickerExchange = tickerExchange,
+                        dateSubmitted = LocalDate.now(),
+                        dateTraded = uiState.value.selectedDate,
+                        price = uiState.value.selectedPrice.toDouble(),
+                        shares = uiState.value.selectedShares.toDouble(),
+                        isBuy = uiState.value.isBuyState,
+                    )
+                )
+                _uiEvents.send(UiEvent.Navigate("success_back"))
+            }
         }
     }
 
@@ -179,8 +182,8 @@ class NewTradeViewModel @Inject constructor(
         return true
     }
 
-    private fun showErrorToast(inputError: InputError){
-        viewModelScope.launch{
+    private fun showErrorToast(inputError: InputError) {
+        viewModelScope.launch {
             _uiEvents.send(UiEvent.ShowToast(inputError))
         }
     }
@@ -208,6 +211,7 @@ class NewTradeViewModel @Inject constructor(
             )
         }
     }
+
     val DEFAULT_POSITION = -1
     private fun getLastAvailableDate(index: Int = DEFAULT_POSITION): LocalDate? {
         return if (index <= DEFAULT_POSITION) {

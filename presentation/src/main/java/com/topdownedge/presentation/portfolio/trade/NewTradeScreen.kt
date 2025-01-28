@@ -84,6 +84,7 @@ fun NewTradeScreen(
     var showDatePicker by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
+    val messageSuccess = stringResource(R.string.new_trade_success, tickerCode)
     LaunchedEffect(Unit) {
         uiEvents.collect { event ->
            when(event){
@@ -95,7 +96,10 @@ fun NewTradeScreen(
                    }
                    Toast.makeText(context, errorMessageRes, Toast.LENGTH_SHORT).show()
                }
-               else -> {}
+               is UiEvent.Navigate -> {
+                   Toast.makeText(context, messageSuccess, Toast.LENGTH_SHORT).show()
+                   onBackPress()
+               }
            }
         }
     }

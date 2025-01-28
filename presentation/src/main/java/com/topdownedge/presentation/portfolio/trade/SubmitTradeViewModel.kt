@@ -33,7 +33,7 @@ sealed interface UiEvent {
     data class Navigate(val route: String) : UiEvent
 }
 
-data class NewTradeUiState(
+data class SubmitTradeUiState(
     var ticker: String = "",
     var name: String = "",
     var displayPriceStr: String = "",
@@ -50,17 +50,18 @@ data class NewTradeUiState(
 )
 
 @HiltViewModel
-class NewTradeViewModel @Inject constructor(
+class SubmitTradeViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     priceDataRepository: PriceDataRepository,
-    val userPortfolioRepository: UserPortfolioRepository
+    val userPortfolioRepository: UserPortfolioRepository,
 ) : ViewModel() {
 
     val tickerCode = savedStateHandle.get<String>("tickerCode") ?: ""
     val tickerExchange = savedStateHandle.get<String>("tickerExchange") ?: ""
+    val symbol = "$tickerCode.$tickerExchange"
 
-    val uiState: StateFlow<NewTradeUiState>
-        field = MutableStateFlow(NewTradeUiState())
+    val uiState: StateFlow<SubmitTradeUiState>
+        field = MutableStateFlow(SubmitTradeUiState())
 
     private val _uiEvents = Channel<UiEvent>()
     val uiEvents = _uiEvents.receiveAsFlow()
@@ -69,7 +70,7 @@ class NewTradeViewModel @Inject constructor(
     val chartModelProducer = CartesianChartModelProducer()
 
     init {
-        val symbol = "$tickerCode.$tickerExchange"
+
         val startDate = LocalDate.now().minusMonths(6)
 
         viewModelScope.launch {
@@ -149,14 +150,17 @@ class NewTradeViewModel @Inject constructor(
         val isInputValid = validateInput()
         if (isInputValid) {
             viewModelScope.launch {
-                userPortfolioRepository.addUserTrade(
+                val shares = uiState.value.selectedShares.toDouble()
+                val sharesCorrected =
+                    if (!uiState.value.isBuyState && shares > 0) -shares else shares
+                userPortfolioRepository.submitUserTrade(
                     UserTrade(
                         tickerCode = tickerCode,
                         tickerExchange = tickerExchange,
                         dateSubmitted = LocalDate.now(),
                         dateTraded = uiState.value.selectedDate,
                         price = uiState.value.selectedPrice.toDouble(),
-                        shares = uiState.value.selectedShares.toDouble(),
+                        shares = sharesCorrected,
                         isBuy = uiState.value.isBuyState,
                     )
                 )

@@ -1,8 +1,16 @@
 package com.topdownedge.domain.entities
 
-class UserPortfolio {
+data class UserPortfolio(
+    val positions: List<UserPosition>,
 
-    // List<Position>
-    // performance
-    //
+    val totalInvested: Double,
+    val currentValue: Double,
+
+    val totalPNL: Double,
+    val totalPNLPercent: Double,
+
+
+) {
+
+
 }

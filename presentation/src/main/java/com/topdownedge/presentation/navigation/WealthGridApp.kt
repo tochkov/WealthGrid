@@ -8,7 +8,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.topdownedge.presentation.news.NewsDetailsScreen
 import com.topdownedge.presentation.portfolio.trade.AssetSearchScreen
-import com.topdownedge.presentation.portfolio.trade.NewTradeScreen
+import com.topdownedge.presentation.portfolio.trade.SubmitTradeScreen
 import com.topdownedge.presentation.ui.theme.WealthGridTheme
 import com.topdownedge.presentation.welcome.WelcomeScreen
 
@@ -98,7 +98,7 @@ fun WealthGridApp(
 
                 composable<ScreenDestination.NewTrade> { backstackEntry ->
                     val ticker: ScreenDestination.NewTrade = backstackEntry.toRoute()
-                    NewTradeScreen(
+                    SubmitTradeScreen(
                         ticker.tickerCode,
                         ticker.tickerExchange,
                         ticker.tickerName,

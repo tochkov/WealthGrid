@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "1275b0dc058a51bc82fc5cb19bd0153e",
+    "identityHash": "d0f689ab7b1af4fcc241f0517fb9626f",
     "entities": [
       {
         "tableName": "user_trades",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `tickerCode` TEXT NOT NULL, `tickerExchange` TEXT NOT NULL, `dateSubmitted` TEXT NOT NULL, `dateTraded` TEXT NOT NULL, `price` REAL NOT NULL, `shares` REAL NOT NULL, `isBuy` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `symbol` TEXT NOT NULL, `dateSubmitted` TEXT NOT NULL, `dateTraded` TEXT NOT NULL, `price` REAL NOT NULL, `shares` REAL NOT NULL, `isBuy` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -15,14 +15,8 @@
             "notNull": true
           },
           {
-            "fieldPath": "tickerCode",
-            "columnName": "tickerCode",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "tickerExchange",
-            "columnName": "tickerExchange",
+            "fieldPath": "symbol",
+            "columnName": "symbol",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -65,14 +59,13 @@
         },
         "indices": [
           {
-            "name": "index_user_trades_tickerCode_tickerExchange",
+            "name": "index_user_trades_symbol",
             "unique": false,
             "columnNames": [
-              "tickerCode",
-              "tickerExchange"
+              "symbol"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_user_trades_tickerCode_tickerExchange` ON `${TABLE_NAME}` (`tickerCode`, `tickerExchange`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_user_trades_symbol` ON `${TABLE_NAME}` (`symbol`)"
           },
           {
             "name": "index_user_trades_dateTraded",
@@ -90,7 +83,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1275b0dc058a51bc82fc5cb19bd0153e')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd0f689ab7b1af4fcc241f0517fb9626f')"
     ]
   }
 }

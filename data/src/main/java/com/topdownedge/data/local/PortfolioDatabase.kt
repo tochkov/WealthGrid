@@ -1,24 +1,22 @@
 package com.topdownedge.data.local
 
-import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.topdownedge.data.local.dao.UserPositionDao
 import com.topdownedge.data.local.dao.UserTradeDao
 
 @Database(
     entities = [
         UserTradeEntity::class,
+        UserPositionEntity::class,
     ],
-    version = 2,
-//        autoMigrations = [
-//        AutoMigration(
-//            from = 1, to = 2,
-//        )
-//    ]
+    version = 4,
 )
 @TypeConverters(TypeConverterz::class)
 abstract class PortfolioDatabase: RoomDatabase() {
 
     abstract fun userTradeDao(): UserTradeDao
+
+    abstract fun userPositionDao(): UserPositionDao
 }

@@ -10,10 +10,19 @@ import kotlinx.coroutines.flow.Flow
 interface UserTradeDao {
 
     @Insert
-    suspend fun insertTrade(trade: UserTradeEntity)
+    suspend fun insertUserTrade(trade: UserTradeEntity)
 
-    @Query("SELECT * FROM user_trades")
-    fun getAllTrades(): Flow<List<UserTradeEntity>>
+    @Query("""
+        SELECT * FROM user_trades 
+        ORDER BY dateTraded DESC
+        """)
+    fun getAllUserTrades(): Flow<List<UserTradeEntity>>
+
+    @Query("""
+        SELECT * FROM user_trades 
+        WHERE symbol = :symbol
+        """)
+    fun getUserTradesForSymbol(symbol: String): Flow<List<UserTradeEntity>>
 
 
 }

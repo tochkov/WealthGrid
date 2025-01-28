@@ -52,13 +52,17 @@ class LocalModule {
             PortfolioDatabase::class.java,
             "user_portfolio"
         )
-//            .fallbackToDestructiveMigration()
+            .fallbackToDestructiveMigration()
             .build()
     }
 
     @Provides
     @Singleton
     fun provideUserTradeDao(db: PortfolioDatabase) = db.userTradeDao()
+
+    @Provides
+    @Singleton
+    fun provideUserPositionDao(db: PortfolioDatabase) = db.userPositionDao()
 
 
 

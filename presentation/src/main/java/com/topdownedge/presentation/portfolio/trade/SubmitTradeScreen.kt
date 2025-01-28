@@ -70,13 +70,13 @@ import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NewTradeScreen(
+fun SubmitTradeScreen(
     tickerCode: String,
     tickerExchange: String,
     tickerName: String,
     onBackPress: () -> Unit = {}
 ) {
-    val viewModel: NewTradeViewModel = hiltViewModel()
+    val viewModel: SubmitTradeViewModel = hiltViewModel()
     val uiState = viewModel.uiState.collectAsState().value
     val uiEvents = viewModel.uiEvents
 
@@ -475,7 +475,7 @@ fun UpDownClickableArrows(
 @Preview
 @Composable
 fun NewTradeScreenPreview() {
-    NewTradeScreen(
+    SubmitTradeScreen(
         tickerCode = "AAPL", tickerExchange = "NASDAQ", tickerName = "Apple Inc."
     )
 }

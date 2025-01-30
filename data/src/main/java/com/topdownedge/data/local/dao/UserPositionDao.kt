@@ -15,6 +15,6 @@ interface UserPositionDao {
     @Query("SELECT * FROM user_positions WHERE symbol = :symbol")
     fun getUserPositionForSymbol(symbol: String): Flow<UserPositionEntity>
 
-    @Query("SELECT * FROM user_positions")
+    @Query("SELECT * FROM user_positions ORDER BY totalInvested DESC")
     fun getAllUserPositions(): Flow<List<UserPositionEntity>>
 }

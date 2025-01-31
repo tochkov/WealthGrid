@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.topdownedge.domain.entities.UserPosition
 import com.topdownedge.domain.fmtPrice
-import com.topdownedge.domain.repositories.PriceDataRepository
+import com.topdownedge.domain.repositories.LivePricesRepository
 import com.topdownedge.domain.repositories.UserPortfolioRepository
 import com.topdownedge.presentation.common.randomColor
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,18 +28,16 @@ data class PortfolioUiState(
     var portfolioValue: String = "",
     var portfolioGain: String = "",
     var selectedPie: Pie? = null,
-
-    )
+)
 
 @HiltViewModel
 class PortfolioViewModel @Inject constructor(
-    priceDataRepository: PriceDataRepository,
-    userPortfolioRepository: UserPortfolioRepository
+    private val userPortfolioRepository: UserPortfolioRepository,
+    private val livePricesRepository: LivePricesRepository
 ) : ViewModel() {
 
     val uiState: StateFlow<PortfolioUiState>
         field = MutableStateFlow(PortfolioUiState())
-
 
     init {
         viewModelScope.launch {
@@ -60,15 +58,10 @@ class PortfolioViewModel @Inject constructor(
                         portfolioGain = calculatePortfolioGain(positionList)
                     )
                 }
+                subscribeToTickersPriceUpdates()
             }
         }
-
-//        viewModelScope.launch{
-//            Log.e("XXX", "testWs")
-//            userPortfolioRepository.testWs()
-//        }
     }
-
 
     fun onPieSliceClick(clickedPie: Pie) {
 
@@ -103,6 +96,31 @@ class PortfolioViewModel @Inject constructor(
         }
     }
 
+    fun startCollectingLivePrices() {
+        viewModelScope.launch {
+            livePricesRepository.observeLivePricesConnection().collect { latestPrices ->
+                uiState.update {
+                    it.copy(
+                        positions = it.positions.map { position ->
+                            position.copy(
+                                currentPrice = latestPrices[position.tickerCode]
+                                    ?: position.currentPrice
+                            )
+                        }
+                    )
+                }
+            }
+        }
+        subscribeToTickersPriceUpdates()
+    }
+
+    fun stopCollectingLivePrices() {
+        livePricesRepository.closeLivePricesConnection()
+    }
+
+    private fun subscribeToTickersPriceUpdates() {
+        livePricesRepository.subscribeToLivePrices(uiState.value.positions.map { it.tickerCode })
+    }
 
     private fun calculatePortfolioValue(positions: List<UserPosition>): String {
         var totalValue = 0.0

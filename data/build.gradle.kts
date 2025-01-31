@@ -27,10 +27,12 @@ android {
     buildTypes {
         debug {
             buildConfigField("String", "BASE_URL_EODHD", "\"https://eodhd.com/api/\"")
+            buildConfigField("String", "BASE_URL_EODHD_WSS", "\"wss://ws.eodhistoricaldata.com/ws/\"")
             isMinifyEnabled = false
         }
         release {
             buildConfigField("String", "BASE_URL_EODHD", "\"https://eodhd.com/api/\"")
+            buildConfigField("String", "BASE_URL_EODHD_WSS", "\"wss://ws.eodhistoricaldata.com/ws\"")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),

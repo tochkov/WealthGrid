@@ -172,7 +172,7 @@ private fun HomeScreenNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = ScreenDestination.Portfolio,
+        startDestination = ScreenDestination.Markets,
         modifier = modifier
     ) {
         composable<ScreenDestination.Markets> {

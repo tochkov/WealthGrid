@@ -23,6 +23,7 @@ import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.logging.SIMPLE
+import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.http.takeFrom
 import io.ktor.serialization.kotlinx.json.json
 import jakarta.inject.Named
@@ -33,7 +34,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
-
 
     @Provides
     @Singleton
@@ -86,4 +86,21 @@ object NetworkModule {
     fun provideEodhdPriceDataApi(@Named("ktorfit_eodhd") ktorfit: Ktorfit): EodhdPriceDataApi {
         return ktorfit.createEodhdPriceDataApi()
     }
+
+    @Provides
+    @Singleton
+//    @Named("ktor_websocket_eodhd")
+    fun provideKtorWebsocketClient(tokenManager: TokenRepository) = HttpClient {
+        install(WebSockets)
+
+        defaultRequest {
+            url {
+                takeFrom(BuildConfig.BASE_URL_EODHD_WSS)
+                parameters.append("api_token", tokenManager.getApiToken())
+            }
+        }
+    }
+
 }
+
+

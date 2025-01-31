@@ -35,6 +35,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.topdownedge.domain.entities.UserPosition
 import com.topdownedge.domain.fmtPrice
+import com.topdownedge.presentation.navigation.ScreenVisibilityObserver
 import ir.ehsannarmani.compose_charts.PieChart
 import ir.ehsannarmani.compose_charts.models.Pie
 import java.time.LocalDate
@@ -44,11 +45,22 @@ private const val PAGE_LINE_CHART = 1
 private const val PAGE_STATS = 2
 
 @Composable
-internal fun PortfolioScreen() {
+internal fun PortfolioScreen(
+//    navController: NavHostController
+) {
 
     val viewModel: PortfolioViewModel = hiltViewModel()
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     val pagerState = rememberPagerState(pageCount = { 3 })
+
+    ScreenVisibilityObserver(
+        onScreenEnter = {
+            viewModel.startCollectingLivePrices()
+        },
+        onScreenExit = {
+            viewModel.stopCollectingLivePrices()
+        }
+    )
 
     Column(
         modifier = Modifier
@@ -152,10 +164,10 @@ fun PortfolioDonut(
 
         ) {
 
-            if(uiState.selectedPie == null){
+            if (uiState.selectedPie == null) {
                 Text(text = "Portfolio value:\n ${uiState.portfolioValue}")
                 Text(text = "Portfolio gain: ${uiState.portfolioGain}")
-            } else{
+            } else {
                 Text(text = uiState.selectedPie!!.label!!)
                 Text(text = uiState.selectedPie!!.data.fmtPrice())
             }
@@ -208,6 +220,10 @@ fun PositionCard(
             )
             Text(
                 text = "Avg. price " + position.averagePrice.fmtPrice(),
+                modifier = Modifier.weight(1f),
+            )
+            Text(
+                text = "Current: " + position.currentPrice.fmtPrice(),
                 modifier = Modifier.weight(1f),
             )
 

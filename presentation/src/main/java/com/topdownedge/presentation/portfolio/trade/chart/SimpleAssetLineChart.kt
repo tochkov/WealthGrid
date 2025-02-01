@@ -65,8 +65,8 @@ class CustomDateFormatter(
 fun SimpleAssetLineChart(
     modelProducer: CartesianChartModelProducer,
     modifier: Modifier = Modifier,
-    customFormatter: CustomDateFormatter,
-    markerVisibilityListener: CartesianMarkerVisibilityListener
+    customFormatter: CustomDateFormatter? = null,
+    markerVisibilityListener: CartesianMarkerVisibilityListener? = null
 ) {
     val lineColor = MaterialTheme.colorScheme.primary
 
@@ -89,7 +89,7 @@ fun SimpleAssetLineChart(
                 ),
                 rangeProvider = RangeProvider,
             ),
-            marker = rememberMarker(customFormatter),
+            marker = customFormatter?.let { rememberMarker(customFormatter) },
             markerVisibilityListener = markerVisibilityListener
 
         ),

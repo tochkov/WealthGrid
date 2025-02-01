@@ -5,7 +5,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -26,12 +28,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil3.compose.AsyncImage
+import coil3.request.CachePolicy
+import coil3.request.ImageRequest
 import com.topdownedge.domain.entities.NewsArticle
 import com.topdownedge.domain.entities.NewsCategory
 
@@ -60,7 +66,10 @@ internal fun NewsListScreen(
                     val categories = mutableListOf(
                         NewsCategory.General,
                         NewsCategory.Ticker("AAPL"),
-                        NewsCategory.Topic("zacks rank")
+                        NewsCategory.Ticker("NVDA"),
+                        NewsCategory.Topic("initial public offering"), // !
+                        NewsCategory.Topic("earnings release"), // !
+                        NewsCategory.Topic("financial results"), // !
                     )
                     items(categories.size) { i ->
                         val isSelected = categories[i] == uiState.selectedCategory
@@ -176,10 +185,21 @@ fun NewsItemCard2(
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = Icons.Filled.Info,
+
+                val imgUrl = "https://icons.duckduckgo.com/ip2/${newsArticle.source}.ico"
+                AsyncImage(
+                    modifier = Modifier
+                        .padding(end = 4.dp)
+                        .width(20.dp)
+                        .height(20.dp),
                     contentDescription = null,
-                    modifier = Modifier.padding(end = 4.dp)
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(imgUrl)
+                        .diskCacheKey(imgUrl) // Use URL as cache key
+//                        .networkCachePolicy(CachePolicy.DISABLED)
+                        .memoryCachePolicy(CachePolicy.ENABLED)
+                        .diskCachePolicy(CachePolicy.ENABLED)
+                        .build()
 
                 )
                 Text(

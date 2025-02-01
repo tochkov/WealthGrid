@@ -75,6 +75,10 @@ dependencies {
 
     implementation(libs.vico.compose.m3)
     implementation (libs.ehsannarmani.compose.charts)
+
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.ktor3)
+
     // DI
     implementation(libs.hilt.android)
     implementation(libs.hilt.navigation.compose)

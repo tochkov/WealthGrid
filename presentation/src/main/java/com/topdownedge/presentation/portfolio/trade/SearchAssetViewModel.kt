@@ -14,18 +14,18 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class AssetSearchUiState(
+data class SearchAssetUiState(
     var assets: List<Ticker> = emptyList(),
     var noResultsState: Boolean = false
 )
 
 @HiltViewModel
-class AssetSearchViewModel @Inject constructor(
+class SearchAssetViewModel @Inject constructor(
     private val marketInfoRepository: MarketInfoRepository
 ) : ViewModel() {
 
-    val uiState: StateFlow<AssetSearchUiState>
-        field = MutableStateFlow(AssetSearchUiState())
+    val uiState: StateFlow<SearchAssetUiState>
+        field = MutableStateFlow(SearchAssetUiState())
 
     init {
         viewModelScope.launch {

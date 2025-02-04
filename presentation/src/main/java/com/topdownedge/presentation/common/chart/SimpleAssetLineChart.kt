@@ -1,4 +1,4 @@
-package com.topdownedge.presentation.portfolio.trade.chart
+package com.topdownedge.presentation.common.chart
 
 import android.text.Spannable
 import android.text.SpannableStringBuilder
@@ -66,7 +66,8 @@ fun SimpleAssetLineChart(
     modelProducer: CartesianChartModelProducer,
     modifier: Modifier = Modifier,
     customFormatter: CustomDateFormatter? = null,
-    markerVisibilityListener: CartesianMarkerVisibilityListener? = null
+    markerVisibilityListener: CartesianMarkerVisibilityListener? = null,
+    animateIn: Boolean = true
 ) {
     val lineColor = MaterialTheme.colorScheme.primary
 
@@ -93,8 +94,9 @@ fun SimpleAssetLineChart(
             markerVisibilityListener = markerVisibilityListener
 
         ),
-        modelProducer,
-        modifier,
-        rememberVicoScrollState(scrollEnabled = false),
+        animateIn = animateIn,
+        modelProducer = modelProducer,
+        modifier = modifier,
+        scrollState = rememberVicoScrollState(scrollEnabled = false),
     )
 }

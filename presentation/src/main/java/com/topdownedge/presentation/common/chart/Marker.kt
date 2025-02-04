@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.topdownedge.presentation.portfolio.trade.chart
+package com.topdownedge.presentation.common.chart
 
 import android.text.Layout
 import androidx.compose.material3.MaterialTheme

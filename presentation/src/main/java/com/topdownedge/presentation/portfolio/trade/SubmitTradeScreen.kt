@@ -60,8 +60,8 @@ import com.topdownedge.domain.fmtPercent
 import com.topdownedge.presentation.R
 import com.topdownedge.presentation.common.ConfirmDialog
 import com.topdownedge.presentation.common.SimpleAppBar
-import com.topdownedge.presentation.portfolio.trade.chart.CustomDateFormatter
-import com.topdownedge.presentation.portfolio.trade.chart.SimpleAssetLineChart
+import com.topdownedge.presentation.common.chart.CustomDateFormatter
+import com.topdownedge.presentation.common.chart.SimpleAssetLineChart
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId

@@ -8,6 +8,7 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.Home
@@ -113,17 +114,39 @@ private fun HomeAppBar(
                     it.hasRoute(item.route::class)
                 } == true
             }
-            if (currentElement == NavBarElement.Portfolio) {
-                IconButton(
-                    onClick = {
-                        onNavigateToScreen(ScreenDestination.InstrumentPicker)
+            when (currentElement) {
+                NavBarElement.Markets -> {
+                    IconButton(
+                        onClick = {
+                            onNavigateToScreen(ScreenDestination.SearchAsset(false))
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Search,
+                            contentDescription = stringResource(currentElement.textResource)
+                        )
                     }
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Add,
-                        contentDescription = stringResource(currentElement.textResource)
-                    )
                 }
+
+                NavBarElement.Portfolio -> {
+                    IconButton(
+                        onClick = {
+                            onNavigateToScreen(ScreenDestination.SearchAsset(true))
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Add,
+                            contentDescription = stringResource(currentElement.textResource)
+                        )
+                    }
+                }
+
+                NavBarElement.News -> {
+
+                }
+
+                else -> {}
+
             }
         },
         modifier = modifier
@@ -176,10 +199,29 @@ private fun HomeScreenNavHost(
         modifier = modifier
     ) {
         composable<ScreenDestination.Markets> {
-            CompaniesListScreen()
+            CompaniesListScreen(
+                onCompanyClick = { ticker ->
+                    onNavigateToScreen(
+                        ScreenDestination.CompanyDetails(
+                            ticker.code,
+                            ticker.exchange,
+                            ticker.name
+                        )
+                    )
+                }
+            )
         }
         composable<ScreenDestination.Portfolio> {
-            PortfolioScreen()
+            PortfolioScreen(
+                onPositionClick = { position ->
+                    onNavigateToScreen(
+                        ScreenDestination.UserPosition(
+                            position.tickerCode,
+                            position.tickerExchange
+                        )
+                    )
+                }
+            )
         }
         composable<ScreenDestination.News> {
             // TODO - back press + nav bar issue potential fix starts with something like this probably:
@@ -187,6 +229,7 @@ private fun HomeScreenNavHost(
 //                navController.navigateSingleTopTo(ScreenDestination.Markets)
 //            }
             NewsListScreen(
+                // TODO - maybe put these kinds of things inside the ComposeScreens? pass the navController?
                 onListItemClick = { newsArticle ->
                     onNavigateToScreen(
                         ScreenDestination.SingleNews(

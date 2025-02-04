@@ -1,6 +1,6 @@
 package com.topdownedge.presentation.market
 
-import android.util.Log
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,10 +25,13 @@ import coil3.request.CachePolicy
 import coil3.request.ImageRequest
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.topdownedge.domain.entities.common.Ticker
-import com.topdownedge.presentation.portfolio.trade.chart.SimpleAssetLineChart
+import com.topdownedge.presentation.common.getLogoUrl
+import com.topdownedge.presentation.common.chart.SimpleAssetLineChart
 
 @Composable
-internal fun CompaniesListScreen() {
+internal fun CompaniesListScreen(
+    onCompanyClick: (Ticker) -> Unit = {},
+) {
 
     val viewModel: MarketsViewModel = hiltViewModel()
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
@@ -74,13 +77,14 @@ internal fun CompaniesListScreen() {
 
         itemsIndexed(uiState.companyList) { index, ticker ->
 
-
-            Log.e("XXX", "item: $ticker")
             StockCard(
                 modifier = Modifier
                     .padding(bottom = 16.dp)
-                    .fillMaxWidth(),
-                ticker = ticker
+                    .fillMaxWidth()
+                    .clickable {
+                        onCompanyClick(ticker)
+                    },
+                ticker = ticker,
             )
         }
 
@@ -117,6 +121,7 @@ fun ChartCard(
             }
             SimpleAssetLineChart(
                 modelProducer = modelProducer,
+                animateIn = false,
             )
         }
     }
@@ -126,7 +131,7 @@ fun ChartCard(
 @Composable
 fun StockCard(
     modifier: Modifier = Modifier,
-    ticker: Ticker
+    ticker: Ticker,
 ) {
     Card(
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
@@ -135,24 +140,7 @@ fun StockCard(
         Row {
 
             Box {
-//                AsyncImage(
-//                    modifier = Modifier
-//                        .padding(8.dp)
-//                        .width(50.dp)
-//                        .height(50.dp),
-//                    model = "https://eodhd.com/img/logos/US/${ticker.code}.png",
-//                    contentDescription = null,
-//                )
-//                AsyncImage(
-//                    modifier = Modifier
-//                        .padding(8.dp)
-//                        .width(50.dp)
-//                        .height(50.dp),
-//                    model = "https://eodhd.com/img/logos/US/${ticker.code.lowercase()}.png",
-//                    contentDescription = null,
-//                )
-//                val imgUrl = "https://financialmodelingprep.com/image-stock/${ticker.code}.png"
-                val imgUrl = "https://assets.parqet.com/logos/symbol/${ticker.code}?format=jpg&size=100"
+                val imgUrl = getLogoUrl(ticker.code)
                 AsyncImage(
                     modifier = Modifier
                         .padding(8.dp)
@@ -161,7 +149,7 @@ fun StockCard(
                     contentDescription = null,
                     model = ImageRequest.Builder(LocalContext.current)
                         .data(imgUrl)
-                        .diskCacheKey(imgUrl) // Use URL as cache key
+                        .diskCacheKey(imgUrl)
 //                        .networkCachePolicy(CachePolicy.DISABLED)
                         .memoryCachePolicy(CachePolicy.ENABLED)
                         .diskCachePolicy(CachePolicy.ENABLED)

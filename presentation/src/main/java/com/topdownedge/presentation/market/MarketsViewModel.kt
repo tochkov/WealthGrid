@@ -8,7 +8,6 @@ import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
 import com.topdownedge.domain.entities.common.Ticker
 import com.topdownedge.domain.repositories.MarketInfoRepository
 import com.topdownedge.domain.repositories.PriceDataRepository
-import com.topdownedge.presentation.portfolio.trade.AssetSearchUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

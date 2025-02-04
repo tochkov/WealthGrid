@@ -6,8 +6,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.topdownedge.presentation.market.CompanyDetailsScreen
 import com.topdownedge.presentation.news.NewsDetailsScreen
-import com.topdownedge.presentation.portfolio.trade.AssetSearchScreen
+import com.topdownedge.presentation.portfolio.UserPositionScreen
+import com.topdownedge.presentation.portfolio.trade.SearchAssetScreen
 import com.topdownedge.presentation.portfolio.trade.SubmitTradeScreen
 import com.topdownedge.presentation.ui.theme.WealthGridTheme
 import com.topdownedge.presentation.welcome.WelcomeScreen
@@ -39,7 +41,15 @@ fun WealthGridApp(
                                     navController.navigateSingleTopTo(screen)
                                 }
 
-                                is ScreenDestination.InstrumentPicker -> {
+                                is ScreenDestination.SearchAsset -> {
+                                    navController.navigateSingleTopTo(screen)
+                                }
+
+                                is ScreenDestination.CompanyDetails -> {
+                                    navController.navigateSingleTopTo(screen)
+                                }
+
+                                is ScreenDestination.UserPosition -> {
                                     navController.navigateSingleTopTo(screen)
                                 }
 
@@ -75,21 +85,30 @@ fun WealthGridApp(
 //                }
 
 
-                composable<ScreenDestination.InstrumentPicker>(
+                composable<ScreenDestination.SearchAsset>(
                     enterTransition = EnterFromBottomTransition,
                     popExitTransition = ExitToBottomTransition,
-                ) {
-                    AssetSearchScreen(
+                ) { backstackEntry ->
+                    val searchAsset: ScreenDestination.SearchAsset = backstackEntry.toRoute()
+                    SearchAssetScreen(
                         onBackPress = {
                             navController.popBackStack()
                         },
                         onListItemClick = { ticker ->
                             navController.navigateSingleTopTo(
-                                ScreenDestination.NewTrade(
-                                    ticker.code,
-                                    ticker.exchange,
-                                    ticker.name
-                                ),
+                                destinationRoute = if (searchAsset.isForNowTrade) {
+                                    ScreenDestination.NewTrade(
+                                        ticker.code,
+                                        ticker.exchange,
+                                        ticker.name
+                                    )
+                                } else {
+                                    ScreenDestination.CompanyDetails(
+                                        ticker.code,
+                                        ticker.exchange,
+                                        ticker.name
+                                    )
+                                },
                                 saveState = false
                             )
                         }
@@ -105,6 +124,23 @@ fun WealthGridApp(
                         onBackPress = {
                             navController.popBackStack()
                         }
+                    )
+                }
+
+                composable<ScreenDestination.CompanyDetails> { backstackEntry ->
+                    val ticker: ScreenDestination.CompanyDetails = backstackEntry.toRoute()
+                    CompanyDetailsScreen(
+                        ticker.tickerCode,
+                        ticker.tickerExchange,
+                        ticker.tickerName,
+                    )
+                }
+
+                composable<ScreenDestination.UserPosition> { backstackEntry ->
+                    val ticker: ScreenDestination.UserPosition = backstackEntry.toRoute()
+                    UserPositionScreen(
+                        ticker.tickerCode,
+                        ticker.tickerExchange,
                     )
                 }
 

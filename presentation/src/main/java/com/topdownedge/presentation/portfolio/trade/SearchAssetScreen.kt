@@ -31,11 +31,11 @@ import com.topdownedge.presentation.ui.theme.WealthGridTheme
 import com.topdownedge.presentation.R
 
 @Composable
-internal fun AssetSearchScreen(
+internal fun SearchAssetScreen(
     onListItemClick: (Ticker) -> Unit = {},
     onBackPress: () -> Unit = {}
 ) {
-    val viewModel: AssetSearchViewModel = hiltViewModel()
+    val viewModel: SearchAssetViewModel = hiltViewModel()
     val uiState = viewModel.uiState.collectAsState().value
 
     var searchQuery by remember { mutableStateOf("") }
@@ -77,10 +77,10 @@ internal fun AssetSearchScreen(
                             .weight(1f)
                     )
 
-                    Text(
-                        text = ticker.indexWeight.toString(),
-                        modifier = Modifier.padding(vertical = 24.dp, horizontal = 16.dp)
-                    )
+//                    Text(
+//                        text = ticker.indexWeight.toString(),
+//                        modifier = Modifier.padding(vertical = 24.dp, horizontal = 16.dp)
+//                    )
                 }
                 HorizontalDivider(thickness = 1.dp)
 
@@ -108,7 +108,7 @@ internal fun AssetSearchScreen(
 @Composable
 private fun SearchTopBarPreview() {
     WealthGridTheme {
-        AssetSearchScreen(
+        SearchAssetScreen(
 
         )
     }

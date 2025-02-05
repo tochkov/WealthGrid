@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
 import com.topdownedge.domain.entities.UserTrade
 import com.topdownedge.domain.fmt
 import com.topdownedge.domain.fmtPrice
@@ -26,6 +27,7 @@ import com.topdownedge.presentation.common.SimpleAppBar
 
 @Composable
 fun UserPositionScreen(
+    masterNavController: NavHostController,
     tickerCode: String,
     tickerExchange: String,
 ) {
@@ -37,7 +39,7 @@ fun UserPositionScreen(
             SimpleAppBar(
                 title = "Trades for $tickerCode",
                 onBackPress = {
-
+                    masterNavController.popBackStack()
                 },
                 actionImage = Icons.Default.MoreVert,
                 actionDescription = "Submit",

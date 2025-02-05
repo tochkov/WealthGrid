@@ -18,129 +18,65 @@ import com.topdownedge.presentation.welcome.WelcomeScreen
 fun WealthGridApp(
     hasApiToken: Boolean
 ) {
-    val navController = rememberNavController()
+    val masterNavController = rememberNavController()
     WealthGridTheme {
         Surface {
             NavHost(
-                navController = navController,
+                navController = masterNavController,
                 startDestination = if (!hasApiToken) ScreenDestination.Welcome else ScreenDestination.HomeScreen
             ) {
                 composable<ScreenDestination.Welcome> {
-                    WelcomeScreen(
-                        onSuccessfulClickNext = {
-                            navController.navigateClearingBackStack(ScreenDestination.HomeScreen)
-                        }
-                    )
+                    WelcomeScreen(masterNavController)
                 }
 
                 composable<ScreenDestination.HomeScreen> {
-                    WealthGridHomeScreen(
-                        onNavigateToScreen = { screen ->
-                            when (screen) {
-                                is ScreenDestination.SingleNews -> {
-                                    navController.navigateSingleTopTo(screen)
-                                }
-
-                                is ScreenDestination.SearchAsset -> {
-                                    navController.navigateSingleTopTo(screen)
-                                }
-
-                                is ScreenDestination.CompanyDetails -> {
-                                    navController.navigateSingleTopTo(screen)
-                                }
-
-                                is ScreenDestination.UserPosition -> {
-                                    navController.navigateSingleTopTo(screen)
-                                }
-
-                                else -> {}
-                            }
-                        }
-                    )
+                    WealthGridHomeScreen(masterNavController)
                 }
 
-                composable<ScreenDestination.SingleNews>(
+                composable<ScreenDestination.NewsDetails>(
                     enterTransition = EnterFromBottomTransition,
                     exitTransition = ExitToBottomTransition
                 ) { backstackEntry ->
-                    val singleNews: ScreenDestination.SingleNews = backstackEntry.toRoute()
+                    val singleNews: ScreenDestination.NewsDetails = backstackEntry.toRoute()
                     NewsDetailsScreen(singleNews.newsTitle, singleNews.newsContent)
                 }
-
-//                //TODO maybe extract this to new NavHost for the trade package; Or just rethink the flow
-//                navigation<ScreenDestination.TradeGraph>(
-//                    startDestination = ScreenDestination.TradeInitiation
-//                ) {
-//                    composable<ScreenDestination.TradeInitiation> {
-//
-//                        TradeInitiationScreen(
-//                            navigateToInstrumentPicker = {
-//                                navController.navigateDeeperTo(ScreenDestination.InstrumentPicker)
-//                            }
-//                        )
-//                    }
-//                    composable<ScreenDestination.InstrumentPicker> { backstackEntry ->
-//                        InstrumentPickerScreen()
-//                    }
-//                }
-
 
                 composable<ScreenDestination.SearchAsset>(
                     enterTransition = EnterFromBottomTransition,
                     popExitTransition = ExitToBottomTransition,
                 ) { backstackEntry ->
                     val searchAsset: ScreenDestination.SearchAsset = backstackEntry.toRoute()
-                    SearchAssetScreen(
-                        onBackPress = {
-                            navController.popBackStack()
-                        },
-                        onListItemClick = { ticker ->
-                            navController.navigateSingleTopTo(
-                                destinationRoute = if (searchAsset.isForNowTrade) {
-                                    ScreenDestination.NewTrade(
-                                        ticker.code,
-                                        ticker.exchange,
-                                        ticker.name
-                                    )
-                                } else {
-                                    ScreenDestination.CompanyDetails(
-                                        ticker.code,
-                                        ticker.exchange,
-                                        ticker.name
-                                    )
-                                },
-                                saveState = false
-                            )
-                        }
-                    )
+                    SearchAssetScreen(masterNavController, searchAsset.isForNewTrade)
                 }
 
-                composable<ScreenDestination.NewTrade> { backstackEntry ->
-                    val ticker: ScreenDestination.NewTrade = backstackEntry.toRoute()
+                composable<ScreenDestination.SubmitTrade> { backstackEntry ->
+                    val company: ScreenDestination.SubmitTrade = backstackEntry.toRoute()
                     SubmitTradeScreen(
-                        ticker.tickerCode,
-                        ticker.tickerExchange,
-                        ticker.tickerName,
+                        company.tickerCode,
+                        company.tickerExchange,
+                        company.tickerName,
                         onBackPress = {
-                            navController.popBackStack()
+                            masterNavController.popBackStack()
                         }
                     )
                 }
 
                 composable<ScreenDestination.CompanyDetails> { backstackEntry ->
-                    val ticker: ScreenDestination.CompanyDetails = backstackEntry.toRoute()
+                    val company: ScreenDestination.CompanyDetails = backstackEntry.toRoute()
                     CompanyDetailsScreen(
-                        ticker.tickerCode,
-                        ticker.tickerExchange,
-                        ticker.tickerName,
+                        masterNavController,
+                        company.tickerCode,
+                        company.tickerExchange,
+                        company.tickerName,
                     )
                 }
 
                 composable<ScreenDestination.UserPosition> { backstackEntry ->
-                    val ticker: ScreenDestination.UserPosition = backstackEntry.toRoute()
+                    val position: ScreenDestination.UserPosition = backstackEntry.toRoute()
                     UserPositionScreen(
-                        ticker.tickerCode,
-                        ticker.tickerExchange,
+                        masterNavController,
+                        position.tickerCode,
+                        position.tickerExchange,
                     )
                 }
 

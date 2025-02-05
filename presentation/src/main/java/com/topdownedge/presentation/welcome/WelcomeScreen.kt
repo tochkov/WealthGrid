@@ -25,15 +25,16 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import com.topdownedge.presentation.R
+import com.topdownedge.presentation.navigation.navigateToHomeScreen
 
 @Composable
 internal fun WelcomeScreen(
-    onSuccessfulClickNext: () -> Unit = {}
+    masterNavController: NavHostController,
 ) {
 
     val viewModel: WelcomeViewModel = hiltViewModel()
@@ -90,7 +91,7 @@ internal fun WelcomeScreen(
                     toastNoToken.show()
                 } else {
                     viewModel.saveApiToken(inputValue.trim())
-                    onSuccessfulClickNext()
+                    masterNavController.navigateToHomeScreen()
                 }
             },
             modifier = Modifier.padding(16.dp)
@@ -104,8 +105,3 @@ internal fun WelcomeScreen(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun WelcomePreview() {
-    WelcomeScreen()
-}

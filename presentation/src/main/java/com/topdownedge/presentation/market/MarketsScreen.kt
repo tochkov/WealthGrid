@@ -20,6 +20,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import coil3.request.CachePolicy
 import coil3.request.ImageRequest
@@ -27,16 +28,16 @@ import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.topdownedge.domain.entities.common.Ticker
 import com.topdownedge.presentation.common.getLogoUrl
 import com.topdownedge.presentation.common.chart.SimpleAssetLineChart
+import com.topdownedge.presentation.navigation.navigateToCompanyDetailsScreen
 
 @Composable
 internal fun CompaniesListScreen(
-    onCompanyClick: (Ticker) -> Unit = {},
+    masterNavController: NavHostController,
 ) {
 
     val viewModel: MarketsViewModel = hiltViewModel()
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
 
-    val context = LocalContext.current
     LazyColumn(
         modifier = Modifier
             .padding(horizontal = 16.dp)
@@ -74,15 +75,13 @@ internal fun CompaniesListScreen(
             }
         }
 
-
         itemsIndexed(uiState.companyList) { index, ticker ->
-
             StockCard(
                 modifier = Modifier
                     .padding(bottom = 16.dp)
                     .fillMaxWidth()
                     .clickable {
-                        onCompanyClick(ticker)
+                        masterNavController.navigateToCompanyDetailsScreen(ticker)
                     },
                 ticker = ticker,
             )
@@ -98,7 +97,6 @@ fun ChartCard(
     modifier: Modifier = Modifier,
     modelProducer: CartesianChartModelProducer,
 ) {
-
     Card(
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         modifier = modifier,
@@ -111,9 +109,7 @@ fun ChartCard(
                 Text(
                     text = "SPY",
                     modifier = Modifier.padding(8.dp),
-
-
-                    )
+                )
                 Text(
                     text = "435.34",
                     modifier = Modifier.padding(8.dp)

@@ -1,6 +1,5 @@
 package com.topdownedge.presentation.portfolio.trade
 
-import android.content.res.Configuration
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,20 +19,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.topdownedge.domain.entities.common.Ticker
+import androidx.navigation.NavHostController
 import com.topdownedge.presentation.common.HighlightedText
 import com.topdownedge.presentation.common.SearchBoxAppBar
-import com.topdownedge.presentation.ui.theme.WealthGridTheme
 
 import com.topdownedge.presentation.R
+import com.topdownedge.presentation.navigation.navigateToCompanyDetailsScreen
+import com.topdownedge.presentation.navigation.navigateToSubmitTradeScreen
 
 @Composable
 internal fun SearchAssetScreen(
-    onListItemClick: (Ticker) -> Unit = {},
-    onBackPress: () -> Unit = {}
+    masterNavController: NavHostController,
+    isForNewTrade: Boolean
 ) {
     val viewModel: SearchAssetViewModel = hiltViewModel()
     val uiState = viewModel.uiState.collectAsState().value
@@ -48,7 +47,7 @@ internal fun SearchAssetScreen(
                     searchQuery = it
                     viewModel.onSearchQueryChange(searchQuery.trim())
                 },
-                onBackClick = onBackPress
+                onBackClick = { masterNavController.popBackStack() }
             )
         }
     ) { innerPadding ->
@@ -60,7 +59,11 @@ internal fun SearchAssetScreen(
                         .fillMaxWidth()
                         .wrapContentHeight()
                         .clickable {
-                            onListItemClick(ticker)
+                            if (isForNewTrade) {
+                                masterNavController.navigateToSubmitTradeScreen(ticker)
+                            } else {
+                                masterNavController.navigateToCompanyDetailsScreen(ticker)
+                            }
                         },
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -100,16 +103,5 @@ internal fun SearchAssetScreen(
 
         }
 
-    }
-}
-
-// Preview
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-private fun SearchTopBarPreview() {
-    WealthGridTheme {
-        SearchAssetScreen(
-
-        )
     }
 }

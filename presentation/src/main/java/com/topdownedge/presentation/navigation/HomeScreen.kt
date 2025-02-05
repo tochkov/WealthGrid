@@ -1,6 +1,7 @@
 package com.topdownedge.presentation.navigation
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -42,28 +43,27 @@ import com.topdownedge.presentation.R
 
 @Composable
 internal fun WealthGridHomeScreen(
-    onNavigateToScreen: (ScreenDestination) -> Unit = {}
+    masterNavController: NavHostController
 ) {
-
-    val navController = rememberNavController()
+    val homeScreenNavController = rememberNavController()
 
     Scaffold(
         topBar = {
             HomeAppBar(
-                navController = navController,
-                onNavigateToScreen = onNavigateToScreen
+                navController = homeScreenNavController,
+                masterNavController = masterNavController
             )
         },
         bottomBar = {
 //            https://claude.ai/chat/a7eca2c9-b2a6-49e2-b05c-7e4578ddf855
-            HomeBottomNavigationBar(navController = navController)
+            HomeBottomNavigationBar(navController = homeScreenNavController)
         }
 
     ) { innerPadding ->
         HomeScreenNavHost(
-            navController = navController,
+            homeScreenNavController = homeScreenNavController,
+            masterNavController = masterNavController,
             modifier = Modifier.padding(innerPadding),
-            onNavigateToScreen = onNavigateToScreen
         )
 
     }
@@ -86,7 +86,7 @@ private enum class NavBarElement(
 @Composable
 private fun HomeAppBar(
     navController: NavHostController,
-    onNavigateToScreen: (ScreenDestination) -> Unit = {},
+    masterNavController: NavHostController,
     modifier: Modifier = Modifier
 ) {
     val entry by navController.currentBackStackEntryAsState()
@@ -118,7 +118,8 @@ private fun HomeAppBar(
                 NavBarElement.Markets -> {
                     IconButton(
                         onClick = {
-                            onNavigateToScreen(ScreenDestination.SearchAsset(false))
+                            Log.e("XXX", "onClick in Markets")
+                            masterNavController.navigateToSearchAssetScreen(isForNewTrade = false)
                         }
                     ) {
                         Icon(
@@ -131,7 +132,8 @@ private fun HomeAppBar(
                 NavBarElement.Portfolio -> {
                     IconButton(
                         onClick = {
-                            onNavigateToScreen(ScreenDestination.SearchAsset(true))
+                            Log.e("XXX", "onClick in Portfolio")
+                            masterNavController.navigateToSearchAssetScreen(isForNewTrade = true)
                         }
                     ) {
                         Icon(
@@ -189,56 +191,27 @@ private fun HomeBottomNavigationBar(
 
 @Composable
 private fun HomeScreenNavHost(
-    navController: NavHostController,
-    onNavigateToScreen: (ScreenDestination) -> Unit = {},
+    homeScreenNavController: NavHostController,
+    masterNavController: NavHostController,
     modifier: Modifier,
 ) {
     NavHost(
-        navController = navController,
+        navController = homeScreenNavController,
         startDestination = ScreenDestination.Markets,
         modifier = modifier
     ) {
         composable<ScreenDestination.Markets> {
-            CompaniesListScreen(
-                onCompanyClick = { ticker ->
-                    onNavigateToScreen(
-                        ScreenDestination.CompanyDetails(
-                            ticker.code,
-                            ticker.exchange,
-                            ticker.name
-                        )
-                    )
-                }
-            )
+            CompaniesListScreen(masterNavController)
         }
         composable<ScreenDestination.Portfolio> {
-            PortfolioScreen(
-                onPositionClick = { position ->
-                    onNavigateToScreen(
-                        ScreenDestination.UserPosition(
-                            position.tickerCode,
-                            position.tickerExchange
-                        )
-                    )
-                }
-            )
+            PortfolioScreen(masterNavController)
         }
         composable<ScreenDestination.News> {
             // TODO - back press + nav bar issue potential fix starts with something like this probably:
 //            BackHandler {
 //                navController.navigateSingleTopTo(ScreenDestination.Markets)
 //            }
-            NewsListScreen(
-                // TODO - maybe put these kinds of things inside the ComposeScreens? pass the navController?
-                onListItemClick = { newsArticle ->
-                    onNavigateToScreen(
-                        ScreenDestination.SingleNews(
-                            newsArticle.title,
-                            newsArticle.content
-                        )
-                    )
-                }
-            )
+            NewsListScreen(masterNavController)
         }
 
     }

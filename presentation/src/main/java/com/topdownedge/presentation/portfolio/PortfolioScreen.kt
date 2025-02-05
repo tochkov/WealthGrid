@@ -34,9 +34,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
 import com.topdownedge.domain.entities.UserPosition
 import com.topdownedge.domain.fmtPrice
 import com.topdownedge.presentation.navigation.ScreenVisibilityObserver
+import com.topdownedge.presentation.navigation.navigateToUserPositionScreen
 import ir.ehsannarmani.compose_charts.PieChart
 import ir.ehsannarmani.compose_charts.models.Pie
 import java.time.LocalDate
@@ -47,7 +49,7 @@ private const val PAGE_STATS = 2
 
 @Composable
 internal fun PortfolioScreen(
-    onPositionClick: (UserPosition) -> Unit = {}
+    masterNavController: NavHostController,
 ) {
 
     val viewModel: PortfolioViewModel = hiltViewModel()
@@ -145,7 +147,7 @@ internal fun PortfolioScreen(
                         .padding(horizontal = 16.dp)
                         .fillMaxWidth()
                         .clickable {
-                            onPositionClick(position)
+                            masterNavController.navigateToUserPositionScreen(position)
                         },
                     position = position,
                 )

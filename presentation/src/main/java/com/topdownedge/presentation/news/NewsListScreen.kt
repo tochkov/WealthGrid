@@ -11,8 +11,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -20,7 +18,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -35,16 +32,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import coil3.request.CachePolicy
 import coil3.request.ImageRequest
 import com.topdownedge.domain.entities.NewsArticle
 import com.topdownedge.domain.entities.NewsCategory
+import com.topdownedge.presentation.navigation.navigateToNewsDetailsScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun NewsListScreen(
-    onListItemClick: (NewsArticle) -> Unit = {}
+    masterNavController: NavHostController,
 ) {
     val viewModel: NewsListViewModel = hiltViewModel()
     val uiState = viewModel.newsState.collectAsStateWithLifecycle().value
@@ -105,7 +104,10 @@ internal fun NewsListScreen(
                 }
                 NewsItemCard2(
                     newsArticle = uiState.news[position],
-                    onCardClick = { onListItemClick(uiState.news[position]) })
+                    onCardClick = {
+                        masterNavController.navigateToNewsDetailsScreen(uiState.news[position])
+                    }
+                )
             }
 
             item {

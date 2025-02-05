@@ -12,12 +12,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
 import com.topdownedge.presentation.common.SimpleAppBar
 import com.topdownedge.presentation.common.chart.SimpleCandlestickChart
 
 
 @Composable
 fun CompanyDetailsScreen(
+    masterNavController: NavHostController,
     tickerCode: String,
     tickerExchange: String,
     tickerName: String
@@ -30,7 +32,7 @@ fun CompanyDetailsScreen(
             SimpleAppBar(
                 title = tickerName,
                 onBackPress = {
-
+                    masterNavController.popBackStack()
                 },
                 actionImage = Icons.Default.MoreVert,
                 actionDescription = "Submit",

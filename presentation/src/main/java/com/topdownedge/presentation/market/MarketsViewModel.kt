@@ -7,6 +7,7 @@ import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
 import com.topdownedge.domain.entities.common.Ticker
 import com.topdownedge.domain.fmtPercent
 import com.topdownedge.domain.fmtPrice
+import com.topdownedge.domain.repositories.LivePricesRepository
 import com.topdownedge.domain.repositories.PriceDataRepository
 import com.topdownedge.presentation.common.getLogoUrl
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -49,6 +50,7 @@ data class MarketsUiState(
 @HiltViewModel
 class MarketsViewModel @Inject constructor(
     private val priceDataRepository: PriceDataRepository,
+    private val livePricesRepository: LivePricesRepository
 ) : ViewModel() {
 
     val uiState: StateFlow<MarketsUiState>
@@ -114,11 +116,39 @@ class MarketsViewModel @Inject constructor(
                             companyList = uiList
                         )
                     }
+                    subscribeToTickersPriceUpdates()
                 }
 
             }
         }
     }
+
+    fun startCollectingLivePrices() {
+        viewModelScope.launch {
+            livePricesRepository.observeLivePricesConnection().collect { livePrices ->
+                uiState.update {
+                    it.copy(
+                        companyList = it.companyList.map { company ->
+                            company.copy(
+                                currentPrice = livePrices[company.tickerCode] ?: company.currentPrice,
+                                isFromCache = false
+                            )
+                        }
+                    )
+                }
+            }
+        }
+        subscribeToTickersPriceUpdates()
+    }
+
+    fun stopCollectingLivePrices() {
+        livePricesRepository.closeLivePricesConnection()
+    }
+
+    private fun subscribeToTickersPriceUpdates() {
+        livePricesRepository.subscribeToLivePrices(uiState.value.companyList.map { it.tickerCode })
+    }
+
 
 
 }

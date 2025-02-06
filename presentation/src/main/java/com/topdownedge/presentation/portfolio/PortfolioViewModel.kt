@@ -118,13 +118,12 @@ class PortfolioViewModel @Inject constructor(
 
     fun startCollectingLivePrices() {
         viewModelScope.launch {
-            livePricesRepository.observeLivePricesConnection().collect { latestPrices ->
+            livePricesRepository.observeLivePricesConnection().collect { livePrices ->
                 uiState.update {
                     it.copy(
                         positions = it.positions.map { position ->
                             position.copy(
-                                currentPrice = latestPrices[position.tickerCode]
-                                    ?: position.currentPrice
+                                currentPrice = livePrices[position.tickerCode] ?: position.currentPrice
                             )
                         }
                     )

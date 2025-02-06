@@ -29,6 +29,7 @@ import coil3.request.ImageRequest
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.topdownedge.domain.entities.common.Ticker
 import com.topdownedge.presentation.common.chart.SimpleAssetLineChart
+import com.topdownedge.presentation.navigation.ScreenVisibilityObserver
 import com.topdownedge.presentation.navigation.navigateToCompanyDetailsScreen
 
 @Composable
@@ -38,6 +39,15 @@ internal fun CompaniesListScreen(
 
     val viewModel: MarketsViewModel = hiltViewModel()
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+
+    ScreenVisibilityObserver(
+        onScreenEnter = {
+            viewModel.startCollectingLivePrices()
+        },
+        onScreenExit = {
+            viewModel.stopCollectingLivePrices()
+        }
+    )
 
     LazyColumn(
         modifier = Modifier

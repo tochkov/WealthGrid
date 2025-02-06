@@ -44,3 +44,28 @@ data class PriceBarEntity(
     val adjustedClose: Double,
     val volume: Long
 )
+
+
+@Entity(
+    tableName = "last_known_prices",
+    indices = [
+        Index(value = ["code"], unique = true),
+    ]
+)
+data class LastKnownPriceEntity(
+    @PrimaryKey(autoGenerate = true)
+    val id: Long = 0,
+
+    val code: String,
+    val timestamp: Long,
+    val gmtoffset: Int,
+    val open: Double,
+    val high: Double,
+    val low: Double,
+    val close: Double,
+    val volume: Int,
+    val previousClose: Double,
+    val change: Double,
+    val changePercentage: Double
+)
+

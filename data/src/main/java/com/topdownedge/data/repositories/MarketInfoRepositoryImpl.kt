@@ -3,6 +3,7 @@ package com.topdownedge.data.repositories
 import com.topdownedge.data.local.dao.TickerDao
 import com.topdownedge.data.mappers.toTicker
 import com.topdownedge.data.mappers.toTickerEntity
+import com.topdownedge.data.mappers.toTickers
 import com.topdownedge.data.remote.EodhdFundamentalsApi
 import com.topdownedge.data.remote.safeApiCall
 import com.topdownedge.domain.entities.common.Ticker
@@ -12,14 +13,18 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 
 
 class MarketInfoRepositoryImpl
 @Inject constructor(
-    private val eodhdApi: EodhdFundamentalsApi,
-    private val tickerDao: TickerDao
+    private val fundamentalsApi: EodhdFundamentalsApi,
+    private val tickerDao: TickerDao,
 ) : MarketInfoRepository {
+
+    private val ioDispatcher: CoroutineContext = Dispatchers.IO
 
     override fun getInitialSearchTickerList(fromCacheOnly: Boolean): Flow<Result<List<Ticker>?>> =
         flow {
@@ -31,7 +36,7 @@ class MarketInfoRepositoryImpl
                 }
             }
 
-            val apiResult = safeApiCall { eodhdApi.getIndexConstituents() }
+            val apiResult = safeApiCall { fundamentalsApi.getIndexConstituents() }
             if (apiResult.isFailure || apiResult.getOrNull() == null) {
                 emit(Result.failure(apiResult.exceptionOrNull()!!))
             } else {
@@ -41,22 +46,22 @@ class MarketInfoRepositoryImpl
 
             // Observe DB for any changes
             tickerDao.getAllIndexTickers()
-                .collect { entities ->
-                    emit(Result.success(entities.map { it.toTicker() }))
-                }
-        }.flowOn(Dispatchers.IO)
+                .map { it.map { it.toTicker() } }
+                .map { Result.success(it) }
+                .collect { emit(it) }
+
+        }.flowOn(ioDispatcher)
 
     override fun getTickersForSearch(searchQuery: String): Flow<Result<List<Ticker>?>> = flow {
         tickerDao.searchTickers(searchQuery)
-            .collect { entities ->
-                emit(Result.success(entities.map { it.toTicker() }))
-            }
-    }.flowOn(Dispatchers.IO)
-
+            .map { it.toTickers() }
+            .map { Result.success(it) }
+            .collect { emit(it) }
+    }.flowOn(ioDispatcher)
 
     override suspend fun getAllTickerList(exchangeCode: String): Result<List<Ticker>?> {
 
-        val response = eodhdApi.getExchangeSymbolsList()
+        val response = fundamentalsApi.getExchangeSymbolsList()
         println(response.code)
         println(response.body())
         println(response.errorBody())

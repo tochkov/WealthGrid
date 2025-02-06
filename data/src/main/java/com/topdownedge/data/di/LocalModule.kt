@@ -29,7 +29,7 @@ object LocalModule {
             "market_info"
         )
 //            .addMigrations(MIGRATION_1_2)
-//            .fallbackToDestructiveMigration()
+            .fallbackToDestructiveMigration()
             .build()
     }
 
@@ -41,6 +41,9 @@ object LocalModule {
     @Singleton
     fun providePriceBarDao(db: MarketDatabase) = db.priceBarDao()
 
+    @Provides
+    @Singleton
+    fun provideLastKnownPriceDao(db: MarketDatabase) = db.lastKnownPriceDao()
 
 
 

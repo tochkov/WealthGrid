@@ -2,7 +2,6 @@ package com.topdownedge.data.mappers
 
 import com.topdownedge.data.local.TickerEntity
 import com.topdownedge.data.remote.dto.IndexConstituentDto
-import com.topdownedge.data.remote.dto.SymbolItemDto
 import com.topdownedge.domain.entities.common.Ticker
 
 
@@ -22,3 +21,5 @@ fun TickerEntity.toTicker(): Ticker {
         indexWeight = indexWeight
     )
 }
+
+fun List<TickerEntity>.toTickers() = map { it.toTicker() }

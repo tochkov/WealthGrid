@@ -13,9 +13,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -26,7 +28,6 @@ import coil3.request.CachePolicy
 import coil3.request.ImageRequest
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.topdownedge.domain.entities.common.Ticker
-import com.topdownedge.presentation.common.getLogoUrl
 import com.topdownedge.presentation.common.chart.SimpleAssetLineChart
 import com.topdownedge.presentation.navigation.navigateToCompanyDetailsScreen
 
@@ -75,15 +76,21 @@ internal fun CompaniesListScreen(
             }
         }
 
-        itemsIndexed(uiState.companyList) { index, ticker ->
+        itemsIndexed(uiState.companyList) { index, company ->
             StockCard(
                 modifier = Modifier
                     .padding(bottom = 16.dp)
                     .fillMaxWidth()
                     .clickable {
-                        masterNavController.navigateToCompanyDetailsScreen(ticker)
+                        masterNavController.navigateToCompanyDetailsScreen(
+                            Ticker(
+                                company.tickerCode,
+                                company.tickerName,
+                                company.tickerExchange
+                            )
+                        )
                     },
-                ticker = ticker,
+                company = company,
             )
         }
 
@@ -127,7 +134,7 @@ fun ChartCard(
 @Composable
 fun StockCard(
     modifier: Modifier = Modifier,
-    ticker: Ticker,
+    company: CompanyItemUiModel,
 ) {
     Card(
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
@@ -136,7 +143,7 @@ fun StockCard(
         Row {
 
             Box {
-                val imgUrl = getLogoUrl(ticker.code)
+                val imgUrl = company.logoUrl
                 AsyncImage(
                     modifier = Modifier
                         .padding(8.dp)
@@ -156,13 +163,31 @@ fun StockCard(
 
 
             Text(
-                text = ticker.code,
+                text = company.tickerCode,
                 modifier = Modifier.padding(8.dp),
             )
             Text(
-                text = "435.34",
+                text = company.getCurrentPrice(),
+                color = if(company.isFromCache) Color.Gray else MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(8.dp)
             )
+            val percentGain = company.getPercentGain()
+            val percentColor = if(company.isFromCache){
+                Color.Gray
+            } else {
+                if(percentGain.startsWith("-")){
+                    Color.Red
+                } else {
+                    Color.Green
+                }
+            }
+            Text(
+                text = percentGain,
+                color = percentColor,
+                modifier = Modifier.padding(8.dp)
+            )
+
+
         }
     }
 }

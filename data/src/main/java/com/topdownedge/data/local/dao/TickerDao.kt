@@ -4,9 +4,10 @@ import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
 import com.topdownedge.data.local.TickerEntity
+import com.topdownedge.domain.entities.common.TickerWithPrice
 import kotlinx.coroutines.flow.Flow
 
-private const val RESULTS_LIMIT = 100
+const val RESULTS_LIMIT = 45
 
 @Dao
 interface TickerDao {
@@ -47,5 +48,23 @@ interface TickerDao {
         """
     )
     fun getAllIndexTickers(): Flow<List<TickerEntity>>
+
+
+    @Query("""
+    SELECT 
+        t.code,
+        t.name,
+        t.exchange,
+        p.close as lastPrice,
+        p.previousClose,
+        p.changePercentage
+    FROM stock_tickers t
+    LEFT JOIN last_known_prices p ON t.code = p.code
+    ORDER BY t.indexWeight DESC
+    LIMIT $RESULTS_LIMIT
+""")
+    fun getTopTickersWithPrices(): Flow<List<TickerWithPrice>>
+
+
 
 }

@@ -26,3 +26,20 @@ data class PriceBarDto(
     @SerialName("volume")
     val volume: Long
 )
+
+
+@Serializable
+data class LastKnownPriceDto(
+    val code: String,
+    val timestamp: Long,
+    val gmtoffset: Int,
+    val open: Double,
+    val high: Double,
+    val low: Double,
+    val close: Double,
+    val volume: Int,
+    val previousClose: Double,
+    val change: Double,
+    @SerialName("change_p")
+    val changePercentage: Double
+)

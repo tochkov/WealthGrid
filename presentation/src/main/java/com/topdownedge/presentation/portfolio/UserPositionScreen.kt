@@ -1,6 +1,5 @@
 package com.topdownedge.presentation.portfolio
 
-import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -63,7 +62,6 @@ fun UserPositionScreen(
 
                 items(uiState.trades.size) { index ->
                     val trade = uiState.trades[index]
-                    Log.e("XXX", "Index: $index, Trade: $trade")
                     TradeCard(
                         modifier = Modifier
                             .padding(16.dp)

@@ -1,7 +1,6 @@
 package com.topdownedge.presentation.navigation
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -24,22 +23,21 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.topdownedge.presentation.R
 import com.topdownedge.presentation.market.CompaniesListScreen
 import com.topdownedge.presentation.news.NewsListScreen
 import com.topdownedge.presentation.portfolio.PortfolioScreen
-
-import com.topdownedge.presentation.R
 
 @Composable
 internal fun WealthGridHomeScreen(
@@ -118,7 +116,6 @@ private fun HomeAppBar(
                 NavBarElement.Markets -> {
                     IconButton(
                         onClick = {
-                            Log.e("XXX", "onClick in Markets")
                             masterNavController.navigateToSearchAssetScreen(isForNewTrade = false)
                         }
                     ) {
@@ -132,7 +129,6 @@ private fun HomeAppBar(
                 NavBarElement.Portfolio -> {
                     IconButton(
                         onClick = {
-                            Log.e("XXX", "onClick in Portfolio")
                             masterNavController.navigateToSearchAssetScreen(isForNewTrade = true)
                         }
                     ) {

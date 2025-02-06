@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.topdownedge.domain.entities.UserPosition
 import com.topdownedge.domain.fmtPrice
 import com.topdownedge.domain.repositories.LivePricesRepository
+import com.topdownedge.domain.repositories.PriceDataRepository
 import com.topdownedge.domain.repositories.UserPortfolioRepository
 import com.topdownedge.presentation.common.randomColor
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,15 +16,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class PositionUiModel(
-    var ticker: String,
-    var valueDollarz: Double,
-    var avgPrice: Double,
-    var selected: Boolean = false
-)
 
 data class PortfolioUiState(
-    var positions: List<UserPosition> = listOf(),
+    var positions: List<PositionItemUiModel> = listOf(),
     var pieList: List<Pie> = listOf(),
     var portfolioValue: String = "",
     var portfolioGain: String = "",
@@ -33,6 +28,7 @@ data class PortfolioUiState(
 @HiltViewModel
 class PortfolioViewModel @Inject constructor(
     private val userPortfolioRepository: UserPortfolioRepository,
+    private val priceDataRepository: PriceDataRepository,
     private val livePricesRepository: LivePricesRepository
 ) : ViewModel() {
 
@@ -44,7 +40,7 @@ class PortfolioViewModel @Inject constructor(
             userPortfolioRepository.getAllUserPositions().collect { positionList ->
                 uiState.update {
                     it.copy(
-                        positions = positionList,
+                        positions = positionList.map { it.toPositionItemUiModel(true) },
                         pieList = positionList.map { position ->
                             val color = randomColor()
                             Pie(
@@ -58,6 +54,7 @@ class PortfolioViewModel @Inject constructor(
                         portfolioGain = calculatePortfolioGain(positionList)
                     )
                 }
+                getLastKnownPrices()
                 subscribeToTickersPriceUpdates()
             }
         }
@@ -95,6 +92,29 @@ class PortfolioViewModel @Inject constructor(
             }
         }
     }
+
+    suspend fun getLastKnownPrices() {
+        if (uiState.value.positions.isEmpty()) return
+
+        priceDataRepository.getLastKnownPriceData(uiState.value.positions.map { it.tickerCode })
+            .collect { result ->
+                if (result.isSuccess) {
+                    uiState.update {
+                        it.copy(
+                            positions = it.positions.map { position ->
+                                val priceData = result.getOrNull()!![position.tickerCode]
+                                position.copy(
+                                    currentPrice = priceData?.close ?: position.currentPrice,
+                                    previousDayClose = priceData?.previousClose ?: position.previousDayClose,
+                                    isCurrentPriceFromCache = priceData?.isFromCache ?: true
+                                )
+                            }
+                        )
+                    }
+                }
+            }
+    }
+
 
     fun startCollectingLivePrices() {
         viewModelScope.launch {

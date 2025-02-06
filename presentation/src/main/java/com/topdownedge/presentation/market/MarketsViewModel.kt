@@ -82,8 +82,10 @@ class MarketsViewModel @Inject constructor(
             priceDataRepository.getHistoricalDailyPrices(ticker.code, fromDate = fromDate)
                 .distinctUntilChanged()
                 .collectLatest {
-                    chartModelProducer.runTransaction {
-                        lineSeries { series(it.getOrNull()?.map { it.close } ?: emptyList()) }
+                    if(it.getOrNull()?.isNotEmpty() == true) {
+                        chartModelProducer.runTransaction {
+                            lineSeries { series(it.getOrNull()!!.map { it.close } )}
+                        }
                     }
                 }
         }

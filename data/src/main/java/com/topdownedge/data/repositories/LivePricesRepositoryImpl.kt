@@ -1,6 +1,5 @@
 package com.topdownedge.data.repositories
 
-import android.util.Log
 import com.topdownedge.data.remote.dto.AuthResponse
 import com.topdownedge.data.remote.dto.LivePriceDto
 import com.topdownedge.domain.repositories.LivePricesRepository
@@ -66,7 +65,8 @@ class LivePricesRepositoryImpl @Inject constructor(
                     }
 
             } catch (e: Exception) {
-                Log.e("XXX", "exception: $e")
+                e.printStackTrace()
+                clearSession()
                 cancel("Flow cancelled due to error", e)
             }
 
@@ -105,8 +105,13 @@ class LivePricesRepositoryImpl @Inject constructor(
     private fun clearSession() {
         isAuthorized.set(false)
         CoroutineScope(Dispatchers.IO).launch {
-            session?.close()
-            session = null
+            try {
+                session?.close()
+            } catch (e: Exception){
+                e.printStackTrace()
+            } finally {
+                session = null
+            }
         }
     }
 

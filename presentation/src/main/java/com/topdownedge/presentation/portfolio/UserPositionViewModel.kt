@@ -1,6 +1,5 @@
 package com.topdownedge.presentation.portfolio
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -39,7 +38,6 @@ class UserPositionViewModel @Inject constructor(
             portfolioRepository.getUserTradesForSymbol(symbol)
                 .distinctUntilChanged()
                 .collectLatest { trades ->
-                    Log.e("XXX", "Trades: $trades")
                     uiState.update {
                         it.copy(
                             trades = trades

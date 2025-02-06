@@ -2,8 +2,8 @@ package com.topdownedge.presentation.navigation
 
 import androidx.navigation.NavHostController
 import com.topdownedge.domain.entities.NewsArticle
-import com.topdownedge.domain.entities.UserPosition
 import com.topdownedge.domain.entities.common.Ticker
+import com.topdownedge.presentation.portfolio.PositionItemUiModel
 import kotlinx.serialization.Serializable
 
 sealed interface ScreenDestination {
@@ -39,7 +39,7 @@ fun NavHostController.navigateToSearchAssetScreen(isForNewTrade: Boolean) {
     )
 }
 
-fun NavHostController.navigateToUserPositionScreen(position: UserPosition) {
+fun NavHostController.navigateToUserPositionScreen(position: PositionItemUiModel) {
     this.navigateSingleTopTo(
         destinationRoute = ScreenDestination.UserPosition(
             position.tickerCode,

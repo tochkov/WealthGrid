@@ -35,13 +35,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
-import com.topdownedge.domain.entities.UserPosition
 import com.topdownedge.domain.fmtPrice
 import com.topdownedge.presentation.navigation.ScreenVisibilityObserver
 import com.topdownedge.presentation.navigation.navigateToUserPositionScreen
 import ir.ehsannarmani.compose_charts.PieChart
 import ir.ehsannarmani.compose_charts.models.Pie
-import java.time.LocalDate
 
 private const val PAGE_PIE_CHART = 0
 private const val PAGE_LINE_CHART = 1
@@ -140,6 +138,10 @@ internal fun PortfolioScreen(
             }
 
 
+            item {
+                Text(text = "Filter by: ")
+            }
+
 
             items(uiState.positions) { position ->
                 PositionCard(
@@ -204,7 +206,7 @@ fun PortfolioDonut(
 @Composable
 fun PositionCard(
     modifier: Modifier = Modifier,
-    position: UserPosition
+    position: PositionItemUiModel
 ) {
     Card(
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
@@ -214,22 +216,36 @@ fun PositionCard(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
 //            modifier = modifier.fillMaxWidth()
         ) {
-            Text(
-                text = position.tickerCode,
-                modifier = Modifier.weight(1f),
-                style = MaterialTheme.typography.titleMedium
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
 
-            )
+                Text(
+                    text = position.tickerCode,
+                    style = MaterialTheme.typography.titleMedium
+
+                )
+                val dailyGain = position.dailyPercentageGain()
+                Text(
+                    text = dailyGain,
+                    color = if (dailyGain.startsWith("+")) Color.Green else Color.Red,
+                )
+            }
             Text(
-                text = position.totalInvested.fmtPrice(),
+                text = position.currentValue(),
                 modifier = Modifier.weight(1f),
             )
             Text(
-                text = "Avg. price " + position.averagePrice.fmtPrice(),
+                text = "Avg. price " + position.averagePrice(),
                 modifier = Modifier.weight(1f),
             )
             Text(
-                text = "Current: " + position.currentPrice.fmtPrice(),
+                text = "Current: " + position.currentPrice(),
+                modifier = Modifier.weight(1f),
+                color = if(position.isCurrentPriceFromCache) Color.Gray else MaterialTheme.colorScheme.primary
+            )
+            Text(
+                text = "%portf: " + position.percentageOfPortfolio(),
                 modifier = Modifier.weight(1f),
             )
 
@@ -240,13 +256,16 @@ fun PositionCard(
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun ASDF() {
-    val position = UserPosition(
+    val position = PositionItemUiModel(
         tickerCode = "AAPL",
-        tickerExchange = "NASDAQ",
-        firstTradeDate = LocalDate.now(),
-        lastTradeDate = LocalDate.now(),
-        averagePrice = 876.54,
-        sharesQuantity = 22.0
+        tickerExchange = "US",
+        averagePrice = 123.45,
+        sharesQuantity = 10.0,
+        currentPrice = 130.45,
+        previousDayClose = 117.8,
+        percentageOfPortfolio = 0.5,
+        isCurrentPriceFromCache = false
+
     )
     PositionCard(
         modifier = Modifier

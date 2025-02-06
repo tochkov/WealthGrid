@@ -133,7 +133,6 @@ class PriceDataRepositoryImpl
             if (tickerSymbols.isEmpty()) {
                 throw IllegalArgumentException("Tickers list muss have at least one ticker")
             }
-
             val initialData = lastKnownPriceDao.observeLastKnownPrices(tickerSymbols).firstOrNull()
 
             if (initialData?.isNotEmpty() == true) {
@@ -156,6 +155,13 @@ class PriceDataRepositoryImpl
                 emit(Result.success(tickerMap))
 
             }
+
+//            lastKnownPriceDao.observeLastKnownPrices(tickerSymbols)
+//                .map { it.map { it.toLastKnownPrice(false) }.associateBy { it.code } }
+//                .map { Result.success(it) }
+//                .collect { emit(it) }
+
+
         }.flowOn(ioDispatcher)
 
 

@@ -1,24 +1,37 @@
 package com.topdownedge.presentation.market
 
+import android.annotation.SuppressLint
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -31,6 +44,8 @@ import com.topdownedge.domain.entities.common.Ticker
 import com.topdownedge.presentation.common.chart.SimpleAssetLineChart
 import com.topdownedge.presentation.navigation.ScreenVisibilityObserver
 import com.topdownedge.presentation.navigation.navigateToCompanyDetailsScreen
+import kotlin.math.roundToInt
+import kotlin.math.sqrt
 
 @Composable
 internal fun CompaniesListScreen(
@@ -53,6 +68,25 @@ internal fun CompaniesListScreen(
         modifier = Modifier
             .padding(horizontal = 16.dp)
     ) {
+        item {
+            HorizontalScrollableText(
+                text = buildAnnotatedString {
+                    withStyle(
+                        style = SpanStyle(
+                            color = MaterialTheme.colorScheme.tertiary,
+                            fontWeight = FontWeight.ExtraBold
+                        )
+                    ) {
+                        append("BREAKING: ")
+                    }
+                    append("Developer leaves feature for later implementation - the quick brown fox...")
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+            )
+        }
+
         val cardHeight = 140.dp
         item {
             ChartCard(
@@ -178,14 +212,14 @@ fun StockCard(
             )
             Text(
                 text = company.getCurrentPrice(),
-                color = if(company.isFromCache) Color.Gray else MaterialTheme.colorScheme.primary,
+                color = if (company.isFromCache) Color.Gray else MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(8.dp)
             )
             val percentGain = company.getPercentGain()
-            val percentColor = if(company.isFromCache){
+            val percentColor = if (company.isFromCache) {
                 Color.Gray
             } else {
-                if(percentGain.startsWith("-")){
+                if (percentGain.startsWith("-")) {
                     Color.Red
                 } else {
                     Color.Green
@@ -201,3 +235,45 @@ fun StockCard(
         }
     }
 }
+
+@SuppressLint("UnusedBoxWithConstraintsScope")
+@Composable
+fun HorizontalScrollableText(
+    text: AnnotatedString,
+    modifier: Modifier = Modifier,
+    minAnimDuration: Int = 10000,
+
+    ) {
+    val scrollState = rememberScrollState()
+
+    // Very rudimentary calculation, to avoid measuring the screen and complicating the logic
+    val duration = minAnimDuration + (sqrt(text.length.toDouble()) * 150).roundToInt()
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+
+    LaunchedEffect(Unit) {
+        while (true) {
+            scrollState.scrollTo(0)
+            scrollState.animateScrollTo(
+                scrollState.maxValue,
+                animationSpec = tween(duration, easing = LinearEasing)
+            )
+        }
+    }
+    Row(
+        modifier = modifier
+            .horizontalScroll(scrollState, enabled = false)
+    ) {
+        Spacer(modifier = Modifier.width(screenWidth))
+        Text(
+            text = text,
+            maxLines = 1,
+            softWrap = false
+        )
+        Spacer(modifier = Modifier.width(screenWidth))
+    }
+}
+
+
+
+
+

@@ -4,9 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
-import com.topdownedge.domain.entities.common.Ticker
-import com.topdownedge.domain.fmtPercent
-import com.topdownedge.domain.fmtPrice
 import com.topdownedge.domain.repositories.LivePricesRepository
 import com.topdownedge.domain.repositories.PriceDataRepository
 import com.topdownedge.presentation.common.getLogoUrl
@@ -20,32 +17,12 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import javax.inject.Inject
 
-data class CompanyItemUiModel(
-    val tickerCode: String,
-    val tickerName: String,
-    val tickerExchange: String,
-    val logoUrl: String,
-    val currentPrice: Double?,
-    val previousClose: Double?,
-    val isFromCache: Boolean = true
-){
-    fun getCurrentPrice() = currentPrice.fmtPrice()
-    fun getPercentGain(): String {
-        if(currentPrice == null || previousClose == null) return ""
-        val percentGain = (currentPrice - previousClose) / previousClose * 100
-        return if(percentGain >= 0) {
-            "+${percentGain.fmtPercent()}"
-        } else {
-            percentGain.fmtPercent()
-        }
-    }
-
-}
-
 data class MarketsUiState(
-    val companyList: List<CompanyItemUiModel> = emptyList(),
+    val spyTicker: MarketItemUiModel = SPY,
+    val qqqTicker: MarketItemUiModel = QQQ,
+    val iwmTicker: MarketItemUiModel = IWM,
+    val companyList: List<MarketItemUiModel> = emptyList(),
 )
-
 
 @HiltViewModel
 class MarketsViewModel @Inject constructor(
@@ -56,50 +33,69 @@ class MarketsViewModel @Inject constructor(
     val uiState: StateFlow<MarketsUiState>
         field = MutableStateFlow(MarketsUiState())
 
-    val spyTicker = Ticker("SPY", "S&P 500", "US")
-    val qqqTicker = Ticker("QQQ", "Nasdaq 100", "US")
-    val iwmTicker = Ticker("IWM", "Russell 2000", "US")
-
     val spyChartModelProducer = CartesianChartModelProducer()
     val qqqChartModelProducer = CartesianChartModelProducer()
     val iwmChartModelProducer = CartesianChartModelProducer()
 
     init {
-
         val fromDate = LocalDate.now().minusMonths(3)
+        loadIndexChart(uiState.value.spyTicker.tickerCode, spyChartModelProducer, fromDate)
+        loadIndexChart(uiState.value.qqqTicker.tickerCode, qqqChartModelProducer, fromDate)
+        loadIndexChart(uiState.value.iwmTicker.tickerCode, iwmChartModelProducer, fromDate)
 
-        loadIndexChart(spyTicker, spyChartModelProducer, fromDate)
-        loadIndexChart(qqqTicker, qqqChartModelProducer, fromDate)
-        loadIndexChart(iwmTicker, iwmChartModelProducer, fromDate)
+        getIndexTickersPrices()
 
         getTopCompanyListWithPrices()
     }
 
     private fun loadIndexChart(
-        ticker: Ticker,
+        tickerCode: String,
         chartModelProducer: CartesianChartModelProducer,
         fromDate: LocalDate = LocalDate.now().minusMonths(3)
     ) {
         viewModelScope.launch {
-            priceDataRepository.getHistoricalDailyPrices(ticker.code, fromDate = fromDate)
+            priceDataRepository.getHistoricalDailyPrices(tickerCode, fromDate = fromDate)
                 .distinctUntilChanged()
                 .collectLatest {
-                    if(it.getOrNull()?.isNotEmpty() == true) {
+                    if (it.getOrNull()?.isNotEmpty() == true) {
                         chartModelProducer.runTransaction {
-                            lineSeries { series(it.getOrNull()!!.map { it.close } )}
+                            lineSeries { series(it.getOrNull()!!.map { it.close }) }
                         }
                     }
                 }
         }
     }
 
-    private fun getTopCompanyListWithPrices(){
-        viewModelScope.launch{
-            priceDataRepository.getMarketTickersWithPrice().collect{ result ->
+    private fun getIndexTickersPrices() {
+        viewModelScope.launch {
+            val indexesList = listOf(
+                uiState.value.spyTicker,
+                uiState.value.qqqTicker,
+                uiState.value.iwmTicker
+            ).map { it.tickerCode }
+            priceDataRepository.getLastKnownPriceData(indexesList).collect { pricesResult ->
+                val pricesMap = pricesResult.getOrNull()
+                if (pricesMap?.isEmpty() == false) {
+                    uiState.update {
+                        it.copy(
+                            spyTicker = it.spyTicker.updatePrice(pricesMap[uiState.value.spyTicker.tickerCode]),
+                            qqqTicker = it.qqqTicker.updatePrice(pricesMap[uiState.value.qqqTicker.tickerCode]),
+                            iwmTicker = it.iwmTicker.updatePrice(pricesMap[uiState.value.iwmTicker.tickerCode]),
+                        )
+                    }
+                }
+            }
+        }
+    }
 
-                if(result.isSuccess) {
+
+    private fun getTopCompanyListWithPrices() {
+        viewModelScope.launch {
+            priceDataRepository.getMarketTickersWithPrice().collect { result ->
+
+                if (result.isSuccess) {
                     val uiList = result.getOrNull()!!.tickers.map { ticker ->
-                        CompanyItemUiModel(
+                        MarketItemUiModel(
                             tickerCode = ticker.code,
                             tickerName = ticker.name,
                             tickerExchange = ticker.exchange,
@@ -130,7 +126,8 @@ class MarketsViewModel @Inject constructor(
                     it.copy(
                         companyList = it.companyList.map { company ->
                             company.copy(
-                                currentPrice = livePrices[company.tickerCode] ?: company.currentPrice,
+                                currentPrice = livePrices[company.tickerCode]
+                                    ?: company.currentPrice,
                                 isFromCache = false
                             )
                         }
@@ -148,7 +145,6 @@ class MarketsViewModel @Inject constructor(
     private fun subscribeToTickersPriceUpdates() {
         livePricesRepository.subscribeToLivePrices(uiState.value.companyList.map { it.tickerCode })
     }
-
 
 
 }

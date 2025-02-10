@@ -128,7 +128,7 @@ class PriceDataRepositoryImpl
     }.flowOn(ioDispatcher)
 
 
-    override suspend fun getLastKnownPriceData(tickerSymbols: List<String>): Flow<Result<Map<String, LastKnownPrice>?>> =
+    override fun getLastKnownPriceData(tickerSymbols: List<String>): Flow<Result<Map<String, LastKnownPrice>?>> =
         flow {
             if (tickerSymbols.isEmpty()) {
                 throw IllegalArgumentException("Tickers list muss have at least one ticker")

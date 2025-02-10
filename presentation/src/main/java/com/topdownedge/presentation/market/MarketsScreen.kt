@@ -6,10 +6,12 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -17,22 +19,29 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material3.Card
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
@@ -41,11 +50,19 @@ import coil3.request.CachePolicy
 import coil3.request.ImageRequest
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.topdownedge.domain.entities.common.Ticker
+import com.topdownedge.presentation.common.applyAlpha
 import com.topdownedge.presentation.common.chart.SimpleAssetLineChart
+import com.topdownedge.presentation.common.isFromCache
 import com.topdownedge.presentation.navigation.ScreenVisibilityObserver
 import com.topdownedge.presentation.navigation.navigateToCompanyDetailsScreen
+import com.topdownedge.presentation.ui.theme.customColorsPalette
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
+
+val cardElevation = 6.dp
+val innerPadding = 8.dp
+val globalHorizontalPadding = 16.dp
+val globalVerticalPadding = 8.dp
 
 @Composable
 internal fun CompaniesListScreen(
@@ -54,6 +71,9 @@ internal fun CompaniesListScreen(
 
     val viewModel: MarketsViewModel = hiltViewModel()
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+
+
+
 
     ScreenVisibilityObserver(
         onScreenEnter = {
@@ -64,10 +84,7 @@ internal fun CompaniesListScreen(
         }
     )
 
-    LazyColumn(
-        modifier = Modifier
-            .padding(horizontal = 16.dp)
-    ) {
+    LazyColumn {
         item {
             HorizontalScrollableText(
                 text = buildAnnotatedString {
@@ -83,48 +100,75 @@ internal fun CompaniesListScreen(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(top = globalVerticalPadding),
             )
         }
 
-        val cardHeight = 140.dp
+        val chartCardHeight = 140.dp
         item {
             ChartCard(
                 modifier = Modifier
-                    .padding(vertical = 16.dp)
-                    .height(cardHeight)
+                    .padding(horizontal = globalHorizontalPadding, vertical = globalVerticalPadding)
+                    .height(chartCardHeight)
                     .fillMaxWidth(),
                 modelProducer = viewModel.spyChartModelProducer,
+                indexTicker = uiState.spyTicker
             )
         }
-
         item {
             Row(
                 modifier = Modifier
-                    .padding(bottom = 16.dp)
+                    .padding(
+                        start = globalHorizontalPadding,
+                        end = globalHorizontalPadding,
+                        bottom = globalVerticalPadding
+                    )
             ) {
                 ChartCard(
                     modifier = Modifier
-                        .padding(end = 8.dp)
-                        .height(cardHeight)
+                        .padding(end = globalVerticalPadding / 2)
+                        .height(chartCardHeight)
                         .weight(1f),
                     modelProducer = viewModel.qqqChartModelProducer,
+                    indexTicker = uiState.qqqTicker
                 )
                 ChartCard(
                     modifier = Modifier
-                        .padding(start = 8.dp)
-                        .height(cardHeight)
+                        .padding(start = globalVerticalPadding / 2)
+                        .height(chartCardHeight)
                         .weight(1f),
                     modelProducer = viewModel.iwmChartModelProducer,
+                    indexTicker = uiState.iwmTicker
                 )
             }
         }
 
+        item {
+            StockListHeader()
+        }
+
         itemsIndexed(uiState.companyList) { index, company ->
-            StockCard(
+
+//            ListItemInsideCard(
+//                modifier = Modifier
+//                    .padding(horizontal = horizontalPadding)
+//                    .clickable {
+//                        masterNavController.navigateToCompanyDetailsScreen(
+//                            Ticker(
+//                                company.tickerCode,
+//                                company.tickerName,
+//                                company.tickerExchange
+//                            )
+//                        )
+//                    },
+//                outerCardVerticalPadding = verticalPadding,
+//                outerCardCornerElevation = cardElevation,
+//                outerCardCornerRounding = cardRounding,
+//                index = index,
+//                totalSize = uiState.companyList.size,
+//            ) {
+            Column(
                 modifier = Modifier
-                    .padding(bottom = 16.dp)
-                    .fillMaxWidth()
                     .clickable {
                         masterNavController.navigateToCompanyDetailsScreen(
                             Ticker(
@@ -133,37 +177,51 @@ internal fun CompaniesListScreen(
                                 company.tickerExchange
                             )
                         )
-                    },
-                company = company,
-            )
+                    }
+            ) {
+                HorizontalDivider(
+                    modifier = Modifier
+                        .padding(horizontal = globalHorizontalPadding),
+                    color = MaterialTheme.colorScheme.primary.applyAlpha(0.1f)
+                )
+                StockListItem(company = company)
+            }
+//            }
         }
-
-
     }
-
 }
 
 @Composable
 fun ChartCard(
     modifier: Modifier = Modifier,
     modelProducer: CartesianChartModelProducer,
+    indexTicker: MarketItemUiModel
 ) {
-    Card(
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+    ElevatedCard(
+        elevation = CardDefaults.cardElevation(defaultElevation = cardElevation),
         modifier = modifier,
     ) {
         Column {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(innerPadding),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "SPY",
-                    modifier = Modifier.padding(8.dp),
+                    text = indexTicker.tickerName,
+                    fontWeight = FontWeight.Bold
                 )
+
+                var percentGain = indexTicker.getPercentGain()
+                val percentColor = if (percentGain.startsWith("-")) {
+                    MaterialTheme.customColorsPalette.priceRed.isFromCache(indexTicker.isFromCache)
+                } else {
+                    MaterialTheme.customColorsPalette.priceGreen.isFromCache(indexTicker.isFromCache)
+                }
                 Text(
-                    text = "435.34",
-                    modifier = Modifier.padding(8.dp)
+                    text = percentGain,
+                    color = percentColor
                 )
             }
             SimpleAssetLineChart(
@@ -175,62 +233,107 @@ fun ChartCard(
 
 }
 
+
 @Composable
-fun StockCard(
-    modifier: Modifier = Modifier,
-    company: CompanyItemUiModel,
+fun StockListHeader(
+
 ) {
-    Card(
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        modifier = modifier,
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .alpha(0.4f)
+            .padding(
+                start = globalHorizontalPadding,
+                end = globalHorizontalPadding,
+                top = globalVerticalPadding * 2,
+                bottom = globalVerticalPadding
+            ),
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Row {
+        Text(
+            text = "Top Companies",
+            color = MaterialTheme.colorScheme.primary
+        )
+        Text(
+            textAlign = TextAlign.End,
+            text = "Price",
+            color = MaterialTheme.colorScheme.primary
+        )
+    }
+}
 
-            Box {
-                val imgUrl = company.logoUrl
-                AsyncImage(
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .width(50.dp)
-                        .height(50.dp),
-                    contentDescription = null,
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(imgUrl)
-                        .diskCacheKey(imgUrl)
-//                        .networkCachePolicy(CachePolicy.DISABLED)
-                        .memoryCachePolicy(CachePolicy.ENABLED)
-                        .diskCachePolicy(CachePolicy.ENABLED)
-                        .build()
+@Composable
+fun StockListItem(
+    modifier: Modifier = Modifier,
+    company: MarketItemUiModel,
+) {
 
-                )
-            }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min)
+            .padding(globalHorizontalPadding),
+        verticalAlignment = Alignment.CenterVertically
+
+    ) {
 
 
+        AsyncImage(
+            modifier = Modifier
+                .padding(end = globalHorizontalPadding)
+                .fillMaxHeight()
+                .aspectRatio(1f)
+//                .clip(CircleShape),
+                .clip(RoundedCornerShape(8.dp)),
+            contentDescription = null,
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(company.logoUrl)
+                .diskCacheKey(company.logoUrl)
+                .memoryCachePolicy(CachePolicy.ENABLED)
+                .diskCachePolicy(CachePolicy.ENABLED)
+                .build()
+
+        )
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
             Text(
                 text = company.tickerCode,
-                modifier = Modifier.padding(8.dp),
+                fontWeight = FontWeight.Bold
             )
             Text(
-                text = company.getCurrentPrice(),
-                color = if (company.isFromCache) Color.Gray else MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(8.dp)
+                modifier = Modifier.alpha(0.7f),
+                text = company.tickerName,
+                fontSize = 13.sp,
+                color = MaterialTheme.colorScheme.tertiary,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
+        }
+        Column(
+            horizontalAlignment = Alignment.End
+        ) {
+
             val percentGain = company.getPercentGain()
-            val percentColor = if (company.isFromCache) {
-                Color.Gray
+            val percentColor = if (percentGain.startsWith("-")) {
+                MaterialTheme.customColorsPalette.priceRed.isFromCache(company.isFromCache)
             } else {
-                if (percentGain.startsWith("-")) {
-                    Color.Red
-                } else {
-                    Color.Green
-                }
+                MaterialTheme.customColorsPalette.priceGreen.isFromCache(company.isFromCache)
             }
+
             Text(
+                textAlign = TextAlign.End,
                 text = percentGain,
                 color = percentColor,
-                modifier = Modifier.padding(8.dp)
             )
 
+            Text(
+                modifier = Modifier
+                    .alpha(if (company.isFromCache) 0.4f else 1.0f),
+                fontSize = 13.sp,
+                textAlign = TextAlign.End,
+                text = company.getCurrentPrice(),
+            )
 
         }
     }

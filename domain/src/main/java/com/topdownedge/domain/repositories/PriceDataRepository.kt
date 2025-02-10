@@ -16,5 +16,5 @@ interface PriceDataRepository {
 
     fun getMarketTickersWithPrice(): Flow<Result<TickerWithPriceWrapper>>
 
-    suspend fun getLastKnownPriceData(tickerCodes: List<String>): Flow<Result<Map<String, LastKnownPrice>?>>
+    fun getLastKnownPriceData(tickerCodes: List<String>): Flow<Result<Map<String, LastKnownPrice>?>>
 }

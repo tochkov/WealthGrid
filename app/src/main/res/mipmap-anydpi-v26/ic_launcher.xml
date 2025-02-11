@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
-    <background android:drawable="@drawable/ic_launcher_background" />
-    <foreground android:drawable="@drawable/ic_launcher_foreground" />
-    <monochrome android:drawable="@drawable/ic_launcher_foreground" />
+<!--    <background android:drawable="@drawable/ic_launcher_background_arrow_up" />-->
+    <background android:drawable="@color/teal_700" />
+    <foreground android:drawable="@drawable/donut_chart_03_extended" />
+    <monochrome android:drawable="@drawable/donut_chart_03_extended" />
 </adaptive-icon>

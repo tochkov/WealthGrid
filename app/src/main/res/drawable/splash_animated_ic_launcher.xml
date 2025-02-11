@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/donut_chart_03_extended">
+
+    <!-- Donut scale animation with different offsets -->
+    <target
+        android:name="donut_group_1"
+        android:animation="@animator/splash_donut_scale_1" />
+
+    <target
+        android:name="donut_group_2"
+        android:animation="@animator/splash_donut_scale_2" />
+
+    <target
+        android:name="donut_group_3"
+        android:animation="@animator/splash_donut_scale_3" />
+
+    <!-- Center Arrow scale animation  -->
+    <target
+        android:name="arrow_group"
+        android:animation="@animator/splash_arrow_scale" />
+
+    <!-- Donut rotate animation -->
+    <target
+        android:name="donut_group_1"
+        android:animation="@animator/splash_donut_rotate" />
+
+    <target
+        android:name="donut_group_2"
+        android:animation="@animator/splash_donut_rotate" />
+
+    <target
+        android:name="donut_group_3"
+        android:animation="@animator/splash_donut_rotate" />
+
+    <!-- Fade out animation -->
+    <target
+        android:name="donut_chart"
+        android:animation="@animator/splash_fade_out" />
+
+</animated-vector>

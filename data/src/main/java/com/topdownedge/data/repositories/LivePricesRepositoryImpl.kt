@@ -1,5 +1,6 @@
 package com.topdownedge.data.repositories
 
+import android.util.Log
 import com.topdownedge.data.remote.dto.AuthResponse
 import com.topdownedge.data.remote.dto.LivePriceDto
 import com.topdownedge.domain.repositories.LivePricesRepository
@@ -62,6 +63,7 @@ class LivePricesRepositoryImpl @Inject constructor(
                     .collect { livePriceDto ->
                         latestPricesMap[livePriceDto.symbol] = livePriceDto.price
                         trySend(latestPricesMap.toMap())
+//                        Log.d("XXX", "${livePriceDto.symbol} - ${livePriceDto.price}")
                     }
 
             } catch (e: Exception) {

@@ -85,6 +85,7 @@ class MarketsViewModel @Inject constructor(
                     }
                 }
             }
+            subscribeToIndexPriceUpdates()
         }
     }
 
@@ -130,11 +131,28 @@ class MarketsViewModel @Inject constructor(
                                     ?: company.currentPrice,
                                 isFromCache = false
                             )
-                        }
+                        },
+                        spyTicker = it.spyTicker.copy(
+                            currentPrice = livePrices[it.spyTicker.tickerCode]
+                                ?: it.spyTicker.currentPrice,
+                            isFromCache = false
+                        ),
+                        qqqTicker = it.qqqTicker.copy(
+                            currentPrice = livePrices[it.qqqTicker.tickerCode]
+                                ?: it.qqqTicker.currentPrice,
+                            isFromCache = false
+                        ),
+                        iwmTicker = it.iwmTicker.copy(
+                            currentPrice = livePrices[it.iwmTicker.tickerCode]
+                                ?: it.iwmTicker.currentPrice,
+                            isFromCache = false
+                        ),
+
                     )
                 }
             }
         }
+        subscribeToIndexPriceUpdates()
         subscribeToTickersPriceUpdates()
     }
 
@@ -144,6 +162,14 @@ class MarketsViewModel @Inject constructor(
 
     private fun subscribeToTickersPriceUpdates() {
         livePricesRepository.subscribeToLivePrices(uiState.value.companyList.map { it.tickerCode })
+    }
+    private fun subscribeToIndexPriceUpdates() {
+        val indexesList = listOf(
+            uiState.value.spyTicker.tickerCode,
+            uiState.value.qqqTicker.tickerCode,
+            uiState.value.iwmTicker.tickerCode
+        )
+        livePricesRepository.subscribeToLivePrices(indexesList)
     }
 
 

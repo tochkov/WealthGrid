@@ -8,6 +8,7 @@ import com.topdownedge.domain.repositories.LivePricesRepository
 import com.topdownedge.domain.repositories.PriceDataRepository
 import com.topdownedge.domain.repositories.UserPortfolioRepository
 import com.topdownedge.presentation.common.randomColor
+import com.topdownedge.presentation.ui.theme.ColorMaster
 import dagger.hilt.android.lifecycle.HiltViewModel
 import ir.ehsannarmani.compose_charts.models.Pie
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,8 +42,8 @@ class PortfolioViewModel @Inject constructor(
                 uiState.update {
                     it.copy(
                         positions = positionList.map { it.toPositionItemUiModel(true) },
-                        pieList = positionList.map { position ->
-                            val color = randomColor()
+                        pieList = positionList.mapIndexed { index, position ->
+                            val color = ColorMaster.getColor(index)
                             Pie(
                                 label = position.tickerCode,
                                 data = position.totalInvested,

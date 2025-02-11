@@ -1,6 +1,8 @@
 package com.topdownedge.data.local.dao
 
 import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Upsert
 import com.topdownedge.data.local.UserPositionEntity
@@ -9,7 +11,8 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface UserPositionDao {
 
-    @Upsert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+//    @Upsert
     suspend fun upsertPosition(position: UserPositionEntity)
 
     @Query("SELECT * FROM user_positions WHERE symbol = :symbol")

@@ -45,10 +45,63 @@ val MaterialTheme.customColorsPalette: CustomColorsPalette
     get() = LocalCustomColorsPalette.current
 
 
-object CustomColors {
+object ColorMaster {
     val priceRed
         @Composable
         @ReadOnlyComposable
         get() = MaterialTheme.colorScheme.tertiary
+    val priceGreen
+        @Composable
+        @ReadOnlyComposable
+        get() = MaterialTheme.colorScheme.tertiary
+    val primary
+        @Composable
+        @ReadOnlyComposable
+        get() = MaterialTheme.colorScheme.tertiary
+
+
+
+//https://colormagic.app/palette/67aa0c31079f8ec4becb2cd9
+    val pieChart1 = Color(0xFF3c9090)
+    val pieChart2 = Color(0xFF6fbe8c)
+    val pieChart3 = Color(0xFF88d8b0)
+    val pieChart4 = Color(0xFFffcb5c)
+    val pieChart5 = Color(0xFFff6e61)
+    val pieChart6 = Color(0xFFff9f75)
+    val pieChart7 = Color(0xFFffe1a8)
+    val pieChart8 = Color(0xFF74c4d8)
+    val pieChart9 = Color(0xFFe2c846)
+    val pieChart10 = Color(0xFFe99516)
+    val pieChart11 = Color(0xFF577925)
+    val pieChart12 = Color(0xFF74c4d8)
+    val pieChart13 = Color(0xFFf9e24e)
+    val pieChart14 = Color(0xFFf6b53c)
+    val pieChart15 = Color(0xFF4d4d89)
+
+    val pieColorList = listOf(
+        pieChart1,
+        pieChart2,
+        pieChart3,
+        pieChart4,
+        pieChart5,
+        pieChart6,
+        pieChart7,
+        pieChart8,
+        pieChart9,
+        pieChart10,
+        pieChart11,
+        pieChart12,
+        pieChart13,
+        pieChart14,
+        pieChart15,
+    )
+
+    fun getColor(index: Int): Color {
+        return pieColorList[index % pieColorList.size]
+
+    }
+
+
+
 
 }

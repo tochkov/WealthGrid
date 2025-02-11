@@ -1,6 +1,8 @@
 package com.topdownedge.data.local.dao
 
 import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Upsert
 import com.topdownedge.data.local.TickerEntity
@@ -35,8 +37,8 @@ interface TickerDao {
     fun searchTickers(queryString: String): Flow<List<TickerEntity>>
 
 
-
-    @Upsert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+//    @Upsert
     suspend fun upsertAllTickers(tickers: List<TickerEntity>)
 
 

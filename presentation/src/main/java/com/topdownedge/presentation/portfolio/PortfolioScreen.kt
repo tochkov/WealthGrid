@@ -5,6 +5,7 @@ import android.content.res.Configuration
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -36,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -88,7 +90,11 @@ internal fun PortfolioScreen(
 
     val viewModel: PortfolioViewModel = hiltViewModel()
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
-    val pagerState = rememberPagerState(pageCount = { 3 })
+
+    if (uiState.positions.isEmpty()) {
+        EmptyPortfolioScreen()
+        return@PortfolioScreen
+    }
 
     ScreenVisibilityObserver(
         onScreenEnter = {
@@ -103,71 +109,7 @@ internal fun PortfolioScreen(
         modifier = Modifier.fillMaxSize()
     ) {
         item {
-            val centralItemVerticalPadding = 16.dp
-            val centralItemHorizontalPadding = 30.dp
-            HorizontalPager(pagerState) { page ->
-                when (page) {
-                    PAGE_PIE_CHART -> {
-                        PortfolioDonut(
-                            modifier = Modifier.padding(
-                                vertical = centralItemVerticalPadding,
-                                horizontal = centralItemHorizontalPadding
-                            ),
-                            uiState = uiState,
-                            onPieSliceClick = {
-                                viewModel.onPieSliceClick(it)
-                            }
-                        )
-                    }
-
-                    PAGE_LINE_CHART -> {
-                        Text(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .aspectRatio(1f)
-                                .padding(
-                                    horizontal = centralItemHorizontalPadding,
-                                    vertical = centralItemVerticalPadding
-                                ),
-                            text = "PAGE_LINE_CHART"
-                        )
-                    }
-
-                    PAGE_STATS -> {
-                        Text(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .aspectRatio(1f)
-                                .padding(
-                                    horizontal = centralItemHorizontalPadding,
-                                    vertical = centralItemVerticalPadding
-                                ),
-                            text = "PAGE_STATS"
-                        )
-                    }
-                }
-            }
-
-            Row(
-                Modifier
-                    .wrapContentHeight()
-                    .fillMaxWidth()
-                    .padding(bottom = 6.dp),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                repeat(pagerState.pageCount) { iteration ->
-                    val color =
-                        if (pagerState.currentPage == iteration) Color.LightGray else Color.DarkGray
-                    Box(
-                        modifier = Modifier
-                            .padding(4.dp)
-                            .clip(CircleShape)
-                            .background(color)
-                            .size(9.dp)
-                    )
-                }
-
-            }
+            PortfolioViewPager(viewModel, uiState)
         }
 
         itemsIndexed(uiState.positions) { index, position ->
@@ -181,35 +123,8 @@ internal fun PortfolioScreen(
                 totalSize = uiState.positions.size,
             ) {
                 Column {
-
                     if (index == 0) {
-                        Row(
-                            Modifier.padding(
-                                start = 16.dp,
-                                top = 16.dp,
-                                end = 16.dp
-                            ),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Text(
-                                modifier = Modifier.weight(1f),
-                                text = "Positions",
-                                fontSize = 19.sp,
-                                fontWeight = FontWeight.ExtraBold
-                            )
-
-                            Icon(
-                                modifier = Modifier
-                                    .background(
-                                        color = ColorMaster.primary.applyAlpha(0.2f),
-                                        shape = RoundedCornerShape(4.dp)
-                                    )
-                                    .padding(5.dp),
-                                painter = painterResource(R.drawable.ic_sort_swap_vert),
-                                contentDescription = "Sort",
-//                                    tint =
-                            )
-                        }
+                        PositionItemHeader()
                     }
                     PositionCardItem(
                         modifier = Modifier
@@ -232,9 +147,131 @@ internal fun PortfolioScreen(
             }
         }
     }
-
-
 }
+
+@Composable
+private fun EmptyPortfolioScreen() {
+    Column(
+//        modifier = Modifier.alpha(0.7f),
+        verticalArrangement = Arrangement.Center,
+    ) {
+        Icon(
+            painter = painterResource(R.drawable.curve_arrow_up_8_svgrepo_com),
+            contentDescription = null,
+            tint = ColorMaster.primary.applyAlpha(0.4f),
+            modifier = Modifier
+                .size(100.dp)
+                .align(Alignment.End)
+                .rotate(10f)
+//                .alpha(0.4f)
+
+        )
+        Text(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    top = 30.dp,
+                    bottom = 0.dp,
+                    start = 24.dp,
+                    end = 24.dp
+                ),
+            text = "You don't have any positions.",
+            fontSize = 22.sp,
+            textAlign = TextAlign.Center
+        )
+        Text(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    horizontal = 24.dp
+                ),
+            text = "To add a new one click the right corner",
+            fontSize = 14.sp,
+            textAlign = TextAlign.Center
+        )
+        Image(
+            modifier = Modifier
+                .alpha(0.6f)
+                .padding(horizontal = 42.dp, vertical = 54.dp),
+            painter = painterResource(R.drawable.undraw_personal_goals_f9bb),
+            contentDescription = null,
+        )
+    }
+}
+
+@Composable
+private fun PortfolioViewPager(
+    viewModel: PortfolioViewModel,
+    uiState: PortfolioUiState,
+) {
+    val pagerState = rememberPagerState(pageCount = { 3 })
+    val centralItemVerticalPadding = 16.dp
+    val centralItemHorizontalPadding = 30.dp
+    HorizontalPager(pagerState) { page ->
+        when (page) {
+            PAGE_PIE_CHART -> {
+                PortfolioDonut(
+                    modifier = Modifier.padding(
+                        vertical = centralItemVerticalPadding,
+                        horizontal = centralItemHorizontalPadding
+                    ),
+                    uiState = uiState,
+                    onPieSliceClick = {
+                        viewModel.onPieSliceClick(it)
+                    }
+                )
+            }
+
+            PAGE_LINE_CHART -> {
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(1f)
+                        .padding(
+                            horizontal = centralItemHorizontalPadding,
+                            vertical = centralItemVerticalPadding
+                        ),
+                    text = "PAGE_LINE_CHART"
+                )
+            }
+
+            PAGE_STATS -> {
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(1f)
+                        .padding(
+                            horizontal = centralItemHorizontalPadding,
+                            vertical = centralItemVerticalPadding
+                        ),
+                    text = "PAGE_STATS"
+                )
+            }
+        }
+    }
+
+    Row(
+        Modifier
+            .wrapContentHeight()
+            .fillMaxWidth()
+            .padding(bottom = 6.dp),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        repeat(pagerState.pageCount) { iteration ->
+            val color =
+                if (pagerState.currentPage == iteration) Color.LightGray else Color.DarkGray
+            Box(
+                modifier = Modifier
+                    .padding(4.dp)
+                    .clip(CircleShape)
+                    .background(color)
+                    .size(9.dp)
+            )
+        }
+
+    }
+}
+
 
 @Composable
 fun PortfolioDonut(
@@ -317,6 +354,38 @@ fun PortfolioDonut(
     }
 }
 
+@Composable
+private fun PositionItemHeader(
+
+) {
+    Row(
+        Modifier.padding(
+            start = 16.dp,
+            top = 16.dp,
+            end = 16.dp
+        ),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            modifier = Modifier.weight(1f),
+            text = "Positions",
+            fontSize = 19.sp,
+            fontWeight = FontWeight.ExtraBold
+        )
+
+        Icon(
+            modifier = Modifier
+                .background(
+                    color = ColorMaster.primary.applyAlpha(0.2f),
+                    shape = RoundedCornerShape(4.dp)
+                )
+                .padding(5.dp),
+            painter = painterResource(R.drawable.ic_sort_swap_vert),
+            contentDescription = "Sort",
+//                                    tint =
+        )
+    }
+}
 
 @Composable
 fun PositionCardItem(
@@ -452,25 +521,26 @@ fun PercentChip(
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun ASDF() {
-    val position = PositionItemUiModel(
-        tickerCode = "AAPL",
-        tickerExchange = "US",
-        tickerName = "Apple Inc.",
-        averagePrice = 123.45,
-        sharesQuantity = 1000.0,
-        currentPrice = 131.17,
-        previousDayClose = 117.8,
-        percentageOfPortfolio = 27.43,
-        isCurrentPriceFromCache = false,
-        positionColor = ColorMaster.primary
-
-    )
-    PositionCardItem(
-        modifier = Modifier
-            .padding(16.dp)
-            .fillMaxWidth(),
-        position = position
-    )
+//    val position = PositionItemUiModel(
+//        tickerCode = "AAPL",
+//        tickerExchange = "US",
+//        tickerName = "Apple Inc.",
+//        averagePrice = 123.45,
+//        sharesQuantity = 1000.0,
+//        currentPrice = 131.17,
+//        previousDayClose = 117.8,
+//        percentageOfPortfolio = 27.43,
+//        isCurrentPriceFromCache = false,
+//        positionColor = ColorMaster.primary
+//
+//    )
+//    PositionCardItem(
+//        modifier = Modifier
+//            .padding(16.dp)
+//            .fillMaxWidth(),
+//        position = position
+//    )
+    EmptyPortfolioScreen()
 
 
 }

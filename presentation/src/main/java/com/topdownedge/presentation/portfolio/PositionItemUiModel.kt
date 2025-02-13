@@ -1,9 +1,12 @@
 package com.topdownedge.presentation.portfolio
 
+import androidx.compose.ui.graphics.Color
 import com.topdownedge.domain.entities.UserPosition
 import com.topdownedge.domain.fmtPercent
 import com.topdownedge.domain.fmtPrice
 import com.topdownedge.domain.fmtMoney
+import com.topdownedge.domain.fmtMoney2
+import ir.ehsannarmani.compose_charts.models.Pie
 
 data class PositionItemUiModel(
     val tickerCode: String,
@@ -12,12 +15,14 @@ data class PositionItemUiModel(
 
     val averagePrice: Double,
     val sharesQuantity: Double,
-    private val totalInvested: Double = averagePrice * sharesQuantity,
+    val totalInvested: Double = averagePrice * sharesQuantity,
 
     val currentPrice: Double?,
     val previousDayClose: Double?,
-    val percentageOfPortfolio: Double? = 23.45,
-    val isCurrentPriceFromCache: Boolean
+    var percentageOfPortfolio: Double? = 23.45,
+    val isCurrentPriceFromCache: Boolean,
+
+    val positionColor: Color
 ) {
     fun averagePrice(): String = averagePrice.fmtPrice()
     fun sharesQuantity(): String = sharesQuantity.fmtPrice()
@@ -32,13 +37,18 @@ data class PositionItemUiModel(
         return (currentPrice * sharesQuantity).fmtMoney()
     }
 
+    fun currentValueDouble(): Double {
+        if (currentPrice == null) return 0.0
+        return currentPrice * sharesQuantity
+    }
+
     fun totalPNL(): String {
         if (currentPrice == null) return ""
         val totalGain = (currentPrice - averagePrice) * sharesQuantity
         return if (totalGain >= 0) {
-            "+${totalGain.fmtMoney()}"
+            "+${totalGain.fmtMoney2()}"
         } else {
-            totalGain.fmtMoney()
+            totalGain.fmtMoney2()
         }
     }
 
@@ -68,7 +78,25 @@ data class PositionItemUiModel(
     }
 }
 
-fun UserPosition.toPositionItemUiModel(isFromCache: Boolean) = PositionItemUiModel(
+
+
+
+fun List<PositionItemUiModel>.toPieList() = mapIndexed { index, position ->
+    Pie(
+        label = position.tickerCode,
+        data = position.currentValueDouble(),
+        color = position.positionColor,
+    )
+}
+
+fun List<PositionItemUiModel>.populatePctOfPortfolio() = also { positions ->
+    val total = positions.sumOf { it.currentValueDouble() }
+    positions.map { it.percentageOfPortfolio = (it.currentValueDouble() / total) * 100 }
+}
+
+
+
+fun UserPosition.toPositionItemUiModel(isFromCache: Boolean, positionColor: Color) = PositionItemUiModel(
     tickerCode = tickerCode,
     tickerExchange = tickerExchange,
     tickerName = tickerName,
@@ -77,6 +105,7 @@ fun UserPosition.toPositionItemUiModel(isFromCache: Boolean) = PositionItemUiMod
     currentPrice = currentPrice,
     previousDayClose = currentPrice,
     percentageOfPortfolio = percentageOfPortfolio,
-    isCurrentPriceFromCache = isFromCache
+    isCurrentPriceFromCache = isFromCache,
+    positionColor = positionColor
 )
 

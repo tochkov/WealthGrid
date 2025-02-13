@@ -1,14 +1,13 @@
 package com.topdownedge.presentation.portfolio
 
 
-import com.topdownedge.presentation.R
 import android.content.res.Configuration
-import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +15,7 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -31,19 +31,21 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -54,7 +56,7 @@ import coil3.compose.AsyncImage
 import coil3.request.CachePolicy
 import coil3.request.ImageRequest
 import com.topdownedge.domain.fmtPercent
-import com.topdownedge.domain.fmtPrice
+import com.topdownedge.presentation.R
 import com.topdownedge.presentation.common.ListItemInsideCard
 import com.topdownedge.presentation.common.applyAlpha
 import com.topdownedge.presentation.common.getLogoUrl
@@ -75,6 +77,10 @@ val zzzInnerPadding = 16.dp
 val zzzHorizontalPadding = 11.dp
 val zzzVerticalPadding = 8.dp
 
+val zzzBigTextSize = 22.sp
+val zzzLessBigTextSize = 18.sp
+val zzzPercentTextSize = 13.sp
+
 @Composable
 internal fun PortfolioScreen(
     masterNavController: NavHostController,
@@ -94,18 +100,19 @@ internal fun PortfolioScreen(
     )
 
     LazyColumn(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxSize()
     ) {
         item {
-            val centralItemPadding = 30.dp
+            val centralItemVerticalPadding = 16.dp
+            val centralItemHorizontalPadding = 30.dp
             HorizontalPager(pagerState) { page ->
                 when (page) {
                     PAGE_PIE_CHART -> {
                         PortfolioDonut(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .aspectRatio(1f)
-                                .padding(30.dp),
+                            modifier = Modifier.padding(
+                                vertical = centralItemVerticalPadding,
+                                horizontal = centralItemHorizontalPadding
+                            ),
                             uiState = uiState,
                             onPieSliceClick = {
                                 viewModel.onPieSliceClick(it)
@@ -118,7 +125,10 @@ internal fun PortfolioScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .aspectRatio(1f)
-                                .padding(centralItemPadding),
+                                .padding(
+                                    horizontal = centralItemHorizontalPadding,
+                                    vertical = centralItemVerticalPadding
+                                ),
                             text = "PAGE_LINE_CHART"
                         )
                     }
@@ -128,7 +138,10 @@ internal fun PortfolioScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .aspectRatio(1f)
-                                .padding(centralItemPadding),
+                                .padding(
+                                    horizontal = centralItemHorizontalPadding,
+                                    vertical = centralItemVerticalPadding
+                                ),
                             text = "PAGE_STATS"
                         )
                     }
@@ -139,7 +152,7 @@ internal fun PortfolioScreen(
                 Modifier
                     .wrapContentHeight()
                     .fillMaxWidth()
-                    .padding(bottom = 12.dp),
+                    .padding(bottom = 6.dp),
                 horizontalArrangement = Arrangement.Center
             ) {
                 repeat(pagerState.pageCount) { iteration ->
@@ -150,7 +163,7 @@ internal fun PortfolioScreen(
                             .padding(4.dp)
                             .clip(CircleShape)
                             .background(color)
-                            .size(12.dp)
+                            .size(9.dp)
                     )
                 }
 
@@ -161,8 +174,6 @@ internal fun PortfolioScreen(
             ListItemInsideCard(
                 modifier = Modifier
                     .padding(horizontal = zzzHorizontalPadding),
-
-//                    outerCardVerticalPadding = globalVerticalPadding,
                 outerCardVerticalPadding = 12.dp,
                 outerCardCornerElevation = cardElevation,
                 outerCardCornerRounding = cardRounding,
@@ -179,7 +190,6 @@ internal fun PortfolioScreen(
                                 end = 16.dp
                             ),
                             verticalAlignment = Alignment.CenterVertically,
-//                                horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(
                                 modifier = Modifier.weight(1f),
@@ -210,10 +220,13 @@ internal fun PortfolioScreen(
                                 bottom = 4.dp
                             )
                             .fillMaxWidth()
-                            .clickable {
+                            .clickable(
+                                indication = null,
+                                interactionSource = remember { MutableInteractionSource() }
+                            ) {
                                 masterNavController.navigateToUserPositionScreen(position)
                             },
-                        position
+                        position = position
                     )
                 }
             }
@@ -230,42 +243,62 @@ fun PortfolioDonut(
     onPieSliceClick: (Pie) -> Unit,
 ) {
 
-
-    val rotationState = remember { Animatable(120f) }
-
-// Launch the rotation animation when the composable enters composition
-    LaunchedEffect(Unit) {
-        rotationState.animateTo(
-            targetValue = 0f,
-            animationSpec = tween(
-                durationMillis = 800,
-//                easing =  FastOutSlowInEasing
-            )
-        )
-    }
-
-
-
-    Box {
+    Box(
+        modifier = modifier
+    ) {
         Column(
             modifier = Modifier.align(Alignment.Center),
             horizontalAlignment = Alignment.CenterHorizontally
-
         ) {
+            val position = uiState.selectedPosition?.let { uiState.positions[it] }
 
-            if (uiState.selectedPie == null) {
-                Text(text = "Portfolio value:\n ${uiState.portfolioValue}")
-                Text(text = "Portfolio gain: ${uiState.portfolioGain}")
+            val topText: AnnotatedString = if (position == null) {
+                buildAnnotatedString { append("My Portfolio") }
             } else {
-                Text(text = uiState.selectedPie!!.label!!)
-                Text(text = uiState.selectedPie!!.data.fmtPrice())
+                buildAnnotatedString {
+                    append(position.tickerCode)
+                    withStyle(
+                        style = SpanStyle(
+                            color = position.positionColor.applyAlpha(0.8f),
+                        )
+                    ) {
+                        append(" (${position.percentageOfPortfolio()})")
+                    }
+                }
             }
 
+            val positionValue = if (position == null) {
+                uiState.portfolioValue
+            } else {
+                position.currentValue()
+            }
+
+            val gainPct = if (position == null) {
+                uiState.portfolioGain.removeSuffix("%").toDoubleOrNull()
+            } else {
+                position.totalPNLPercentDouble()
+            }
+
+            Text(
+                text = topText,
+                fontSize = 17.sp
+            )
+            Text(
+                modifier = Modifier.padding(bottom = 8.dp, top = 4.dp),
+                text = positionValue,
+                fontSize = 25.sp,
+                fontWeight = FontWeight.ExtraBold
+
+            )
+            PercentChip(
+                percent = gainPct
+            )
 
         }
 
         PieChart(
-            modifier = modifier.rotate(rotationState.value),
+            modifier = Modifier
+                .aspectRatio(1f),
             data = uiState.pieList,
             onPieClick = onPieSliceClick,
             selectedScale = 1.15f,
@@ -279,7 +312,7 @@ fun PortfolioDonut(
             spaceDegreeAnimExitSpec = tween(300),
             //  spaceDegree = 7f,
             //  selectedPaddingDegree = 4f,
-            style = Pie.Style.Stroke(width = 70.dp)
+            style = Pie.Style.Stroke(width = 65.dp)
         )
     }
 }
@@ -296,7 +329,6 @@ fun PositionCardItem(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(IntrinsicSize.Min),
-//            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             AsyncImage(
                 modifier = Modifier
@@ -328,7 +360,7 @@ fun PositionCardItem(
 
                 Text(
                     text = position.currentValue(),
-                    fontSize = 22.sp,
+                    fontSize = zzzBigTextSize,
                     fontWeight = FontWeight.ExtraBold
                 )
             }
@@ -339,7 +371,7 @@ fun PositionCardItem(
                 Text(
                     modifier = Modifier.padding(bottom = 6.dp),
                     text = position.totalPNL(),
-                    fontSize = 19.sp,
+                    fontSize = zzzLessBigTextSize,
                     color = if (position.totalPNL().startsWith("-"))
                         ColorMaster.priceRed
                     else ColorMaster.priceGreen
@@ -363,17 +395,17 @@ fun PositionCardItem(
                     .alpha(0.4f)
                     .height(2.dp),
                 gapSize = 2.dp,
-                progress = { 0.33f },
+                progress = { (position.percentageOfPortfolio!! / 100.00).toFloat() },
+                color = position.positionColor,
                 drawStopIndicator = {}
             )
             Text(
                 text = position.percentageOfPortfolio(),
                 modifier = Modifier
                     .weight(1f)
-//                    .padding(start = 16.dp)
                     .alpha(0.4f),
                 textAlign = TextAlign.End,
-                fontSize = 14.sp,
+                fontSize = zzzPercentTextSize,
             )
         }
     }
@@ -429,7 +461,8 @@ fun ASDF() {
         currentPrice = 131.17,
         previousDayClose = 117.8,
         percentageOfPortfolio = 27.43,
-        isCurrentPriceFromCache = false
+        isCurrentPriceFromCache = false,
+        positionColor = ColorMaster.primary
 
     )
     PositionCardItem(

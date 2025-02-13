@@ -1,0 +1,239 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 5,
+    "identityHash": "d4a2b95ada1e52eebd9203a4f389b25b",
+    "entities": [
+      {
+        "tableName": "user_trades",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `tickerCode` TEXT NOT NULL, `tickerExchange` TEXT NOT NULL, `symbol` TEXT NOT NULL, `tickerName` TEXT NOT NULL, `dateSubmitted` TEXT NOT NULL, `dateTraded` TEXT NOT NULL, `price` REAL NOT NULL, `shares` REAL NOT NULL, `isBuy` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tickerCode",
+            "columnName": "tickerCode",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tickerExchange",
+            "columnName": "tickerExchange",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "symbol",
+            "columnName": "symbol",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tickerName",
+            "columnName": "tickerName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dateSubmitted",
+            "columnName": "dateSubmitted",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dateTraded",
+            "columnName": "dateTraded",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "price",
+            "columnName": "price",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "shares",
+            "columnName": "shares",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isBuy",
+            "columnName": "isBuy",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_user_trades_symbol",
+            "unique": false,
+            "columnNames": [
+              "symbol"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_user_trades_symbol` ON `${TABLE_NAME}` (`symbol`)"
+          },
+          {
+            "name": "index_user_trades_dateTraded",
+            "unique": false,
+            "columnNames": [
+              "dateTraded"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_user_trades_dateTraded` ON `${TABLE_NAME}` (`dateTraded`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "user_positions",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `tickerCode` TEXT NOT NULL, `tickerExchange` TEXT NOT NULL, `symbol` TEXT NOT NULL, `tickerName` TEXT NOT NULL, `firstTradeDate` TEXT NOT NULL, `lastTradeDate` TEXT NOT NULL, `averagePrice` REAL NOT NULL, `sharesQuantity` REAL NOT NULL, `totalInvested` REAL NOT NULL, `currentPrice` REAL NOT NULL, `currentValue` REAL NOT NULL, `totalPNL` REAL NOT NULL, `totalPNLPercent` REAL NOT NULL, `percentageOfPortfolio` REAL NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tickerCode",
+            "columnName": "tickerCode",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tickerExchange",
+            "columnName": "tickerExchange",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "symbol",
+            "columnName": "symbol",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tickerName",
+            "columnName": "tickerName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "firstTradeDate",
+            "columnName": "firstTradeDate",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastTradeDate",
+            "columnName": "lastTradeDate",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "averagePrice",
+            "columnName": "averagePrice",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sharesQuantity",
+            "columnName": "sharesQuantity",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "totalInvested",
+            "columnName": "totalInvested",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "currentPrice",
+            "columnName": "currentPrice",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "currentValue",
+            "columnName": "currentValue",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "totalPNL",
+            "columnName": "totalPNL",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "totalPNLPercent",
+            "columnName": "totalPNLPercent",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "percentageOfPortfolio",
+            "columnName": "percentageOfPortfolio",
+            "affinity": "REAL",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_user_positions_symbol",
+            "unique": true,
+            "columnNames": [
+              "symbol"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_user_positions_symbol` ON `${TABLE_NAME}` (`symbol`)"
+          },
+          {
+            "name": "index_user_positions_percentageOfPortfolio",
+            "unique": false,
+            "columnNames": [
+              "percentageOfPortfolio"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_user_positions_percentageOfPortfolio` ON `${TABLE_NAME}` (`percentageOfPortfolio`)"
+          },
+          {
+            "name": "index_user_positions_totalPNLPercent",
+            "unique": false,
+            "columnNames": [
+              "totalPNLPercent"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_user_positions_totalPNLPercent` ON `${TABLE_NAME}` (`totalPNLPercent`)"
+          }
+        ],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd4a2b95ada1e52eebd9203a4f389b25b')"
+    ]
+  }
+}

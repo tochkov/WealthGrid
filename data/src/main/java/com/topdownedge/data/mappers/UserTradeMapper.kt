@@ -41,8 +41,7 @@ fun UserPositionEntity.toUserPosition() = UserPosition(
     averagePrice = averagePrice,
     sharesQuantity = sharesQuantity,
     totalInvested = totalInvested,
-    currentPrice = currentPrice,
-    percentageOfPortfolio = percentageOfPortfolio,
+    currentPrice = lastKnownPrice,
 )
 
 fun UserPosition.toUserPositionEntity() = UserPositionEntity(
@@ -54,11 +53,8 @@ fun UserPosition.toUserPositionEntity() = UserPositionEntity(
     averagePrice = averagePrice,
     sharesQuantity = sharesQuantity,
     totalInvested = totalInvested,
-    currentPrice = currentPrice,
-    currentValue = currentValue(),
-    totalPNL = totalPNL(),
-    totalPNLPercent = totalPNLPercent(),
-    percentageOfPortfolio = percentageOfPortfolio,
+    lastKnownPrice = currentPrice,
+
 )
 
 

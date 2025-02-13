@@ -11,7 +11,7 @@ import com.topdownedge.data.local.dao.UserTradeDao
         UserTradeEntity::class,
         UserPositionEntity::class,
     ],
-    version = 5,
+    version = 6,
 )
 @TypeConverters(TypeConverterz::class)
 abstract class PortfolioDatabase: RoomDatabase() {

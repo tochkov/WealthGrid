@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 5,
-    "identityHash": "fd902548ecc7dbb2375aba5aa0aa0dff",
+    "version": 6,
+    "identityHash": "3e4985b5fee9580b456db3e581b11f85",
     "entities": [
       {
         "tableName": "user_trades",
@@ -99,7 +99,7 @@
       },
       {
         "tableName": "user_positions",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `tickerCode` TEXT NOT NULL, `tickerExchange` TEXT NOT NULL, `symbol` TEXT NOT NULL, `tickerName` TEXT NOT NULL, `firstTradeDate` TEXT NOT NULL, `lastTradeDate` TEXT NOT NULL, `averagePrice` REAL NOT NULL, `sharesQuantity` REAL NOT NULL, `totalInvested` REAL NOT NULL, `currentPrice` REAL NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `tickerCode` TEXT NOT NULL, `tickerExchange` TEXT NOT NULL, `symbol` TEXT NOT NULL, `tickerName` TEXT NOT NULL, `firstTradeDate` TEXT NOT NULL, `lastTradeDate` TEXT NOT NULL, `averagePrice` REAL NOT NULL, `sharesQuantity` REAL NOT NULL, `totalInvested` REAL NOT NULL, `lastKnownPrice` REAL NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -162,8 +162,8 @@
             "notNull": true
           },
           {
-            "fieldPath": "currentPrice",
-            "columnName": "currentPrice",
+            "fieldPath": "lastKnownPrice",
+            "columnName": "lastKnownPrice",
             "affinity": "REAL",
             "notNull": true
           }
@@ -191,7 +191,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'fd902548ecc7dbb2375aba5aa0aa0dff')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '3e4985b5fee9580b456db3e581b11f85')"
     ]
   }
 }

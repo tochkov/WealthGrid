@@ -32,8 +32,6 @@ data class UserTradeEntity(
     tableName = "user_positions",
     indices = [
         Index(value = ["symbol"], unique = true),
-        Index(value = ["percentageOfPortfolio"]),
-        Index(value = ["totalPNLPercent"])
     ]
 )
 data class UserPositionEntity(
@@ -53,11 +51,6 @@ data class UserPositionEntity(
     val sharesQuantity: Double,
     val totalInvested: Double,
 
-    val currentPrice: Double = averagePrice,
-    val currentValue: Double,
+    val lastKnownPrice: Double,
 
-    val totalPNL: Double,
-    val totalPNLPercent: Double,
-
-    val percentageOfPortfolio: Double
-)
+    )

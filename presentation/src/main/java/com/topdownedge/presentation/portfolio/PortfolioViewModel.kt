@@ -25,6 +25,7 @@ data class PortfolioUiState(
     var portfolioValue: String = "",
     var portfolioGain: String = "",
     var selectedPosition: Int? = null,
+    var isLoading: Boolean = false
 )
 
 
@@ -39,15 +40,18 @@ class PortfolioViewModel @Inject constructor(
         field = MutableStateFlow(PortfolioUiState())
 
     init {
+        uiState.update { it.copy(isLoading = true) }
+
         viewModelScope.launch {
             userPortfolioRepository.getAllUserPositions().collect { positionList ->
                 uiState.update {
                     val updatedPositions = updatePositionsFromDb(positionList)
                     it.copy(
                         positions = updatedPositions,
-//                        pieList = updatedPositions.toPieList(),
+                        pieList = updatedPositions.toPieList(),
                         portfolioValue = calculatePortfolioValue(updatedPositions),
-                        portfolioGain = calculatePortfolioGain(updatedPositions)
+                        portfolioGain = calculatePortfolioGain(updatedPositions),
+                        isLoading = false
                     )
                 }
                 getLastKnownPrices()
@@ -77,7 +81,8 @@ class PortfolioViewModel @Inject constructor(
                             positions = updatedPositions,
                             pieList = updatedPositions.toPieList(),
                             portfolioValue = calculatePortfolioValue(updatedPositions),
-                            portfolioGain = calculatePortfolioGain(updatedPositions)
+                            portfolioGain = calculatePortfolioGain(updatedPositions),
+                            isLoading = false
                         )
                     }
                 }
@@ -110,7 +115,8 @@ class PortfolioViewModel @Inject constructor(
                         positions = updatedPositions,
 //                        pieList = updatedPositions.toPieList(),
                         portfolioValue = calculatePortfolioValue(updatedPositions),
-                        portfolioGain = calculatePortfolioGain(updatedPositions)
+                        portfolioGain = calculatePortfolioGain(updatedPositions),
+                        isLoading = false
                     )
                 }
             }

@@ -4,6 +4,7 @@ import com.topdownedge.data.local.dao.LastKnownPriceDao
 import com.topdownedge.data.local.dao.PriceBarDao
 import com.topdownedge.data.local.dao.RESULTS_LIMIT
 import com.topdownedge.data.local.dao.TickerDao
+import com.topdownedge.data.local.dao.UserPositionDao
 import com.topdownedge.data.mappers.toEntities
 import com.topdownedge.data.mappers.toLastKnownPriceEntities
 import com.topdownedge.data.mappers.toLastKnownPrices
@@ -12,6 +13,7 @@ import com.topdownedge.data.mappers.toPriceBars
 import com.topdownedge.data.mappers.toTickerEntity
 import com.topdownedge.data.remote.EodhdFundamentalsApi
 import com.topdownedge.data.remote.EodhdPriceDataApi
+import com.topdownedge.data.remote.dto.LastKnownPriceDto
 import com.topdownedge.data.remote.safeApiCall
 import com.topdownedge.domain.entities.common.LastKnownPrice
 import com.topdownedge.domain.entities.common.PriceBar
@@ -20,6 +22,7 @@ import com.topdownedge.domain.fmt
 import com.topdownedge.domain.repositories.PriceDataRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -35,6 +38,7 @@ class PriceDataRepositoryImpl
     private val tickerDao: TickerDao,
     private val priceBarDao: PriceBarDao,
     private val lastKnownPriceDao: LastKnownPriceDao,
+    private val userPositionDao: UserPositionDao,
 ) : PriceDataRepository {
 
     private val ioDispatcher: CoroutineContext = Dispatchers.IO
@@ -150,6 +154,8 @@ class PriceDataRepositoryImpl
                 lastKnownPriceDao.insertReplaceLastKnownPrices(
                     apiResultPrices.getOrNull()!!.toLastKnownPriceEntities()
                 )
+                updatePositionPrices(apiResultPrices.getOrNull())
+
                 val tickerMap = apiResultPrices.getOrNull()!!.toLastKnownPricesDomain(false)
                     .associateBy { it.code }
                 emit(Result.success(tickerMap))
@@ -163,6 +169,25 @@ class PriceDataRepositoryImpl
 
 
         }.flowOn(ioDispatcher)
+
+
+    suspend fun updatePositionPrices(priceUpdates: List<LastKnownPriceDto>?) {
+        if(priceUpdates?.isEmpty() == true){
+            return
+        }
+        // First fetch current positions
+        val currentPositions = userPositionDao.getAllUserPositions().first()
+
+        // Create updated position entities
+        val updatedPositions = currentPositions.map { position ->
+            priceUpdates!!.find { it.code == position.symbol }?.let { update ->
+                position.copy(lastKnownPrice = update.close)
+            } ?: position
+        }
+
+        // Update all positions in a single transaction
+        userPositionDao.updatePositions(updatedPositions)
+    }
 
 
 }

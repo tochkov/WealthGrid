@@ -91,9 +91,9 @@ internal fun PortfolioScreen(
     val viewModel: PortfolioViewModel = hiltViewModel()
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
 
-    if (uiState.positions.isEmpty()) {
+    if (uiState.positions.isEmpty() && !uiState.isLoading) {
         EmptyPortfolioScreen()
-        return@PortfolioScreen
+        return
     }
 
     ScreenVisibilityObserver(

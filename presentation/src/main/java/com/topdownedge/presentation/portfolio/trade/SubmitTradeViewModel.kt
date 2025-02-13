@@ -58,6 +58,7 @@ class SubmitTradeViewModel @Inject constructor(
 
     val tickerCode = savedStateHandle.get<String>("tickerCode") ?: ""
     val tickerExchange = savedStateHandle.get<String>("tickerExchange") ?: ""
+    val tickerName = savedStateHandle.get<String>("tickerName") ?: ""
     val symbol = "$tickerCode.$tickerExchange"
 
     val uiState: StateFlow<SubmitTradeUiState>
@@ -157,6 +158,7 @@ class SubmitTradeViewModel @Inject constructor(
                     UserTrade(
                         tickerCode = tickerCode,
                         tickerExchange = tickerExchange,
+                        tickerName = tickerName,
                         dateSubmitted = LocalDate.now(),
                         dateTraded = uiState.value.selectedDate,
                         price = uiState.value.selectedPrice.toDouble(),

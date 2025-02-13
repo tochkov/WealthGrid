@@ -50,6 +50,7 @@ class UserPortfolioRepositoryImpl @Inject constructor(
         return UserPosition(
             tickerCode = firstTrade.tickerCode,
             tickerExchange = firstTrade.tickerExchange,
+            tickerName = firstTrade.tickerName,
             firstTradeDate = firstTrade.dateTraded,
             lastTradeDate = lastTrade.dateTraded,
             averagePrice = averagePrice,

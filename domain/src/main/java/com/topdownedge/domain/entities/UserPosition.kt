@@ -7,6 +7,7 @@ data class UserPosition(
     val tickerCode: String,
     val tickerExchange: String,
     val symbol: String = "$tickerCode.$tickerExchange",
+    val tickerName: String,
 
     val firstTradeDate: LocalDate,
     val lastTradeDate: LocalDate,

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 4,
-    "identityHash": "498229f9caa0bddbc8d3d91b71660289",
+    "identityHash": "bfdfbb4d68aa603fdba1de3b99951152",
     "entities": [
       {
         "tableName": "user_trades",
@@ -93,7 +93,7 @@
       },
       {
         "tableName": "user_positions",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `tickerCode` TEXT NOT NULL, `tickerExchange` TEXT NOT NULL, `symbol` TEXT NOT NULL, `firstTradeDate` TEXT NOT NULL, `lastTradeDate` TEXT NOT NULL, `averagePrice` REAL NOT NULL, `sharesQuantity` REAL NOT NULL, `totalInvested` REAL NOT NULL, `currentPrice` REAL NOT NULL, `currentValue` REAL NOT NULL, `totalPNL` REAL NOT NULL, `totalPNLPercent` REAL NOT NULL, `percentageOfPortfolio` REAL NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `tickerCode` TEXT NOT NULL, `tickerExchange` TEXT NOT NULL, `symbol` TEXT NOT NULL, `tickerName` TEXT NOT NULL, `firstTradeDate` TEXT NOT NULL, `lastTradeDate` TEXT NOT NULL, `averagePrice` REAL NOT NULL, `sharesQuantity` REAL NOT NULL, `totalInvested` REAL NOT NULL, `currentPrice` REAL NOT NULL, `currentValue` REAL NOT NULL, `totalPNL` REAL NOT NULL, `totalPNLPercent` REAL NOT NULL, `percentageOfPortfolio` REAL NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -116,6 +116,12 @@
           {
             "fieldPath": "symbol",
             "columnName": "symbol",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tickerName",
+            "columnName": "tickerName",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -221,7 +227,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '498229f9caa0bddbc8d3d91b71660289')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'bfdfbb4d68aa603fdba1de3b99951152')"
     ]
   }
 }

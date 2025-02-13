@@ -49,15 +49,20 @@ object ColorMaster {
     val priceRed
         @Composable
         @ReadOnlyComposable
-        get() = MaterialTheme.colorScheme.tertiary
+        get() = MaterialTheme.customColorsPalette.priceRed
     val priceGreen
         @Composable
         @ReadOnlyComposable
-        get() = MaterialTheme.colorScheme.tertiary
+        get() = MaterialTheme.customColorsPalette.priceGreen
     val primary
         @Composable
         @ReadOnlyComposable
+        get() = MaterialTheme.colorScheme.primary
+    val tertiary
+        @Composable
+        @ReadOnlyComposable
         get() = MaterialTheme.colorScheme.tertiary
+
 
 
 

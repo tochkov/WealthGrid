@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
@@ -50,6 +51,7 @@ import coil3.request.CachePolicy
 import coil3.request.ImageRequest
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.topdownedge.domain.entities.common.Ticker
+import com.topdownedge.presentation.common.ListItemInsideCard
 import com.topdownedge.presentation.common.applyAlpha
 import com.topdownedge.presentation.common.chart.SimpleAssetLineChart
 import com.topdownedge.presentation.common.isFromCache
@@ -149,9 +151,10 @@ internal fun CompaniesListScreen(
 
         itemsIndexed(uiState.companyList) { index, company ->
 
+
 //            ListItemInsideCard(
 //                modifier = Modifier
-//                    .padding(horizontal = horizontalPadding)
+//                    .padding(horizontal = globalHorizontalPadding)
 //                    .clickable {
 //                        masterNavController.navigateToCompanyDetailsScreen(
 //                            Ticker(
@@ -161,9 +164,9 @@ internal fun CompaniesListScreen(
 //                            )
 //                        )
 //                    },
-//                outerCardVerticalPadding = verticalPadding,
+//                outerCardVerticalPadding = globalVerticalPadding,
 //                outerCardCornerElevation = cardElevation,
-//                outerCardCornerRounding = cardRounding,
+//                outerCardCornerRounding = 12.dp,
 //                index = index,
 //                totalSize = uiState.companyList.size,
 //            ) {

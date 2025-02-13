@@ -3,33 +3,43 @@ package com.topdownedge.presentation.portfolio
 import com.topdownedge.domain.entities.UserPosition
 import com.topdownedge.domain.fmtPercent
 import com.topdownedge.domain.fmtPrice
+import com.topdownedge.domain.fmtMoney
 
 data class PositionItemUiModel(
     val tickerCode: String,
     val tickerExchange: String,
+    val tickerName: String,
 
     val averagePrice: Double,
     val sharesQuantity: Double,
-    val totalInvested: Double = averagePrice * sharesQuantity,
+    private val totalInvested: Double = averagePrice * sharesQuantity,
 
     val currentPrice: Double?,
     val previousDayClose: Double?,
-    val percentageOfPortfolio: Double?,
+    val percentageOfPortfolio: Double? = 23.45,
     val isCurrentPriceFromCache: Boolean
 ) {
     fun averagePrice(): String = averagePrice.fmtPrice()
     fun sharesQuantity(): String = sharesQuantity.fmtPrice()
     fun currentPrice(): String = currentPrice.fmtPrice()
-    fun percentageOfPortfolio(): String = percentageOfPortfolio.fmtPrice()
+
+    fun percentageOfPortfolio(): String = percentageOfPortfolio.fmtPercent()
+
+    fun totalInvested(): String = totalInvested.fmtMoney()
 
     fun currentValue(): String {
         if (currentPrice == null) return ""
-        return (currentPrice * sharesQuantity).fmtPrice()
+        return (currentPrice * sharesQuantity).fmtMoney()
     }
 
     fun totalPNL(): String {
         if (currentPrice == null) return ""
-        return ((currentPrice - averagePrice) * totalInvested).fmtPrice()
+        val totalGain = (currentPrice - averagePrice) * sharesQuantity
+        return if (totalGain >= 0) {
+            "+${totalGain.fmtMoney()}"
+        } else {
+            totalGain.fmtMoney()
+        }
     }
 
     fun totalPNLPercent(): String{
@@ -40,6 +50,11 @@ data class PositionItemUiModel(
         } else {
             percentGain.fmtPercent()
         }
+    }
+
+    fun totalPNLPercentDouble(): Double?{
+        if (currentPrice == null) return null
+        return ((currentPrice - averagePrice) / averagePrice) * 100
     }
 
     fun dailyPercentageGain(): String {
@@ -56,6 +71,7 @@ data class PositionItemUiModel(
 fun UserPosition.toPositionItemUiModel(isFromCache: Boolean) = PositionItemUiModel(
     tickerCode = tickerCode,
     tickerExchange = tickerExchange,
+    tickerName = tickerName,
     averagePrice = averagePrice,
     sharesQuantity = sharesQuantity,
     currentPrice = currentPrice,

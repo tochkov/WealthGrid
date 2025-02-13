@@ -20,6 +20,7 @@ data class UserTradeEntity(
     val tickerCode: String,
     val tickerExchange: String,
     val symbol: String = "$tickerCode.$tickerExchange",
+    val tickerName: String,
     val dateSubmitted: LocalDate,
     val dateTraded: LocalDate,
     val price: Double,
@@ -43,6 +44,7 @@ data class UserPositionEntity(
     val tickerCode: String,
     val tickerExchange: String,
     val symbol: String = "$tickerCode.$tickerExchange",
+    val tickerName: String,
 
     val firstTradeDate: LocalDate,
     val lastTradeDate: LocalDate,

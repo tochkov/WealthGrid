@@ -36,6 +36,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
@@ -54,6 +55,9 @@ private val cardElevation = 6.dp
 private val innerPadding = 8.dp
 private val globalHorizontalPadding = 16.dp
 private val globalVerticalPadding = 8.dp
+
+private val topTextSize = 17.sp
+private val bottomTextSize = 14.sp
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -188,7 +192,10 @@ internal fun MarketsScreen(
                     tickerCode = company.tickerCode,
                     tickerName = company.tickerName,
                     percent = company.getPercentGainAsDouble(),
-                    price = company.currentPrice
+                    price = company.currentPrice,
+                    fontSizeTopItems = topTextSize,
+                    fontSizeBottomItems = bottomTextSize
+
                 )
             }
         }
@@ -214,7 +221,8 @@ fun ChartCard(
             ) {
                 Text(
                     text = indexTicker.tickerName,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    fontSize = topTextSize
                 )
 
                 var percentGain = indexTicker.getPercentGain()
@@ -225,7 +233,8 @@ fun ChartCard(
                 }
                 Text(
                     text = percentGain,
-                    color = percentColor
+                    color = percentColor,
+                    fontSize = topTextSize
                 )
             }
             SimpleAssetLineChart(

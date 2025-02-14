@@ -29,6 +29,50 @@ Some of the stack covered:
 
 - Tests decorated with Thruth and Mockk
 
+It's naive from business logic prespective, but is a fully production app in techincal aspect
+
+// The project uses Explicit Backing Fields,
+// so to build and run the project you should enable the K2 Mode from Settings -> Languages & Frameworks -> Kotlin: Check the "Enable K2 Kotlin Mode"
+
+
+TODODO 
+Refactor compose navigation with all the listeners and stuff
+Add live price data to Markets screen
+
+
+This is a naive app. From business logic perspective this is not a real app, but from technical standpoint it aims to be production ready.
+
+
+Ideas for project improvement:
+Portfolio Chart
+Portfolio Stats
+
+
+Ideas if this app will be a real world product:
+
+BE service should be implemented for sync - Firebase or custom
+
+Trade Imports should be implemented 
+//If the costs of AI services continue to fall//
+a simple screenshot to json conversion could work:
+Gemini prompt - "This is a list of trades. Extract them from the image with
+#id
+asset and exchange
+currency
+amount of shares
+fill price
+time 
+
+return as an answer only json with the following format: {"",""}
+
+Before any of the above - better rewrite for KMP
+
+
+
+
+
+
+
 
 
 

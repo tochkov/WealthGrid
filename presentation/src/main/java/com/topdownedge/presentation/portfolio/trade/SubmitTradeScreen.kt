@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
@@ -19,7 +20,9 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -88,20 +91,21 @@ fun SubmitTradeScreen(
     val messageSuccess = stringResource(R.string.new_trade_success, tickerCode)
     LaunchedEffect(Unit) {
         uiEvents.collect { event ->
-           when(event){
-               is UiEvent.ShowToast -> {
-                   val errorMessageRes = when(event.inputError){
-                       InputError.DATE -> R.string.enter_valid_date
-                       InputError.PRICE -> R.string.enter_valid_price
-                       InputError.SHARES -> R.string.enter_valid_shares
-                   }
-                   Toast.makeText(context, errorMessageRes, Toast.LENGTH_SHORT).show()
-               }
-               is UiEvent.Navigate -> {
-                   Toast.makeText(context, messageSuccess, Toast.LENGTH_SHORT).show()
-                   onBackPress()
-               }
-           }
+            when (event) {
+                is UiEvent.ShowToast -> {
+                    val errorMessageRes = when (event.inputError) {
+                        InputError.DATE -> R.string.enter_valid_date
+                        InputError.PRICE -> R.string.enter_valid_price
+                        InputError.SHARES -> R.string.enter_valid_shares
+                    }
+                    Toast.makeText(context, errorMessageRes, Toast.LENGTH_SHORT).show()
+                }
+
+                is UiEvent.Navigate -> {
+                    Toast.makeText(context, messageSuccess, Toast.LENGTH_SHORT).show()
+                    onBackPress()
+                }
+            }
         }
     }
 
@@ -223,131 +227,155 @@ fun SubmitTradeScreen(
                 )
             }
 
-            BuySellSwitch(
-                checked = uiState.isBuyState,
-                onCheckedChange = {
-                    viewModel.userSetBuyState(it)
-                },
+//            BuySellSwitch(
+//                checked = uiState.isBuyState,
+//                onCheckedChange = {
+//                    viewModel.userSetBuyState(it)
+//                },
+//                modifier = Modifier
+//                    .align(Alignment.End)
+//                    .padding(end = 16.dp)
+//            )
+
+            Text(
+                text = "Your current position is 225 shares @ 123.45 avg.",
+//                textAlign = TextAlign.Center,
                 modifier = Modifier
-                    .align(Alignment.End)
-                    .padding(end = 16.dp)
+                    .padding(start = 12.dp, end = 12.dp, bottom = 12.dp)
+                    .alpha(0.6f)
+//                    .align(Alignment.CenterHorizontally),
             )
 
-            Row {
-                Text(
-                    text = stringResource(R.string.select_date),
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier
-                        .padding(12.dp)
-                        .weight(4f)
-                )
-                TextField(
-                    value = uiState.selectedDate.format(DateTimeFormatter.ofPattern("dd/MM/yy")),
-                    onValueChange = { },
-                    textStyle = MaterialTheme.typography.bodyLarge,
-                    enabled = false,
-                    colors = TextFieldDefaults.colors(
-                        disabledTextColor = MaterialTheme.colorScheme.onSurface,
-                        disabledContainerColor = MaterialTheme.colorScheme.surface,
-                    ),
-                    trailingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.DateRange,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+            ElevatedCard(
+//                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
+            ) {
+                Column(Modifier.padding(16.dp)) {
+                    val textFieldWidth = 143.dp
+                    val bottomPadding = 20.dp
+                    Row(
+                        modifier = Modifier.padding(bottom = bottomPadding),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+
+                        Text(
+                            text = stringResource(R.string.select_date),
+                            style = MaterialTheme.typography.bodyLarge,
                         )
-                    },
-                    modifier = Modifier
-                        .padding(12.dp)
-                        .weight(3f)
-                        .clickable { showDatePicker = true }
-                )
+                        HorizontalDivider(modifier = Modifier
+                            .padding(16.dp)
+                            .alpha(0.4f)
+                            .weight(1f)
+                        )
+                        TextField(
+                            value = uiState.selectedDate.format(DateTimeFormatter.ofPattern("dd/MM/yy")),
+                            onValueChange = { },
+                            textStyle = MaterialTheme.typography.bodyLarge,
+                            enabled = false,
+                            colors = TextFieldDefaults.colors(
+                                disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                                disabledContainerColor = MaterialTheme.colorScheme.surface,
+                            ),
+                            trailingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.DateRange,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            },
+                            modifier = Modifier
+                                .width(textFieldWidth)
+                                .clickable { showDatePicker = true }
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier.padding(bottom = bottomPadding),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = stringResource(R.string.enter_price),
+                            style = MaterialTheme.typography.bodyLarge,
+
+                        )
+                        HorizontalDivider(modifier = Modifier
+                            .padding(16.dp)
+                            .alpha(0.4f)
+                            .weight(1f)
+                        )
+                        TextField(
+                            value = uiState.selectedPrice,
+                            onValueChange = {
+                                viewModel.userSetPrice(it)
+                            },
+                            textStyle = MaterialTheme.typography.bodyLarge,
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Number,
+                                imeAction = ImeAction.Done
+                            ),
+                            trailingIcon = {
+                                val ctx = LocalContext.current
+                                UpDownClickableArrows { clickedUp ->
+                                    Toast.makeText(
+                                        ctx,
+                                        if (clickedUp) "Increment Up" else "Increment Down",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            },
+                            modifier = Modifier
+                                .width(textFieldWidth)
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier.padding(bottom = bottomPadding),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = stringResource(R.string.num_of_shares),
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                        HorizontalDivider(modifier = Modifier
+                            .padding(16.dp)
+                            .alpha(0.4f)
+                            .weight(1f)
+                        )
+                        TextField(
+                            value = uiState.selectedShares,
+                            onValueChange = { viewModel.userSetShares(it) },
+                            textStyle = MaterialTheme.typography.bodyLarge,
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Number,
+                                imeAction = ImeAction.Done
+                            ),
+                            trailingIcon = {
+                                val ctx = LocalContext.current
+                                UpDownClickableArrows { clickedUp ->
+                                    Toast.makeText(
+                                        ctx,
+                                        if (clickedUp) "Increment Up" else "Increment Down",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            },
+                            modifier = Modifier
+                                .width(textFieldWidth)
+                        )
+                    }
+
+
+                    Text(
+                        text = "Total: $${
+                            uiState.totalPosition
+                        }",
+                        fontSize = 18.sp,
+                        modifier = Modifier
+//                            .padding(top = bottomPadding)
+                            .align(Alignment.End),
+                    )
+
+                }
             }
-
-            Row {
-                Text(
-                    text = stringResource(R.string.enter_price),
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier
-                        .padding(12.dp)
-                        .weight(4f),
-                )
-                TextField(
-                    value = uiState.selectedPrice,
-                    onValueChange = {
-                        viewModel.userSetPrice(it)
-                    },
-                    textStyle = MaterialTheme.typography.bodyLarge,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Number,
-                        imeAction = ImeAction.Done
-                    ),
-                    trailingIcon = {
-                        val ctx = LocalContext.current
-                        UpDownClickableArrows { clickedUp ->
-                            Toast.makeText(
-                                ctx,
-                                if (clickedUp) "Increment Up" else "Increment Down",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    },
-                    modifier = Modifier
-                        .padding(12.dp)
-                        .weight(3f)
-                )
-            }
-
-            Row {
-                Text(
-                    text = stringResource(R.string.num_of_shares),
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier
-                        .padding(12.dp)
-                        .weight(4f),
-                )
-                TextField(
-                    value = uiState.selectedShares,
-                    onValueChange = { viewModel.userSetShares(it) },
-                    textStyle = MaterialTheme.typography.bodyLarge,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Number,
-                        imeAction = ImeAction.Done
-                    ),
-                    trailingIcon = {
-                        val ctx = LocalContext.current
-                        UpDownClickableArrows { clickedUp ->
-                            Toast.makeText(
-                                ctx,
-                                if (clickedUp) "Increment Up" else "Increment Down",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    },
-                    modifier = Modifier
-                        .padding(12.dp)
-                        .weight(3f)
-                )
-            }
-
-
-            Text(
-                text = "Total: $${
-                    uiState.totalPosition
-                }",
-                modifier = Modifier
-                    .padding(12.dp)
-                    .align(Alignment.End),
-            )
-
-            Text(
-                text = "You already have 13 shares of $tickerCode at average price of 123.45",
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .padding(36.dp)
-                    .align(Alignment.CenterHorizontally),
-            )
-
 
         }
     }

@@ -11,4 +11,8 @@
     <color name="surface">#FFFFFFFF</color>
     <color name="surfaceContainerLow">#FFEFF5F4</color>
     <color name="surfaceContainerHigh">#FFE3E9E9</color>
+    <color name="priceRed">#F23645</color>
+    <color name="priceGreen">#0AC64B</color>
+    <color name="primary">#006A6A</color>
+    <color name="tertiary">#725C0C</color>
 </resources>

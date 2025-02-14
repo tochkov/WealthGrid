@@ -79,9 +79,9 @@ val zzzInnerPadding = 16.dp
 val zzzHorizontalPadding = 11.dp
 val zzzVerticalPadding = 8.dp
 
-val zzzBigTextSize = 22.sp
+val zzzBigTextSize = 21.sp
 val zzzLessBigTextSize = 18.sp
-val zzzPercentTextSize = 13.sp
+val zzzPercentTextSize = 14.sp
 
 @Composable
 internal fun PortfolioScreen(
@@ -423,7 +423,7 @@ fun PositionCardItem(
                 Text(
                     modifier = Modifier.alpha(0.7f),
                     text = position.tickerName,
-                    fontSize = 13.sp,
+                    fontSize = 14.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -450,7 +450,7 @@ fun PositionCardItem(
                 PercentChip(
                     percent = position.totalPNLPercentDouble(),
                     hasBackground = true,
-                    fontSize = 14.sp
+                    fontSize = 15.sp
                 )
             }
         }

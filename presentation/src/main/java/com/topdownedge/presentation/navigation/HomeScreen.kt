@@ -2,6 +2,9 @@ package com.topdownedge.presentation.navigation
 
 import android.annotation.SuppressLint
 import androidx.annotation.StringRes
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -35,13 +38,16 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.topdownedge.presentation.R
-import com.topdownedge.presentation.market.CompaniesListScreen
+import com.topdownedge.presentation.market.MarketsScreen
 import com.topdownedge.presentation.news.NewsListScreen
 import com.topdownedge.presentation.portfolio.PortfolioScreen
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 internal fun WealthGridHomeScreen(
-    masterNavController: NavHostController
+    masterNavController: NavHostController,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedContentScope: AnimatedContentScope
 ) {
     val homeScreenNavController = rememberNavController()
 
@@ -61,6 +67,8 @@ internal fun WealthGridHomeScreen(
         HomeScreenNavHost(
             homeScreenNavController = homeScreenNavController,
             masterNavController = masterNavController,
+            sharedTransitionScope = sharedTransitionScope,
+            animatedContentScope = animatedContentScope,
             modifier = Modifier.padding(innerPadding),
         )
 
@@ -185,10 +193,13 @@ private fun HomeBottomNavigationBar(
 
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 private fun HomeScreenNavHost(
     homeScreenNavController: NavHostController,
     masterNavController: NavHostController,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedContentScope: AnimatedContentScope,
     modifier: Modifier,
 ) {
     NavHost(
@@ -197,7 +208,9 @@ private fun HomeScreenNavHost(
         modifier = modifier
     ) {
         composable<ScreenDestination.Markets> {
-            CompaniesListScreen(masterNavController)
+            MarketsScreen(masterNavController,
+                sharedTransitionScope,
+                animatedContentScope)
         }
         composable<ScreenDestination.Portfolio> {
             PortfolioScreen(masterNavController)

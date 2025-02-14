@@ -62,6 +62,7 @@ import com.topdownedge.presentation.common.ConfirmDialog
 import com.topdownedge.presentation.common.SimpleAppBar
 import com.topdownedge.presentation.common.chart.CustomDateFormatter
 import com.topdownedge.presentation.common.chart.SimpleAssetLineChart
+import com.topdownedge.presentation.ui.theme.ColorMaster
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -159,7 +160,7 @@ fun SubmitTradeScreen(
                     if (pctChange != null) {
                         Text(
                             text = (if (pctChange >= 0) "+" else "") + pctChange.fmtPercent(),
-                            color = if (pctChange >= 0) Color.Green else Color.Red,
+                            color = if (pctChange >= 0) ColorMaster.priceGreen else ColorMaster.priceGreen,
                             style = MaterialTheme.typography.bodyLarge,
                             modifier = Modifier
                                 .align(Alignment.End)

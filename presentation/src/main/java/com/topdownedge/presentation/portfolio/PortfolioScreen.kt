@@ -57,9 +57,9 @@ import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import coil3.request.CachePolicy
 import coil3.request.ImageRequest
-import com.topdownedge.domain.fmtPercent
 import com.topdownedge.presentation.R
 import com.topdownedge.presentation.common.ListItemInsideCard
+import com.topdownedge.presentation.common.PercentChip
 import com.topdownedge.presentation.common.applyAlpha
 import com.topdownedge.presentation.common.getLogoUrl
 import com.topdownedge.presentation.navigation.ScreenVisibilityObserver
@@ -328,7 +328,8 @@ fun PortfolioDonut(
 
             )
             PercentChip(
-                percent = gainPct
+                percent = gainPct,
+                hasBackground = true,
             )
 
         }
@@ -447,7 +448,9 @@ fun PositionCardItem(
                 )
 
                 PercentChip(
-                    percent = position.totalPNLPercentDouble()
+                    percent = position.totalPNLPercentDouble(),
+                    hasBackground = true,
+                    fontSize = 14.sp
                 )
             }
         }
@@ -479,43 +482,6 @@ fun PositionCardItem(
         }
     }
 
-}
-
-@Composable
-fun PercentChip(
-    modifier: Modifier = Modifier,
-    percent: Double?
-) {
-    if (percent == null) return
-
-    val priceColor = if (percent < 0)
-        ColorMaster.priceRed
-    else
-        ColorMaster.priceGreen
-
-    Row(
-        modifier = modifier
-            .background(
-                color = priceColor.applyAlpha(0.2f),
-                shape = RoundedCornerShape(4.dp)
-            )
-            .padding(end = 5.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            painter = painterResource(
-                if (percent < 0)
-                    R.drawable.ic_arrow_drop_down
-                else R.drawable.ic_arrow_drop_up
-            ),
-            tint = priceColor,
-            contentDescription = null
-        )
-        Text(
-            text = percent.fmtPercent(),
-            color = priceColor
-        )
-    }
 }
 
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)

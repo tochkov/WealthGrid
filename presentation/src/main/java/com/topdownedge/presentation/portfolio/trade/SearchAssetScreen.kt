@@ -22,6 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.topdownedge.domain.entities.common.TickerWithPrice
 import com.topdownedge.presentation.common.HighlightedText
 import com.topdownedge.presentation.common.SearchBoxAppBar
 
@@ -62,7 +63,11 @@ internal fun SearchAssetScreen(
                             if (isForNewTrade) {
                                 masterNavController.navigateToSubmitTradeScreen(ticker)
                             } else {
-                                masterNavController.navigateToCompanyDetailsScreen(ticker)
+                                masterNavController.navigateToCompanyDetailsScreen(
+                                    TickerWithPrice(
+                                        ticker.code, ticker.name, ticker.exchange, null, null, null
+                                    )
+                                )
                             }
                         },
                     verticalAlignment = Alignment.CenterVertically

@@ -3,6 +3,7 @@ package com.topdownedge.presentation.navigation
 import androidx.navigation.NavHostController
 import com.topdownedge.domain.entities.NewsArticle
 import com.topdownedge.domain.entities.common.Ticker
+import com.topdownedge.domain.entities.common.TickerWithPrice
 import com.topdownedge.presentation.portfolio.PositionItemUiModel
 import kotlinx.serialization.Serializable
 
@@ -24,7 +25,7 @@ sealed interface ScreenDestination {
 
     @Serializable data class SubmitTrade(val tickerCode: String, val tickerExchange: String, val tickerName: String) : ScreenDestination
 
-    @Serializable data class CompanyDetails(val tickerCode: String, val tickerExchange: String, val tickerName: String) : ScreenDestination
+    @Serializable data class CompanyDetails(val tickerCode: String, val tickerExchange: String, val tickerName: String, val percent: Double?, val price: Double?) : ScreenDestination
 
     @Serializable data class UserPosition(val tickerCode: String, val tickerExchange: String) : ScreenDestination
 }
@@ -59,12 +60,14 @@ fun NavHostController.navigateToSubmitTradeScreen(ticker: Ticker) {
     )
 }
 
-fun NavHostController.navigateToCompanyDetailsScreen(ticker: Ticker) {
+fun NavHostController.navigateToCompanyDetailsScreen(ticker: TickerWithPrice) {
     this.navigateSingleTopTo(
         destinationRoute = ScreenDestination.CompanyDetails(
             ticker.code,
             ticker.exchange,
-            ticker.name
+            ticker.name,
+            ticker.changePercentage,
+            ticker.lastPrice
         ),
         saveState = false
     )

@@ -41,6 +41,10 @@ data class MarketItemUiModel(
             percentGain.fmtPercent()
         }
     }
+    fun getPercentGainAsDouble(): Double?{
+        if (currentPrice == null || previousClose == null) return null
+        return (currentPrice - previousClose) / previousClose * 100
+    }
 
 }
 

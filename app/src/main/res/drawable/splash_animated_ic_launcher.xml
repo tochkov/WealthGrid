@@ -34,8 +34,8 @@
         android:animation="@animator/splash_donut_rotate" />
 
     <!-- Fade out animation -->
-    <target
-        android:name="donut_chart"
-        android:animation="@animator/splash_fade_out" />
+<!--    <target-->
+<!--        android:name="donut_chart"-->
+<!--        android:animation="@animator/splash_fade_out" />-->
 
 </animated-vector>

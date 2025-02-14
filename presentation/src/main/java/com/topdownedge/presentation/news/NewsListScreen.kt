@@ -1,7 +1,10 @@
 package com.topdownedge.presentation.news
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,11 +14,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -25,6 +29,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -38,7 +44,9 @@ import coil3.request.CachePolicy
 import coil3.request.ImageRequest
 import com.topdownedge.domain.entities.NewsArticle
 import com.topdownedge.domain.entities.NewsCategory
+import com.topdownedge.presentation.common.applyAlpha
 import com.topdownedge.presentation.navigation.navigateToNewsDetailsScreen
+import com.topdownedge.presentation.ui.theme.ColorMaster
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -64,6 +72,7 @@ internal fun NewsListScreen(
                 ) {
                     val categories = mutableListOf(
                         NewsCategory.General,
+                        NewsCategory.Ticker("SBUX"),
                         NewsCategory.Ticker("AAPL"),
                         NewsCategory.Ticker("NVDA"),
                         NewsCategory.Topic("initial public offering"), // !
@@ -85,8 +94,10 @@ internal fun NewsListScreen(
                             Text(
                                 modifier = Modifier.padding(4.dp),
                                 text = categories[i].title,
+//                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = if (isSelected) FontWeight.ExtraBold else FontWeight.Normal,
                                 style = MaterialTheme.typography.titleMedium,
-                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                         }
                     }
@@ -147,42 +158,78 @@ internal fun NewsListScreen(
 }
 
 //@Preview(showBackground = true)
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun NewsItemCard2(
     newsArticle: NewsArticle,
     modifier: Modifier = Modifier,
     onCardClick: () -> Unit = {}
 ) {
-    Card(
+    ElevatedCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        modifier = modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+        modifier = modifier.padding(horizontal = 11.dp, vertical = 8.dp),
         onClick = onCardClick
     ) {
         Column(
             modifier = modifier.padding(
                 horizontal = 16.dp,
-                vertical = 8.dp
+                vertical = 16.dp
             )
         ) {
             Text(
 //                text = "NewsHeading Ashweaganda, Ashkolsun mashala Starwars The Gateman of the Galaxy",
                 text = newsArticle.title,
-                fontSize = 24.sp,
+                fontSize = 20.sp,
 //                fontWeight = FontWeight.ExtraBold,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.padding(bottom = 8.dp),
                 style = MaterialTheme.typography.titleLarge,
 
-            )
+                )
+
+            val uniqueSymbols = newsArticle.symbols.map { it.split(".")[0] }.distinct()
+
+            FlowRow(
+                maxLines = 1
+            ) {
+                uniqueSymbols.forEach { tag ->
+                    Box(modifier = Modifier.padding(end = 6.dp, bottom = 6.dp)) {
+
+
+                        Text(
+                            modifier = Modifier
+                                .background(
+                                    color = ColorMaster.primary.applyAlpha(0.15f),
+                                    shape = RoundedCornerShape(4.dp)
+                                )
+                                .padding(horizontal = 5.dp, vertical = 4.dp),
+                            text = tag,
+                            fontSize = 11.sp,
+                            lineHeight = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
+                }
+
+
+            }
+
             Text(
+                modifier = Modifier.padding(top = 8.dp),
 //                text = "News subtitle ahsd dikwjmasdansi Novonoasdj SNasnjd. asdsubtitle ahsd dikwjmasdansi Novonoasdj SNasnjd. asdsubtitle ahsd dikwjmasdansi Novonoasdj SNasnjd. asdsubtitle ahsd dikwjmasdansi Novonoasdj SNasnjd. asdsubtitle ahsd dikwjmasdansi Novonoasdj SNasnjd. asdsubtitle ahsd dikwjmasdansi Novonoasdj SNasnjd. asdsubtitle ahsd dikwjmasdansi Novonoasdj SNasnjd. asd",
                 text = newsArticle.content,
+                fontSize = 14.sp,
+//                lineHeight = 1.dp,
                 maxLines = 4,
+                lineHeight = 18.sp,
                 overflow = TextOverflow.Ellipsis
             )
+
             HorizontalDivider(
-                modifier = Modifier.padding(vertical = 8.dp)
+                modifier = Modifier
+                    .padding(vertical = 16.dp)
+                    .alpha(0.4f)
             )
             Row(
                 verticalAlignment = Alignment.CenterVertically
@@ -191,9 +238,10 @@ fun NewsItemCard2(
                 val imgUrl = "https://icons.duckduckgo.com/ip2/${newsArticle.source}.ico"
                 AsyncImage(
                     modifier = Modifier
-                        .padding(end = 4.dp)
-                        .width(20.dp)
-                        .height(20.dp),
+                        .padding(end = 8.dp)
+                        .width(21.dp)
+                        .height(21.dp)
+                        .clip(RoundedCornerShape(4.dp)),
                     contentDescription = null,
                     model = ImageRequest.Builder(LocalContext.current)
                         .data(imgUrl)
@@ -207,9 +255,13 @@ fun NewsItemCard2(
                 Text(
 //                    text = "url.com",
                     text = newsArticle.source,
-                    modifier = Modifier.weight(1f)
+                    color = ColorMaster.tertiary,
+                    modifier = Modifier
+                        .weight(1f)
+                        .alpha(0.7f)
                 )
                 Text(
+                    modifier = Modifier.alpha(0.6f),
 //                    text = "2024-12-21"
                     text = newsArticle.date
                 )

@@ -1,79 +1,204 @@
-WealthGrid - Portfolio tracker app.
+# <div align="center">WealthGrid</div>
 
-All your assets in one place - stocks, crypto and more.
+<div align="center">
 
-you can see live and historical stock prices for the US Stock exchange
-you can see company data and fundamentals
-you can track stock positions by adding trades
-you can visualize your portfolio in different ways
-read news for your portfolio's stocks
+[![Kotlin](https://img.shields.io/badge/Language-Kotlin-purple.svg)](https://kotlinlang.org)
+[![Android](https://img.shields.io/badge/Platform-Android-green.svg)](https://developer.android.com/reference)
+[![Compose](https://img.shields.io/badge/UI-Jetpack%20Compose-blue.svg)](https://developer.android.com/jetpack/compose)
 
-This project is being develop with the sole purpose to update and improve my technical skills, using the latest technologies, best practices and industry standards.
-Using eodhd.com API
-Some of the stack covered:
-- Jetpack Compose (My first attempt ever, so don't judge too harsh)
-- Kotlin Flows - Again my first attempt
-- Material3 (Because if I don't hurry they will release 4)
-- Hilt for dependency injection
-- Compose Navigation (Because, why things should be easy when they can be hard)
-- Websockets for live data with Ktor
-- Ktorfit for Rest api
-- Room for caching and user portfolio data
-- Coil for images and image caching
-- https://github.com/patrykandpatrick/vico - for Cartesian charts
-- https://github.com/ehsannarmani/ComposeCharts - for Pie charts
+This is a personal project focused on exploring modern Android development practices and learning new technologies. While the business logic might be simplistic, the technical implementation aims to follow production-grade standards and best practices.
+
+Designed and developed by [me](https://www.linkedin.com/in/philip-tochkov-a556a2ab/)
+
+![App Banner](./.demo/WG_app_banner_01.webp)
+</div>
 
 
+## 🛠️ Tech Stack
 
-- Trying to be as close as possible to Clean Architecture, with proper MVVM as the presentation layer
-
-- Tests decorated with Thruth and Mockk
-
-It's naive from business logic prespective, but is a fully production app in techincal aspect
-
-// The project uses Explicit Backing Fields,
-// so to build and run the project you should enable the K2 Mode from Settings -> Languages & Frameworks -> Kotlin: Check the "Enable K2 Kotlin Mode"
-
-
-TODODO 
-Refactor compose navigation with all the listeners and stuff
-Add live price data to Markets screen
-
-
-This is a naive app. From business logic perspective this is not a real app, but from technical standpoint it aims to be production ready.
-
-
-Ideas for project improvement:
-Portfolio Chart
-Portfolio Stats
+- **Clean Architecture** with Repositories and **MVVM** presentation layer
+- **Reactive stream processing**: Kotlin Flow
+- **DI**: Hilt
+- **UI Toolkit**:
+    - Jetpack Compose
+    - Compose Navigation
+    - Material3
+    - [Vico](https://github.com/patrykandpatrick/vico) and [ComposeCharts](https://github.com/ehsannarmani/ComposeCharts) for data visualization
+    - Coil for image loading
+    - Custom animations
+- **Local Storage**: Room
+- **Network**: [Ktorfit](https://github.com/Foso/Ktorfit) for REST API, Ktor for WSS
+- **Testing**:
+    - Unit Tests with JUnit, Thruth & MockK
+    - UI Tests with Espresso **//TODO**
+- **CI/CD**: GitHub Actions **//TODO**
 
 
-Ideas if this app will be a real world product:
+> ⚠️ The project is using experimental features so you need to [Enable K2 Kotlin Mode](https://blog.jetbrains.com/idea/2024/03/k2-kotlin-mode-alpha-in-intellij-idea/)
 
-BE service should be implemented for sync - Firebase or custom
-
-Trade Imports should be implemented 
-//If the costs of AI services continue to fall//
-a simple screenshot to json conversion could work:
-Gemini prompt - "This is a list of trades. Extract them from the image with
-#id
-asset and exchange
-currency
-amount of shares
-fill price
-time 
-
-return as an answer only json with the following format: {"",""}
-
-Before any of the above - better rewrite for KMP
+> 🗝️ To use the app you need an API key from [EODHD](https://eodhd.com/)
 
 
+<!-- ## 🏗️ Architecture
+
+The application follows Clean Architecture principles with MVVM pattern:
+
+```
+app/
+├── data/          # Data layer with repositories and data sources
+├── domain/        # Business logic and use cases
+├── presentation/  # UI layer with ViewModels and Composables
+└── di/            # Dependency injection modules
+``` -->
+
+
+## 📱 Screenshots
+
+<table border="0">
+  <tr>
+    <td><img src="./.demo/markets.png" width="200"/></td>
+    <td><img src="./.demo/portfolio.png" width="200"/></td>
+    <td><img src="./.demo/portfolio_2.png" width="200"/></td>
+    <td><img src="./.demo/search.png" width="200"/></td>
+    <td><img src="./.demo/trade.png" width="200"/></td>
+    <td><img src="./.demo/news.png" width="200"/></td>
+  </tr>
+</table>
+
+Supports light theme, but was not in focus during development...
+
+<table border="0">
+  <tr>
+    <td><img src="./.demo/w_markets.png" width="200"/></td>
+    <td><img src="./.demo/w_portfolio.png" width="200"/></td>
+    <td><img src="./.demo/w_portfolio_2.png" width="200"/></td>
+    <td><img src="./.demo/w_search.png" width="200"/></td>
+    <td><img src="./.demo/w_trade.png" width="200"/></td>
+    <td><img src="./.demo/w_news.png" width="200"/></td>
+  </tr>
+</table>
+
+## 🌟 Features
+
+<table border="0">
+  <tr>
+    <td width="70%" valign="top">
+      <h3>📊 Markets Dashboard</h3>
+      <p>Experience a comprehensive market overview with real-time data and interactive charts.</p>
+      <ul>
+        <li>Custom animated splash screen</li>
+        <li>Major market indices charts</li>
+        <li>Top companies listing</li>
+        -
+        <li>Real-time market data updates with Ktor WSS and Kotlin Flow</li>
+        <li>Historical chart data is cached because it's immutable by nature</li>
+        <li>Latest prices cahced for better UX</li>
+        <li>Shared element transition animations</li>
+      </ul>
+    </td>
+    <td width="30%">
+      <img src="./.demo/markets_anim.gif" width="100%" />
+    </td>
+  </tr>
+</table>
+
+<table border="0">
+  <tr>
+      <td width="30%">
+      <img src="./.demo/portfolio_anim.gif" width="100%" />
+    </td>
+    <td width="70%" valign="top">
+      <h3>💼 Portfolio Management</h3>
+      <p>Keep track of your investments with an intuitive and visually appealing interface.</p>
+      <ul>
+        <li>Interactive pie chart for portfolio distribution</li>
+        <li>Detailed position tracking</li>
+        <li>Real time prices and updates</li>
+        <li>Performance analytics</li>
+        <li>Gain/Loss visualization</li>
+        <li>Sorting</li>
+      </ul>
+    </td>
+
+  </tr>
+</table>
+
+<table border="0">
+  <tr>
+    <td width="70%" valign="top">
+      <h3>📝 Submit Trade</h3>
+      <p>Effortlessly manage your trades with our streamlined process.</p>
+      <ul>
+        <li>Intuitive search</li>
+        <li>Interactive chart</li>
+        <li>Date picker</li>
+        <li>Safe cancel Dialog</li>
+        <li>Transaction history</li>
+      </ul>
+    </td>
+    <td width="30%">
+      <img src="./.demo/trade_anim.gif" width="100%" />
+    </td>
+  </tr>
+</table>
+
+<table border="0">
+  <tr>
+      <td width="30%">
+      <img src="./.demo/news_anim.gif" width="100%" />
+    </td>
+    <td width="70%" valign="top">
+      <h3>📰 Market News</h3>
+      <p>Stay informed with the latest market news and updates.</p>
+      <ul>
+        <li>Customizable news feed</li>
+        <li>Multiple news sources</li>
+        <li>Category filtering</li>
+        <li>Infinite scroll pagination</li>
+        <li>Pull-to-refresh functionality</li>
+      </ul>
+    </td>
+
+  </tr>
+</table>
 
 
 
+## 📝 Current TODOs and Improvements
+
+- Refactoring - this project was quickly bootstrapped while I was learning most of the technologies
+- Add more unit tests and advanced testing
+- Company Details Screen - started
+- More Portfolio charts and stats in Portfolio Screen
+- Position Details - with more position data and list of trades
+- Add Crypto and custom assets
+- Implement proper CI/CD pipeline
+
+## 🚀 Product Requirements
+
+To make this a real world business product, it would need:
+
+- Better API providers and/or custom service solution
+- Way more complex trade logic with fees, selling, levarage, etc
+- Watchlists and multiple portfolios
+- Advanced analytics and reporting
+- Import trades from provider - Theoretically it is possible to utilize the latest AI technologies and import trades from screenshots (Image to structured json)
+- Export portfolio or cloud solution (Firebase, custom)
 
 
+## 🤝 Contributing
 
+This project is primarily for demonstration purposes, but suggestions and feedback are welcome! Feel free to:
+- Open issues
+- Submit pull requests
+- Share improvement ideas
 
+## 📄 License
 
+```
+MIT License
 
+Copyright (c) [Year] [Your Name]
+
+Permission is hereby granted, free of charge...
+```

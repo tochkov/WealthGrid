@@ -17,7 +17,7 @@ Designed and developed by [me](https://www.linkedin.com/in/philip-tochkov-a556a2
 ## 🛠️ Tech Stack
 
 - **Clean Architecture** with Repositories and **MVVM** presentation layer
-- **Reactive stream processing**: Kotlin Flow
+- **Reactive streams**: Kotlin Flow
 - **DI**: Hilt
 - **UI Toolkit**:
     - Jetpack Compose
@@ -36,7 +36,7 @@ Designed and developed by [me](https://www.linkedin.com/in/philip-tochkov-a556a2
 
 > ⚠️ The project is using experimental features so you need to [Enable K2 Kotlin Mode](https://blog.jetbrains.com/idea/2024/03/k2-kotlin-mode-alpha-in-intellij-idea/)
 
-> 🗝️ To use the app you need an API key from [EODHD](https://eodhd.com/)
+> 🔑 To use the app you need an API key from [EODHD](https://eodhd.com/)
 
 
 <!-- ## 🏗️ Architecture
@@ -166,20 +166,21 @@ Supports light theme, but was not in focus during development...
 
 ## 📝 Current TODOs and Improvements
 
+- Markets screen smoother loading
 - Refactoring - this project was quickly bootstrapped while I was learning most of the technologies
 - Add more unit tests and advanced testing
 - Company Details Screen - started
 - More Portfolio charts and stats in Portfolio Screen
 - Position Details - with more position data and list of trades
-- Add Crypto and custom assets
 - Implement proper CI/CD pipeline
+- Add Crypto and custom assets
 
 ## 🚀 Product Requirements
 
 To make this a real world business product, it would need:
 
-- Better API providers and/or custom service solution
-- Way more complex trade logic with fees, selling, levarage, etc
+- Better API providers and/or custom BE solution
+- Way more complex trade logic with fees, selling, leverage, etc
 - Watchlists and multiple portfolios
 - Advanced analytics and reporting
 - Import trades from provider - Theoretically it is possible to utilize the latest AI technologies and import trades from screenshots (Image to structured json)

@@ -16,7 +16,7 @@ Designed and developed by [me](https://www.linkedin.com/in/philip-tochkov-a556a2
 
 ## 🛠️ Tech Stack
 
-- **Clean Architecture** with Repositories and **MVVM** presentation layer
+- **Clean Architecture** with **MVVM** presentation layer
 - **Reactive streams**: Kotlin Flow
 - **DI**: Hilt
 - **UI Toolkit**:
@@ -33,10 +33,17 @@ Designed and developed by [me](https://www.linkedin.com/in/philip-tochkov-a556a2
     - UI Tests with Espresso **//TODO**
 - **CI/CD**: GitHub Actions **//TODO**
 
+## 📥 Installation
 
-> ⚠️ The project is using experimental features so you need to [Enable K2 Kotlin Mode](https://blog.jetbrains.com/idea/2024/03/k2-kotlin-mode-alpha-in-intellij-idea/)
+Clone the repository 
+```bash
+git clone https://github.com/tochkov/WealthGrid.git
+```
+Or download [apk](./.demo/WealthGrid-debug.apk)
 
 > 🔑 To use the app you need an API key from [EODHD](https://eodhd.com/)
+> 
+> ⚠️ The project is using experimental features so you need to [Enable K2 Kotlin Mode](https://blog.jetbrains.com/idea/2024/03/k2-kotlin-mode-alpha-in-intellij-idea/)
 
 
 <!-- ## 🏗️ Architecture
@@ -50,33 +57,6 @@ app/
 ├── presentation/  # UI layer with ViewModels and Composables
 └── di/            # Dependency injection modules
 ``` -->
-
-
-## 📱 Screenshots
-
-<table border="0">
-  <tr>
-    <td><img src="./.demo/markets.png" width="200"/></td>
-    <td><img src="./.demo/portfolio.png" width="200"/></td>
-    <td><img src="./.demo/portfolio_2.png" width="200"/></td>
-    <td><img src="./.demo/search.png" width="200"/></td>
-    <td><img src="./.demo/trade.png" width="200"/></td>
-    <td><img src="./.demo/news.png" width="200"/></td>
-  </tr>
-</table>
-
-Supports light theme, but was not in focus during development...
-
-<table border="0">
-  <tr>
-    <td><img src="./.demo/w_markets.png" width="200"/></td>
-    <td><img src="./.demo/w_portfolio.png" width="200"/></td>
-    <td><img src="./.demo/w_portfolio_2.png" width="200"/></td>
-    <td><img src="./.demo/w_search.png" width="200"/></td>
-    <td><img src="./.demo/w_trade.png" width="200"/></td>
-    <td><img src="./.demo/w_news.png" width="200"/></td>
-  </tr>
-</table>
 
 ## 🌟 Features
 
@@ -194,12 +174,29 @@ This project is primarily for demonstration purposes, but suggestions and feedba
 - Submit pull requests
 - Share improvement ideas
 
-## 📄 License
 
-```
-MIT License
+## 📱 Screenshots
 
-Copyright (c) [Year] [Your Name]
+<table border="0">
+  <tr>
+    <td><img src="./.demo/markets.png" width="200"/></td>
+    <td><img src="./.demo/portfolio.png" width="200"/></td>
+    <td><img src="./.demo/portfolio_2.png" width="200"/></td>
+    <td><img src="./.demo/search.png" width="200"/></td>
+    <td><img src="./.demo/trade.png" width="200"/></td>
+    <td><img src="./.demo/news.png" width="200"/></td>
+  </tr>
+</table>
 
-Permission is hereby granted, free of charge...
-```
+Supports light theme, but was not in focus during development...
+
+<table border="0">
+  <tr>
+    <td><img src="./.demo/w_markets.png" width="200"/></td>
+    <td><img src="./.demo/w_portfolio.png" width="200"/></td>
+    <td><img src="./.demo/w_portfolio_2.png" width="200"/></td>
+    <td><img src="./.demo/w_search.png" width="200"/></td>
+    <td><img src="./.demo/w_trade.png" width="200"/></td>
+    <td><img src="./.demo/w_news.png" width="200"/></td>
+  </tr>
+</table>

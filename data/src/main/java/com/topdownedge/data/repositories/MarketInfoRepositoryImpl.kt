@@ -22,9 +22,8 @@ class MarketInfoRepositoryImpl
 @Inject constructor(
     private val fundamentalsApi: EodhdFundamentalsApi,
     private val tickerDao: TickerDao,
-) : MarketInfoRepository {
-
     private val ioDispatcher: CoroutineContext = Dispatchers.IO
+) : MarketInfoRepository {
 
     override fun getInitialSearchTickerList(fromCacheOnly: Boolean): Flow<Result<List<Ticker>?>> =
         flow {

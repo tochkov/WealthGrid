@@ -10,6 +10,7 @@ import io.ktor.websocket.DefaultWebSocketSession
 import io.ktor.websocket.Frame
 import io.ktor.websocket.close
 import io.ktor.websocket.readText
+import jakarta.inject.Named
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -26,22 +27,30 @@ import java.util.Queue
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 
 
 class LivePricesRepositoryImpl @Inject constructor(
-    val wssClient: HttpClient
+    @Named("ktor_websocket_eodhd")val wssClient: HttpClient,
+    private val ioDispatcher: CoroutineContext = Dispatchers.IO
 ) : LivePricesRepository {
 
     private var session: DefaultWebSocketSession? = null
     private var isAuthorized = AtomicBoolean(false)
-    private val messageQueue: Queue<String> = ConcurrentLinkedQueue()
+    private val subscriptionMessages: Queue<String> = ConcurrentLinkedQueue()
+    private val latestPricesMap = mutableMapOf<String, Double>()
 
+    /**
+     * Observes live price updates over WebSocket connection and maintains a map of latest prices.
+     * Authenticates connection, and processes incoming price updates.
+     * Updates are sampled every 200ms to reduce load.
+     *
+     * @return [Flow] emitting a map of symbol to price updates
+     */
     override fun observeLivePricesConnection(): Flow<Map<String, Double>> = callbackFlow {
 
         wssClient.wss(path = "us") {
             session = this
-
-            val latestPricesMap = mutableMapOf<String, Double>()
 
             try {
                 val authResponse = waitForAuth()
@@ -49,11 +58,12 @@ class LivePricesRepositoryImpl @Inject constructor(
                     throw Exception("Authorization failed: ${authResponse?.message}")
                 } else {
                     isAuthorized.set(true)
-                    while (messageQueue.isNotEmpty()) {
-                        send(Frame.Text(messageQueue.poll()))
+                    while (subscriptionMessages.isNotEmpty()) {
+                        send(Frame.Text(subscriptionMessages.poll()))
                     }
                 }
 
+                // process incoming price updates
                 incoming
                     .receiveAsFlow()
                     .filterIsInstance<Frame.Text>()
@@ -61,9 +71,10 @@ class LivePricesRepositoryImpl @Inject constructor(
                         LivePriceDto.parse(frame.readText())
                     }
                     .collect { livePriceDto ->
+                        // emit the whole map instead of single ticker update, because we are sampling
                         latestPricesMap[livePriceDto.symbol] = livePriceDto.price
                         trySend(latestPricesMap.toMap())
-//                        Log.d("XXX", "${livePriceDto.symbol} - ${livePriceDto.price}")
+                        Log.d("XXX", "${livePriceDto.symbol} - ${livePriceDto.price}")
                     }
 
             } catch (e: Exception) {
@@ -76,8 +87,9 @@ class LivePricesRepositoryImpl @Inject constructor(
 
         awaitClose { clearSession() }
     }
+        // emit every 200 milliseconds, so the UI is not overwhelmed
         .sample(200)
-        .flowOn(Dispatchers.IO)
+        .flowOn(ioDispatcher)
 
     override fun closeLivePricesConnection() {
         clearSession()
@@ -96,17 +108,17 @@ class LivePricesRepositoryImpl @Inject constructor(
 
         val message = """{"action": "$action", "symbols": "${tickers.joinToString(",")}"}"""
         if (isAuthorized.get()) {
-            CoroutineScope(Dispatchers.IO).launch {
+            CoroutineScope(ioDispatcher).launch {
                 session?.send(Frame.Text(message))
             }
         } else {
-            messageQueue.add(message)
+            subscriptionMessages.add(message)
         }
     }
 
     private fun clearSession() {
         isAuthorized.set(false)
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(ioDispatcher).launch {
             try {
                 session?.close()
             } catch (e: Exception){

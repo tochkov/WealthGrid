@@ -4,12 +4,11 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Upsert
 import com.topdownedge.data.local.TickerEntity
 import com.topdownedge.domain.entities.common.TickerWithPrice
 import kotlinx.coroutines.flow.Flow
 
-const val RESULTS_LIMIT = 45
+const val RESULTS_LIMIT = 15
 
 @Dao
 interface TickerDao {

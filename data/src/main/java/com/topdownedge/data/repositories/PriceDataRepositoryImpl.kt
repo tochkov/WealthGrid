@@ -39,9 +39,8 @@ class PriceDataRepositoryImpl
     private val priceBarDao: PriceBarDao,
     private val lastKnownPriceDao: LastKnownPriceDao,
     private val userPositionDao: UserPositionDao,
-) : PriceDataRepository {
-
     private val ioDispatcher: CoroutineContext = Dispatchers.IO
+) : PriceDataRepository {
 
     override fun getHistoricalDailyPrices(
         symbol: String,

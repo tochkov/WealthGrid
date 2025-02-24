@@ -89,7 +89,7 @@ object NetworkModule {
 
     @Provides
     @Singleton
-//    @Named("ktor_websocket_eodhd")
+    @Named("ktor_websocket_eodhd")
     fun provideKtorWebsocketClient(tokenManager: TokenRepository) = HttpClient {
         install(WebSockets)
 

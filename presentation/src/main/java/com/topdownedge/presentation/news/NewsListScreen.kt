@@ -72,9 +72,13 @@ internal fun NewsListScreen(
                 ) {
                     val categories = mutableListOf(
                         NewsCategory.General,
-                        NewsCategory.Ticker("SBUX"),
+                        NewsCategory.Ticker("SPY"),
                         NewsCategory.Ticker("AAPL"),
                         NewsCategory.Ticker("NVDA"),
+                        NewsCategory.Ticker("HOOD"),
+                        NewsCategory.Ticker("RGTI"),
+                        NewsCategory.Ticker("SBUX"),
+                        NewsCategory.Ticker("MSFT"),
                         NewsCategory.Topic("initial public offering"), // !
                         NewsCategory.Topic("earnings release"), // !
                         NewsCategory.Topic("financial results"), // !
@@ -188,7 +192,10 @@ fun NewsItemCard2(
 
                 )
 
-            val uniqueSymbols = newsArticle.symbols.map { it.split(".")[0] }.distinct()
+            val uniqueSymbols = newsArticle.symbols
+                .map { it.split(".")[0] }
+                .filter { !it.first().isDigit() }
+                .distinct()
 
             FlowRow(
                 maxLines = 1

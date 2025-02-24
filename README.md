@@ -8,7 +8,7 @@
 
 This is a personal project focused on exploring modern Android development practices and learning new technologies. While the business logic might be simplistic, the technical implementation aims to follow production-grade standards and best practices.
 
-Designed and developed by [me](https://www.linkedin.com/in/philip-tochkov-a556a2ab/)
+Designed and developed by [me](https://www.linkedin.com/in/philip-tochkov/)
 
 ![App Banner](./.demo/WG_app_banner_01.webp)
 </div>
